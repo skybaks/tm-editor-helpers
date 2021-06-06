@@ -1,0 +1,11 @@
+[meta]
+name = "Editor Helpers"
+author = "skybaxrider"
+category = "Editor"
+blocks = [ "Plugin_EditorHelpers" ]
+siteid = 69
+version = "3.0"
+perms = "paid"
+
+[script]
+imports = [ "Icons.as", "Time.as", "Permissions.as" ]
