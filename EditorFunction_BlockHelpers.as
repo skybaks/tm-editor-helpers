@@ -1,6 +1,18 @@
 
 namespace EditorHelpers
 {
+    namespace Compatibility
+    {
+        void SetHideBlockHelpers(CGameCtnEditorFree@ editor, bool setValue)
+        {
+#if TMNEXT
+            editor.HideBlockHelpers = setValue;
+#elif MP4
+            editor.PluginMapType.HideBlockHelpers = setValue;
+#endif
+        }
+    }
+
     [Setting category="BlockHelpers" name="Enabled"]
     bool settingBlockHelpers = true;
     [Setting category="BlockHelpers" name="Block Helpers Off"]
@@ -38,19 +50,11 @@ namespace EditorHelpers
             if (!Enabled() || Editor is null) return;
             if (settingBlockHelpersBlockHelpersOff)
             {
-#if TMNEXT
-                Editor.HideBlockHelpers = true;
-#else
-                Editor.PluginMapType.HideBlockHelpers = true;
-#endif
+                Compatibility::SetHideBlockHelpers(Editor, true);
             }
             else if (lastBlockHelpersOff && !settingBlockHelpersBlockHelpersOff)
             {
-#if TMNEXT
-                Editor.HideBlockHelpers = false;
-#else
-                Editor.PluginMapType.HideBlockHelpers = false;
-#endif
+                Compatibility::SetHideBlockHelpers(Editor, false);
             }
             lastBlockHelpersOff = settingBlockHelpersBlockHelpersOff;
         }

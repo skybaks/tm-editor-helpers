@@ -7,12 +7,11 @@
 // - set medal times
 // - change map bases dynamically
 
+
 [Setting category="General" name="Window Visible In Editor"]
 bool settingWindowVisible = true;
 [Setting category="General" name="Tooltips Enabled"]
 bool settingToolTipsEnabled = true;
-
-
 
 array<EditorHelpers::EditorFunction@> functions = 
 {
@@ -24,6 +23,24 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::CustomItemPlacement()
     , EditorHelpers::FreeblockModePreciseRotation()
 };
+
+namespace Compatibility
+{
+    bool EditorIsNull()
+    {
+        return cast<CGameCtnEditorFree>(GetApp().Editor) is null;
+    }
+
+    bool IsMapTesting()
+    {
+#if TMNEXT
+        return GetApp().CurrentPlayground !is null;
+#else
+        CGameCtnEditorFree@ editor = cast<CGameCtnEditorFree>(GetApp().Editor);
+        return editor !is null && editor.PluginMapType.IsSwitchedToPlayground;
+#endif
+    }
+}
 
 void RenderMenu()
 {
@@ -37,12 +54,7 @@ void RenderMenu()
 void RenderInterface()
 {
     if (!EditorHelpers::HasPermission()) return;
-    if (cast<CGameCtnEditorFree>(GetApp().Editor) is null
-#if TMNEXT
-        || GetApp().CurrentPlayground !is null
-#endif
-        || !settingWindowVisible)
-        return;
+    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
     UI::SetNextWindowSize(300, 600, UI::Cond::FirstUseEver);
     UI::Begin(Icons::PuzzlePiece + " Editor Helpers", settingWindowVisible);
     for (uint index = 0; index < functions.Length; index++)
