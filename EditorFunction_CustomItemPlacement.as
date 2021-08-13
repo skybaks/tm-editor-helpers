@@ -1,5 +1,107 @@
 namespace EditorHelpers
 {
+    namespace Compatibility
+    {
+        uint GetPivotPositionsLength(CGameItemPlacementParam@ placementParams)
+        {
+#if TMNEXT
+            return placementParams.PivotPositions.Length;
+#else
+            return placementParams.Pivots_Positions.Length;
+#endif
+        }
+
+        float GetPivotPositionsX(CGameItemPlacementParam@ placementParams, uint index)
+        {
+#if TMNEXT
+            return placementParams.PivotPositions[index].x;
+#else
+            return placementParams.Pivots_Positions[index].x;
+#endif
+        }
+
+        float GetPivotPositionsY(CGameItemPlacementParam@ placementParams, uint index)
+        {
+#if TMNEXT
+            return placementParams.PivotPositions[index].y;
+#else
+            return placementParams.Pivots_Positions[index].y;
+#endif
+        }
+
+        float GetPivotPositionsZ(CGameItemPlacementParam@ placementParams, uint index)
+        {
+#if TMNEXT
+            return placementParams.PivotPositions[index].z;
+#else
+            return placementParams.Pivots_Positions[index].z;
+#endif
+        }
+
+        float GetFlyStep(CGameItemPlacementParam@ placementParams)
+        {
+#if TMNEXT
+            return placementParams.FlyStep;
+#else
+            return placementParams.FlyVStep;
+#endif
+        }
+
+        float GetFlyOffset(CGameItemPlacementParam@ placementParams)
+        {
+#if TMNEXT
+            return placementParams.FlyOffset;
+#else
+            return placementParams.FlyVOffset;
+#endif
+        }
+
+        void SetPivotPositionsX(CGameItemPlacementParam@ placementParams, uint index, float setValue)
+        {
+#if TMNEXT
+            placementParams.PivotPositions[index].x = setValue;
+#else
+            placementParams.Pivots_Positions[index].x = setValue;
+#endif
+        }
+
+        void SetPivotPositionsY(CGameItemPlacementParam@ placementParams, uint index, float setValue)
+        {
+#if TMNEXT
+            placementParams.PivotPositions[index].y = setValue;
+#else
+            placementParams.Pivots_Positions[index].y = setValue;
+#endif
+        }
+
+        void SetPivotPositionsZ(CGameItemPlacementParam@ placementParams, uint index, float setValue)
+        {
+#if TMNEXT
+            placementParams.PivotPositions[index].z = setValue;
+#else
+            placementParams.Pivots_Positions[index].z = setValue;
+#endif
+        }
+
+        float SetFlyStep(CGameItemPlacementParam@ placementParams, float setValue)
+        {
+#if TMNEXT
+            return placementParams.FlyStep;
+#else
+            return placementParams.FlyVStep;
+#endif
+        }
+
+        float SetFlyOffset(CGameItemPlacementParam@ placementParams, float setValue)
+        {
+#if TMNEXT
+            return placementParams.FlyOffset;
+#else
+            return placementParams.FlyVOffset;
+#endif
+        }
+    }
+
     class CustomItemPlacementSettings
     {
         bool Initialized = false;
@@ -88,11 +190,7 @@ namespace EditorHelpers
                     {
                         auto prevItemPlacementDef = GetDefaultPlacement(currentItemModel.IdName);
                         if (!prevItemPlacementDef.HasPivotPosition
-#if TMNEXT
-                            && currentItemModel.DefaultPlacementParam_Head.PivotPositions.Length > 0)
-#else
-                            && currentItemModel.DefaultPlacementParam_Head.Pivots_Positions.Length > 0)
-#endif
+                            && Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head) > 0)
                         {
                             currentItemModel.DefaultPlacementParam_Head.RemoveLastPivotPosition();
                         }
@@ -103,45 +201,26 @@ namespace EditorHelpers
                     if (!currentItemPlacementDef.Initialized)
                     {
                         currentItemPlacementDef.Initialized = true;
-#if TMNEXT
-                        uint pivotsLength = Editor.CurrentItemModel.DefaultPlacementParam_Head.PivotPositions.Length;
-#else
-                        uint pivotsLength = Editor.CurrentItemModel.DefaultPlacementParam_Head.Pivots_Positions.Length;
-#endif
+                        uint pivotsLength = Compatibility::GetPivotPositionsLength(Editor.CurrentItemModel.DefaultPlacementParam_Head);
                         currentItemPlacementDef.HasPivotPosition = pivotsLength > 0;
                         if (pivotsLength > 0)
                         {
-#if TMNEXT
-                            currentItemPlacementDef.PivotX = Editor.CurrentItemModel.DefaultPlacementParam_Head.PivotPositions[pivotsLength - 1].x;
-                            currentItemPlacementDef.PivotY = Editor.CurrentItemModel.DefaultPlacementParam_Head.PivotPositions[pivotsLength - 1].y;
-                            currentItemPlacementDef.PivotZ = Editor.CurrentItemModel.DefaultPlacementParam_Head.PivotPositions[pivotsLength - 1].z;
-#else
-                            currentItemPlacementDef.PivotX = Editor.CurrentItemModel.DefaultPlacementParam_Head.Pivots_Positions[pivotsLength - 1].x;
-                            currentItemPlacementDef.PivotY = Editor.CurrentItemModel.DefaultPlacementParam_Head.Pivots_Positions[pivotsLength - 1].y;
-                            currentItemPlacementDef.PivotZ = Editor.CurrentItemModel.DefaultPlacementParam_Head.Pivots_Positions[pivotsLength - 1].z;
-#endif
+                            currentItemPlacementDef.PivotX = Compatibility::GetPivotPositionsX(Editor.CurrentItemModel.DefaultPlacementParam_Head, pivotsLength - 1);
+                            currentItemPlacementDef.PivotY = Compatibility::GetPivotPositionsY(Editor.CurrentItemModel.DefaultPlacementParam_Head, pivotsLength - 1);
+                            currentItemPlacementDef.PivotZ = Compatibility::GetPivotPositionsZ(Editor.CurrentItemModel.DefaultPlacementParam_Head, pivotsLength - 1);
                         }
 
                         currentItemPlacementDef.GhostMode = Editor.CurrentItemModel.DefaultPlacementParam_Head.GhostMode;
                         currentItemPlacementDef.AutoRotation = Editor.CurrentItemModel.DefaultPlacementParam_Head.AutoRotation;
-#if TMNEXT
-                        currentItemPlacementDef.FlyStep = Editor.CurrentItemModel.DefaultPlacementParam_Head.FlyStep;
-                        currentItemPlacementDef.FlyOffset = Editor.CurrentItemModel.DefaultPlacementParam_Head.FlyOffset;
-#else
-                        currentItemPlacementDef.FlyStep = Editor.CurrentItemModel.DefaultPlacementParam_Head.FlyVStep;
-                        currentItemPlacementDef.FlyOffset = Editor.CurrentItemModel.DefaultPlacementParam_Head.FlyVOffset;
-#endif
+                        currentItemPlacementDef.FlyStep = Compatibility::GetFlyStep(Editor.CurrentItemModel.DefaultPlacementParam_Head);
+                        currentItemPlacementDef.FlyOffset = Compatibility::GetFlyOffset(Editor.CurrentItemModel.DefaultPlacementParam_Head);
                         currentItemPlacementDef.HStep = Editor.CurrentItemModel.DefaultPlacementParam_Head.GridSnap_HStep;
                         currentItemPlacementDef.VStep = Editor.CurrentItemModel.DefaultPlacementParam_Head.GridSnap_VStep;
                         currentItemPlacementDef.HOffset = Editor.CurrentItemModel.DefaultPlacementParam_Head.GridSnap_HOffset;
                         currentItemPlacementDef.VOffset = Editor.CurrentItemModel.DefaultPlacementParam_Head.GridSnap_VOffset;
                     }
 
-#if TMNEXT
-                    if (Editor.CurrentItemModel.DefaultPlacementParam_Head.PivotPositions.Length == 0)
-#else
-                    if (Editor.CurrentItemModel.DefaultPlacementParam_Head.Pivots_Positions.Length == 0)
-#endif
+                    if (Compatibility::GetPivotPositionsLength(Editor.CurrentItemModel.DefaultPlacementParam_Head) == 0)
                     {
                         Editor.CurrentItemModel.DefaultPlacementParam_Head.AddPivotPosition();
                     }
@@ -165,26 +244,15 @@ namespace EditorHelpers
 
                 if (settingCustomItemPlacementApplyGrid)
                 {
-#if TMNEXT
-                    currentItemModel.DefaultPlacementParam_Head.FlyStep = settingCustomItemPlacementVerticalGridSize;
-                    currentItemModel.DefaultPlacementParam_Head.FlyOffset = 0.0f;
-#else
-                    currentItemModel.DefaultPlacementParam_Head.FlyVStep = settingCustomItemPlacementVerticalGridSize;
-                    currentItemModel.DefaultPlacementParam_Head.FlyVOffset = 0.0f;
-#endif
+                    Compatibility::SetFlyStep(currentItemModel.DefaultPlacementParam_Head, settingCustomItemPlacementVerticalGridSize);
+                    Compatibility::SetFlyOffset(currentItemModel.DefaultPlacementParam_Head, 0.0f);
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_HStep = settingCustomItemPlacementHorizontalGridSize;
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_VStep = settingCustomItemPlacementVerticalGridSize;
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_VOffset = 0.0f;
 
-#if TMNEXT
-                    uint lastPivotIndex = currentItemModel.DefaultPlacementParam_Head.PivotPositions.Length-1;
-                    float pivotX = currentItemModel.DefaultPlacementParam_Head.PivotPositions[lastPivotIndex].x;
-                    float pivotZ = currentItemModel.DefaultPlacementParam_Head.PivotPositions[lastPivotIndex].z;
-#else
-                    uint lastPivotIndex = currentItemModel.DefaultPlacementParam_Head.Pivots_Positions.Length-1;
-                    float pivotX = currentItemModel.DefaultPlacementParam_Head.Pivots_Positions[lastPivotIndex].x;
-                    float pivotZ = currentItemModel.DefaultPlacementParam_Head.Pivots_Positions[lastPivotIndex].z;
-#endif
+                    uint lastPivotIndex = Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head)-1;
+                    float pivotX = Compatibility::GetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex);
+                    float pivotZ = Compatibility::GetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex);
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_HOffset = settingCustomItemPlacementHorizontalGridSize - pivotX;
                 }
                 else if (!settingCustomItemPlacementApplyGrid && lastApplyGrid)
@@ -213,30 +281,18 @@ namespace EditorHelpers
                 {
                     currentItemModel.DefaultPlacementParam_Head.GhostMode = itemPlacementDef.GhostMode;
                     currentItemModel.DefaultPlacementParam_Head.AutoRotation = itemPlacementDef.AutoRotation;
-#if TMNEXT
-                    currentItemModel.DefaultPlacementParam_Head.FlyStep = itemPlacementDef.FlyStep;
-                    currentItemModel.DefaultPlacementParam_Head.FlyOffset = itemPlacementDef.FlyOffset;
-#else
-                    currentItemModel.DefaultPlacementParam_Head.FlyVStep = itemPlacementDef.FlyStep;
-                    currentItemModel.DefaultPlacementParam_Head.FlyVOffset = itemPlacementDef.FlyOffset;
-#endif
+                    Compatibility::SetFlyStep(currentItemModel.DefaultPlacementParam_Head, itemPlacementDef.FlyStep);
+                    Compatibility::SetFlyOffset(currentItemModel.DefaultPlacementParam_Head, itemPlacementDef.FlyOffset);
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_HStep = itemPlacementDef.HStep;
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_VStep = itemPlacementDef.VStep;
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_HOffset = itemPlacementDef.HOffset;
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_VOffset = itemPlacementDef.VOffset;
                     if (itemPlacementDef.HasPivotPosition)
                     {
-#if TMNEXT
-                        uint pivotsLength = currentItemModel.DefaultPlacementParam_Head.PivotPositions.Length;
-                        currentItemModel.DefaultPlacementParam_Head.PivotPositions[pivotsLength - 1].x = itemPlacementDef.PivotX;
-                        currentItemModel.DefaultPlacementParam_Head.PivotPositions[pivotsLength - 1].y = itemPlacementDef.PivotY;
-                        currentItemModel.DefaultPlacementParam_Head.PivotPositions[pivotsLength - 1].z = itemPlacementDef.PivotZ;
-#else
-                        uint pivotsLength = currentItemModel.DefaultPlacementParam_Head.Pivots_Positions.Length;
-                        currentItemModel.DefaultPlacementParam_Head.Pivots_Positions[pivotsLength - 1].x = itemPlacementDef.PivotX;
-                        currentItemModel.DefaultPlacementParam_Head.Pivots_Positions[pivotsLength - 1].y = itemPlacementDef.PivotY;
-                        currentItemModel.DefaultPlacementParam_Head.Pivots_Positions[pivotsLength - 1].z = itemPlacementDef.PivotZ;
-#endif
+                        uint pivotsLength = Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head);
+                        Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, pivotsLength - 1, itemPlacementDef.PivotX);
+                        Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, pivotsLength - 1, itemPlacementDef.PivotY);
+                        Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, pivotsLength - 1, itemPlacementDef.PivotZ);
                     }
                 }
             }
