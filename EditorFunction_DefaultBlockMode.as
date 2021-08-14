@@ -1,5 +1,100 @@
 namespace EditorHelpers
 {
+    namespace Compatibility
+    {
+        void SetModeBlockNormal(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            editor.ButtonNormalBlockModeOnClick();
+#else
+            if (editor.PluginMapType.PlaceMode != CGameEditorPluginMap::EPlaceMode::Block)
+            {
+                editor.PluginMapType.PlaceMode = CGameEditorPluginMap::EPlaceMode::Block;
+            }
+#endif
+        }
+
+        void SetModeBlockGhost(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            editor.ButtonGhostBlockModeOnClick();
+#else
+            editor.ButtonInventoryGhostBlocksOnClick();
+#endif
+        }
+
+        void SetModeBlockFree(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            Editor.ButtonFreeBlockModeOnClick();
+#endif
+        }
+
+        void SetModeItemNormal(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            editor.ButtonNormalItemModeOnClick();
+#else
+            // TODO: Need way to differentiate between Free and Normal Item Mode
+            // editor.ButtonInventoryObjectsOnClick();
+#endif
+        }
+
+        void SetModeItemFreeGround(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            editor.ButtonFreeGroundItemModeOnClick();
+#endif
+        }
+
+        void SetModeItemFree(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            editor.ButtonFreeItemModeOnClick();
+#else
+            // TODO: Need way to differentiate between Free and Normal Item Mode
+            // editor.ButtonInventoryObjectsOnClick();
+#endif
+        }
+
+        void SetModeMacroblockNormal(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            editor.ButtonNormalMacroblockModeOnClick();
+#endif
+        }
+
+        void SetModeMacroblockFree(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            editor.ButtonFreeMacroblockModeOnClick();
+#endif
+        }
+
+        string[] ValidBlockModes = {
+              "Normal"
+            , "Ghost"
+#if TMNEXT
+            , "Free"
+#endif
+        };
+
+        string[] ValidItemModes = {
+              "Normal"
+#if TMNEXT
+            , "Free Ground"
+            , "Free"
+#endif
+        };
+
+        string[] ValidMacroblockModes = {
+              "Normal"
+#if TMNEXT
+            , "Free"
+#endif
+        };
+    }
+
     [Setting category="DefaultBlockMode" name="Enabled"]
     bool settingDefaultBlockModeEnabled = true;
     [Setting category="DefaultBlockMode" name="Default Block Mode"]
@@ -27,72 +122,67 @@ namespace EditorHelpers
             if (!Enabled()) return;
             if (UI::CollapsingHeader("Default Block Modes"))
             {
-                if (settingToolTipsEnabled)
+                if (Compatibility::ValidBlockModes.Length > 1)
                 {
-                    EditorHelpers::HelpMarker("Default when switching into block mode");
-                    UI::SameLine();
-                }
-                if (UI::BeginCombo("Block Mode", settingDefaultBlockMode))
-                {
-                    if (UI::Selectable("Normal", false))
+                    if (settingToolTipsEnabled)
                     {
-                        settingDefaultBlockMode = "Normal";
+                        EditorHelpers::HelpMarker("Default when switching into block mode");
+                        UI::SameLine();
                     }
-                    else if (UI::Selectable("Ghost", false))
+                    if (UI::BeginCombo("Block Mode", settingDefaultBlockMode))
                     {
-                        settingDefaultBlockMode = "Ghost";
+                        for (uint i = 0; i < Compatibility::ValidBlockModes.Length; i++)
+                        {
+                            if (UI::Selectable(Compatibility::ValidBlockModes[i], false))
+                            {
+                                settingDefaultBlockMode = Compatibility::ValidBlockModes[i];
+                                break;
+                            }
+                        }
+                        UI::EndCombo();
                     }
-#if TMNEXT
-                    else if (UI::Selectable("Free", false))
-                    {
-                        settingDefaultBlockMode = "Free";
-                    }
-#endif
-                    UI::EndCombo();
                 }
 
-                if (settingToolTipsEnabled)
+                if (Compatibility::ValidItemModes.Length > 1)
                 {
-                    EditorHelpers::HelpMarker("Default when switching into item mode");
-                    UI::SameLine();
-                }
-                if (UI::BeginCombo("Item Mode", settingDefaultItemMode))
-                {
-                    if (UI::Selectable("Normal", false))
+                    if (settingToolTipsEnabled)
                     {
-                        settingDefaultItemMode = "Normal";
+                        EditorHelpers::HelpMarker("Default when switching into item mode");
+                        UI::SameLine();
                     }
-#if TMNEXT
-                    else if (UI::Selectable("Free Ground", false))
+                    if (UI::BeginCombo("Item Mode", settingDefaultItemMode))
                     {
-                        settingDefaultItemMode = "Free Ground";
+                        for (uint i = 0; i < Compatibility::ValidItemModes.Length; i++)
+                        {
+                            if (UI::Selectable(Compatibility::ValidItemModes[i], false))
+                            {
+                                settingDefaultItemMode = Compatibility::ValidItemModes[i];
+                                break;
+                            }
+                        }
+                        UI::EndCombo();
                     }
-#else
-                    else if (UI::Selectable("Free", false))
-                    {
-                        settingDefaultItemMode = "Free";
-                    }
-                    UI::EndCombo();
                 }
 
-                if (settingToolTipsEnabled)
+                if (Compatibility::ValidMacroblockModes.Length > 1)
                 {
-                    EditorHelpers::HelpMarker("Default when switching into macroblock mode");
-                    UI::SameLine();
-                }
-                if (UI::BeginCombo("Macroblock Mode", settingDefaultMacroblockMode))
-                {
-                    if (UI::Selectable("Normal", false))
+                    if (settingToolTipsEnabled)
                     {
-                        settingDefaultMacroblockMode = "Normal";
+                        EditorHelpers::HelpMarker("Default when switching into macroblock mode");
+                        UI::SameLine();
                     }
-#if TMNEXT
-                    else if (UI::Selectable("Free", false))
+                    if (UI::BeginCombo("Macroblock Mode", settingDefaultMacroblockMode))
                     {
-                        settingDefaultMacroblockMode = "Free";
+                        for (uint i = 0; i < Compatibility::ValidMacroblockModes.Length; i++)
+                        {
+                            if (UI::Selectable(Compatibility::ValidMacroblockModes[i], false))
+                            {
+                                settingDefaultMacroblockMode = Compatibility::ValidMacroblockModes[i];
+                                break;
+                            }
+                        }
+                        UI::EndCombo();
                     }
-#endif
-                    UI::EndCombo();
                 }
             }
         }
@@ -123,68 +213,42 @@ namespace EditorHelpers
                 {
                     if (settingDefaultBlockMode == "Normal")
                     {
-#if TMNEXT
-                        Editor.ButtonNormalBlockModeOnClick();
-#else
-                        Editor.ButtonInventoryBlocksOnClick();
-#endif
+                        Compatibility::SetModeBlockNormal(Editor);
                     }
                     else if (settingDefaultBlockMode == "Ghost")
                     {
-#if TMNEXT
-                        Editor.ButtonGhostBlockModeOnClick();
-#else
-                        Editor.ButtonInventoryGhostBlocksOnClick();
-#endif
+                        Compatibility::SetModeBlockGhost(Editor);
                     }
-#if TMNEXT
                     else if (settingDefaultBlockMode == "Free")
                     {
-                        Editor.ButtonFreeBlockModeOnClick();
+                        Compatibility::SetModeBlockFree(Editor);
                     }
-#endif
                 }
                 else if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item)
                 {
                     if (settingDefaultItemMode == "Normal")
                     {
-#if TMNEXT
-                        Editor.ButtonNormalItemModeOnClick();
-#else
-                        Editor.ButtonInventoryObjectsOnClick();
-#endif
+                        Compatibility::SetModeItemNormal(Editor);
                     }
-#if TMNEXT
                     else if (settingDefaultItemMode == "Free Ground")
                     {
-                        Editor.ButtonFreeGroundItemModeOnClick();
+                        Compatibility::SetModeItemFreeGround(Editor);
                     }
-#endif
                     else if (settingDefaultItemMode == "Free")
                     {
-#if TMNEXT
-                        Editor.ButtonFreeItemModeOnClick();
-#else
-                        Editor.ButtonInventoryObjectsOnClick();
-#endif
+                        Compatibility::SetModeItemFree(Editor);
                     }
                 }
                 else if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Macroblock)
                 {
                     if (settingDefaultMacroblockMode == "Normal")
                     {
-#if TMNEXT
-                        Editor.ButtonNormalMacroblockModeOnClick();
-#else
-                        Editor.ButtonInventoryMacroBlocksOnClick();
-#endif
+                        Compatibility::SetModeMacroblockNormal(Editor);
                     }
-#if TMNEXT
                     else if (settingDefaultMacroblockMode == "Free")
                     {
-                        Editor.ButtonFreeMacroblockModeOnClick();
+                        Compatibility::SetModeMacroblockFree(Editor);
                     }
-#endif
                 }
             }
             lastPlaceModeCategory = currentPlaceModeCategory;
