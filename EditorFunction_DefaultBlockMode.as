@@ -26,7 +26,7 @@ namespace EditorHelpers
         void SetModeBlockFree(CGameCtnEditorFree@ editor)
         {
 #if TMNEXT
-            Editor.ButtonFreeBlockModeOnClick();
+            editor.ButtonFreeBlockModeOnClick();
 #endif
         }
 
