@@ -1,6 +1,27 @@
 
 namespace EditorHelpers
 {
+    namespace Compatibility
+    {
+        bool FreeblockModePreciseRotationShouldBeActive(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            return editor.Cursor.UseFreePos;
+#else
+            return editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item;
+#endif
+        }
+
+        string FreeblockModePreciseRotationName()
+        {
+#if TMNEXT
+            return "Freeblock";
+#else
+            return "Item";
+#endif
+        }
+    }
+
     [Setting category="FreeblockModePreciseRotation" name="Enabled"]
     bool settingsFreeblockModePreciseRotationEnabled = true;
     [Setting category="FreeblockModePreciseRotation" name="Step Size"]
@@ -25,6 +46,10 @@ namespace EditorHelpers
                 {
                     stepSize = 1.0f;
                 }
+                else if (settingsFreeblockModePreciseRotationStepSize == "BiBiSlope")
+                {
+                    stepSize = Math::ToDeg(Math::Atan(4.0f / 32.0f));
+                }
                 else if (settingsFreeblockModePreciseRotationStepSize == "BiSlope")
                 {
                     stepSize = Math::ToDeg(Math::Atan(8.0f / 32.0f));
@@ -40,7 +65,7 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
             UI::PushID("FreeblockModePreciseRotation::RenderInterface");
-            if (UI::CollapsingHeader("Freeblock Precise Rotation"))
+            if (UI::CollapsingHeader(Compatibility::FreeblockModePreciseRotationName() + " Precise Rotation"))
             {
                 if (settingToolTipsEnabled)
                 {
@@ -53,6 +78,11 @@ namespace EditorHelpers
                     {
                         stepSize = 1.0f;
                         settingsFreeblockModePreciseRotationStepSize = "Default";
+                    }
+                    else if (UI::Selectable("BiBiSlope", false))
+                    {
+                        stepSize = Math::ToDeg(Math::Atan(4.0f / 32.0f));
+                        settingsFreeblockModePreciseRotationStepSize = "BiBiSlope";
                     }
                     else if (UI::Selectable("BiSlope", false))
                     {
@@ -97,11 +127,7 @@ namespace EditorHelpers
         void Update(float) override
         {
             if (!Enabled() || Editor is null) return;
-#if TMNEXT
-            if (Editor.Cursor.UseFreePos)
-#else
-            if (true)
-#endif
+            if (Compatibility::FreeblockModePreciseRotationShouldBeActive(Editor))
             {
                 if (newInputToApply)
                 {
