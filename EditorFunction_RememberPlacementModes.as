@@ -1,6 +1,48 @@
 
 namespace EditorHelpers
 {
+    namespace Compatibility
+    {
+        void SetModeBlock(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            editor.ButtonNormalBlockModeOnClick();
+#else
+            if (editor.PluginMapType.PlaceMode != CGameEditorPluginMap::EPlaceMode::Block)
+            {
+                editor.PluginMapType.PlaceMode = CGameEditorPluginMap::EPlaceMode::Block;
+            }
+#endif
+        }
+
+        void SetModeItem(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            editor.ButtonNormalItemModeOnClick();
+#else
+            editor.ButtonInventoryObjectsOnClick();
+#endif
+        }
+
+        void SetModeMacroblock(CGameCtnEditorFree@ editor)
+        {
+#if TMNEXT
+            editor.ButtonNormalMacroblockModeOnClick();
+#else
+            editor.ButtonInventoryMacroBlocksOnClick();
+#endif
+        }
+
+        bool EnableCopySelectionTool()
+        {
+#if TMNEXT
+            return true;
+#else
+            return false;
+#endif
+        }
+    }
+
     [Setting category="RememberPlacementModes" name="Enabled"]
     bool settingRememberPlacementModesEnabled = true;
     [Setting category="RememberPlacementModes" name="Maintain Block/Item Mode After Test"]
@@ -38,12 +80,16 @@ namespace EditorHelpers
                     UI::SameLine();
                 }
                 settingRememberPlacementModesMaintainBlockModeAfterTest = UI::Checkbox("Maintain Block Mode After Test", settingRememberPlacementModesMaintainBlockModeAfterTest);
-                if (settingToolTipsEnabled)
+
+                if (Compatibility::EnableCopySelectionTool())
                 {
-                    EditorHelpers::HelpMarker("Remember selection add or remove mode while using camera");
-                    UI::SameLine();
+                    if (settingToolTipsEnabled)
+                    {
+                        EditorHelpers::HelpMarker("Remember selection add or remove mode while using camera");
+                        UI::SameLine();
+                    }
+                    settingRememberPlacementModesMaintainSelectionMode = UI::Checkbox("Maintain Copy Tool Selection Mode", settingRememberPlacementModesMaintainSelectionMode);
                 }
-                settingRememberPlacementModesMaintainSelectionMode = UI::Checkbox("Maintain Copy Tool Selection Mode", settingRememberPlacementModesMaintainSelectionMode);
             }
         }
 
@@ -77,27 +123,15 @@ namespace EditorHelpers
                 {
                     if (lastPlaceModeCategoryBeforeTest == "Block")
                     {
-#if TMNEXT
-                        Editor.ButtonNormalBlockModeOnClick();
-#else
-                        Editor.ButtonInventoryBlocksOnClick();
-#endif
+                        Compatibility::SetModeBlock(Editor);
                     }
                     else if (lastPlaceModeCategoryBeforeTest == "Item")
                     {
-#if TMNEXT
-                        Editor.ButtonNormalItemModeOnClick();
-#else
-                        Editor.ButtonInventoryObjectsOnClick();
-#endif
+                        Compatibility::SetModeItem(Editor);
                     }
                     else if (lastPlaceModeCategoryBeforeTest == "Macroblock")
                     {
-#if TMNEXT
-                        Editor.ButtonNormalMacroblockModeOnClick();
-#else
-                        Editor.ButtonInventoryMacroBlocksOnClick();
-#endif
+                        Compatibility::SetModeMacroblock(Editor);
                     }
                 }
                 if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Test)
@@ -106,8 +140,9 @@ namespace EditorHelpers
                 }
             }
 
-            if (settingRememberPlacementModesMaintainSelectionMode
-            && Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::CopyPaste)
+            if (Compatibility::EnableCopySelectionTool()
+                &&  settingRememberPlacementModesMaintainSelectionMode
+                && Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::CopyPaste)
             {
                 if (Editor.PluginMapType.EditMode == CGameEditorPluginMap::EditMode::SelectionAdd
                 || Editor.PluginMapType.EditMode == CGameEditorPluginMap::EditMode::SelectionRemove)
