@@ -83,21 +83,21 @@ namespace EditorHelpers
 #endif
         }
 
-        float SetFlyStep(CGameItemPlacementParam@ placementParams, float setValue)
+        void SetFlyStep(CGameItemPlacementParam@ placementParams, float setValue)
         {
 #if TMNEXT
-            return placementParams.FlyStep;
+            placementParams.FlyStep = setValue;
 #else
-            return placementParams.FlyVStep;
+            placementParams.FlyVStep = setValue;
 #endif
         }
 
-        float SetFlyOffset(CGameItemPlacementParam@ placementParams, float setValue)
+        void SetFlyOffset(CGameItemPlacementParam@ placementParams, float setValue)
         {
 #if TMNEXT
-            return placementParams.FlyOffset;
+            placementParams.FlyOffset = setValue;
 #else
-            return placementParams.FlyVOffset;
+            placementParams.FlyVOffset = setValue;
 #endif
         }
     }
