@@ -10,5 +10,6 @@ namespace EditorHelpers
         void Init(){}
         void RenderInterface(){}
         void Update(float){}
+        bool OnKeyPress(bool down, VirtualKey key){return false;}
     }
 }

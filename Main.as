@@ -22,6 +22,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::RememberPlacementModes()
     , EditorHelpers::CustomItemPlacement()
     , EditorHelpers::FreeblockModePreciseRotation()
+    , EditorHelpers::AirBlockModeHotkey()
 };
 
 namespace Compatibility
@@ -62,6 +63,19 @@ void RenderInterface()
         functions[index].RenderInterface();
     }
     UI::End();
+}
+
+bool OnKeyPress(bool down, VirtualKey key)
+{
+    bool handled = false;
+    if (!EditorHelpers::HasPermission()) return handled;
+    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return handled;
+    for (uint index = 0; index < functions.Length; index++)
+    {
+        handled = functions[index].OnKeyPress(down, key);
+        if (handled) { break; }
+    }
+    return handled;
 }
 
 void Main()
