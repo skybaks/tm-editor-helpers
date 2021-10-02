@@ -22,7 +22,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::RememberPlacementModes()
     , EditorHelpers::CustomItemPlacement()
     , EditorHelpers::FreeblockModePreciseRotation()
-    , EditorHelpers::AirBlockModeHotkey()
+    , EditorHelpers::Hotkeys()
 };
 
 namespace Compatibility
