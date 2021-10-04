@@ -1,13 +1,18 @@
 
 namespace EditorHelpers
 {
-    [Setting category="Hotkeys" name="Enabled"]
+    [Setting category="Hotkeys" name="Hotkeys Function Enabled"]
     bool Setting_Hotkeys_Enabled = true;
 
-    [Setting category="Hotkeys" name="AirBlockHotKeyEnabled"]
+    [Setting category="Hotkeys" name="AirBlock HotKey Enabled"]
     bool Setting_Hotkeys_AirBlockHotKeyEnabled = true;
-    [Setting category="Hotkeys" name="AirBlockHotKey"]
+    [Setting category="Hotkeys" name="AirBlock HotKey"]
     VirtualKey Setting_Hotkeys_AirBlockHotKey = VirtualKey::A;
+
+    [Setting category="Hotkeys" name="ToggleColors HotKey Enabled"]
+    bool Setting_Hotkeys_ToggleColorsHotKeyEnabled = false;
+    [Setting category="Hotkeys" name="ToggleColors HotKey"]
+    VirtualKey Setting_Hotkeys_ToggleColorsHotKey = VirtualKey::F6;
 
     class Hotkeys : EditorHelpers::EditorFunction
     {
@@ -30,10 +35,17 @@ namespace EditorHelpers
             {
                 if (settingToolTipsEnabled)
                 {
-                    EditorHelpers::HelpMarker("Hotkey for airblock mode toggle");
+                    EditorHelpers::HelpMarker("[" + tostring(Setting_Hotkeys_AirBlockHotKey) + "] Hotkey for airblock mode toggle");
                     UI::SameLine();
                 }
                 Setting_Hotkeys_AirBlockHotKeyEnabled = UI::Checkbox("Enable AirBlockMode Hotkey", Setting_Hotkeys_AirBlockHotKeyEnabled);
+
+                if (settingToolTipsEnabled)
+                {
+                    EditorHelpers::HelpMarker("[" + tostring(Setting_Hotkeys_ToggleColorsHotKey) + "] Hotkey to cycle through block colors");
+                    UI::SameLine();
+                }
+                Setting_Hotkeys_ToggleColorsHotKeyEnabled = UI::Checkbox("Enable ColorToggle Hotkey", Setting_Hotkeys_ToggleColorsHotKeyEnabled);
             }
         }
 
@@ -51,11 +63,20 @@ namespace EditorHelpers
 
             bool handled = false;
             if (!Enabled()) return handled;
-            if (!down && m_keysDown.IsEmpty())
+            if (!down && m_keysDown.IsEmpty() && Editor.PluginMapType !is null && Editor.PluginMapType.IsEditorReadyForRequest)
             {
-                if (Setting_Hotkeys_AirBlockHotKeyEnabled && key == Setting_Hotkeys_AirBlockHotKey)
+                if (Setting_Hotkeys_AirBlockHotKeyEnabled && key == Setting_Hotkeys_AirBlockHotKey
+                    && Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block)
                 {
                     Editor.ButtonAirBlockModeOnClick();
+                    handled = true;
+                }
+
+                if (Setting_Hotkeys_ToggleColorsHotKeyEnabled && key == Setting_Hotkeys_ToggleColorsHotKey)
+                {
+                    int currValue = int(Editor.PluginMapType.NextMapElemColor);
+                    if (currValue < 5) { currValue += 1; } else { currValue = 0; }
+                    Editor.PluginMapType.NextMapElemColor = CGameEditorPluginMap::EMapElemColor(currValue);
                     handled = true;
                 }
             }
