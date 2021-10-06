@@ -66,7 +66,9 @@ namespace EditorHelpers
             if (!down && m_keysDown.IsEmpty() && Editor.PluginMapType !is null && Editor.PluginMapType.IsEditorReadyForRequest)
             {
                 if (Setting_Hotkeys_AirBlockHotKeyEnabled && key == Setting_Hotkeys_AirBlockHotKey
-                    && Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block)
+                    && (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block
+                        || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::GhostBlock
+                        || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeBlock))
                 {
                     Editor.ButtonAirBlockModeOnClick();
                     handled = true;
