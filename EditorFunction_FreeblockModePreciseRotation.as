@@ -6,7 +6,7 @@ namespace EditorHelpers
         bool FreeblockModePreciseRotationShouldBeActive(CGameCtnEditorFree@ editor)
         {
 #if TMNEXT
-            return editor.Cursor.UseFreePos;
+            return editor.Cursor.UseFreePos || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item;
 #else
             return editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item;
 #endif
@@ -15,9 +15,9 @@ namespace EditorHelpers
         string FreeblockModePreciseRotationName()
         {
 #if TMNEXT
-            return "Freeblock";
+            return "";
 #else
-            return "Item";
+            return "Item ";
 #endif
         }
     }
@@ -65,7 +65,7 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
             UI::PushID("FreeblockModePreciseRotation::RenderInterface");
-            if (UI::CollapsingHeader(Compatibility::FreeblockModePreciseRotationName() + " Precise Rotation"))
+            if (UI::CollapsingHeader(Compatibility::FreeblockModePreciseRotationName() + "Precise Rotation"))
             {
                 if (settingToolTipsEnabled)
                 {
