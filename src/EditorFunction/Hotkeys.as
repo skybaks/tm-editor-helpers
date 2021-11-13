@@ -3,7 +3,7 @@ namespace EditorHelpers
 {
     namespace Compatibility
     {
-        bool OnKeyPress_AirBlockModeHotkey()
+        bool OnKeyPress_AirBlockModeHotkey(CGameCtnEditorFree@ Editor, VirtualKey key)
         {
             bool handled = false;
 #if TMNEXT
@@ -21,7 +21,7 @@ namespace EditorHelpers
             return handled;
         }
 
-        bool OnKeyPress_ToggleColorsHotkey()
+        bool OnKeyPress_ToggleColorsHotkey(CGameCtnEditorFree@ Editor, VirtualKey key)
         {
             bool handled = false;
 #if TMNEXT
@@ -114,8 +114,8 @@ namespace EditorHelpers
             {
                 // '|| handled' second will result in multiple hotkeys being
                 // able to be handled together if assigned to the same key
-                handled = Compatibility::OnKeyPress_AirBlockModeHotkey() || handled;
-                handled = Compatibility::OnKeyPress_ToggleColorsHotkey() || handled;
+                handled = Compatibility::OnKeyPress_AirBlockModeHotkey(Editor, key) || handled;
+                handled = Compatibility::OnKeyPress_ToggleColorsHotkey(Editor, key) || handled;
             }
             return handled;
         }
