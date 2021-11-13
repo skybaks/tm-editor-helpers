@@ -130,12 +130,16 @@ namespace EditorHelpers
     float settingCustomItemPlacementHorizontalGridSize = 32.0f;
     [Setting category="CustomItemPlacement" name="Vertical Grid Size"]
     float settingCustomItemPlacementVerticalGridSize = 8.0f;
+    [Setting category="CustomItemPlacement" name="Apply Custom Pivot"]
+    bool Setting_CustomItemPlacement_ApplyPivot = false;
     class CustomItemPlacement : EditorHelpers::EditorFunction
     {
         private CGameItemModel@ currentItemModel = null;
         private dictionary defaultPlacement;
         private bool lastGhostMode = false;
         private bool lastApplyGrid = false;
+        private bool lastApplyPivot = false;
+        private vec3 currItemPivot = vec3(0,0,0);
 
         bool Enabled() override { return settingCustomItemPlacementEnabled; }
 
@@ -143,6 +147,11 @@ namespace EditorHelpers
         {
             if (Editor is null || !Enabled())
             {
+                lastGhostMode = false;
+                lastApplyGrid = false;
+                lastApplyPivot = false;
+                currItemPivot = vec3(0,0,0);
+
                 if (currentItemModel !is null)
                 {
                     ResetCurrentItemPlacement();
@@ -175,6 +184,15 @@ namespace EditorHelpers
                 settingCustomItemPlacementApplyGrid = UI::Checkbox("Apply Grid to Items", settingCustomItemPlacementApplyGrid);
                 settingCustomItemPlacementHorizontalGridSize = UI::InputFloat("Horizontal Grid", settingCustomItemPlacementHorizontalGridSize);
                 settingCustomItemPlacementVerticalGridSize = UI::InputFloat("Vertical Grid", settingCustomItemPlacementVerticalGridSize);
+                if (settingToolTipsEnabled)
+                {
+                    EditorHelpers::HelpMarker("Advanced manipulation of item pivot");
+                    UI::SameLine();
+                }
+                Setting_CustomItemPlacement_ApplyPivot = UI::Checkbox("Apply Custom Pivot", Setting_CustomItemPlacement_ApplyPivot);
+                currItemPivot.x = UI::InputFloat("Pivot X", currItemPivot.x);
+                currItemPivot.y = UI::InputFloat("Pivot Y", currItemPivot.y);
+                currItemPivot.z = UI::InputFloat("Pivot Z", currItemPivot.z);
             }
             UI::PopID();
         }
@@ -224,6 +242,10 @@ namespace EditorHelpers
                     {
                         Editor.CurrentItemModel.DefaultPlacementParam_Head.AddPivotPosition();
                     }
+
+                    currItemPivot.x = currentItemPlacementDef.PivotX;
+                    currItemPivot.y = currentItemPlacementDef.PivotY;
+                    currItemPivot.z = currentItemPlacementDef.PivotZ;
                 }
 
                 @currentItemModel = Editor.CurrentItemModel;
@@ -260,6 +282,19 @@ namespace EditorHelpers
                     ResetCurrentItemPlacement();
                 }
                 lastApplyGrid = settingCustomItemPlacementApplyGrid;
+
+                if (Setting_CustomItemPlacement_ApplyPivot)
+                {
+                    uint lastPivotIndex = Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head)-1;
+                    Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, currItemPivot.x);
+                    Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, currItemPivot.y);
+                    Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, currItemPivot.z);
+                }
+                else if (!Setting_CustomItemPlacement_ApplyPivot && lastApplyPivot)
+                {
+                    ResetCurrentItemPivot();
+                }
+                lastApplyPivot = Setting_CustomItemPlacement_ApplyPivot;
             }
         }
 
@@ -287,13 +322,27 @@ namespace EditorHelpers
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_VStep = itemPlacementDef.VStep;
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_HOffset = itemPlacementDef.HOffset;
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_VOffset = itemPlacementDef.VOffset;
-                    if (itemPlacementDef.HasPivotPosition)
+                }
+            }
+        }
+
+        private void ResetCurrentItemPivot()
+        {
+            if (currentItemModel !is null)
+            {
+                auto itemPlacementDef = GetDefaultPlacement(currentItemModel.IdName);
+                if (itemPlacementDef.Initialized)
+                {
+                    uint pivotsLength = Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head);
+                    if (pivotsLength > 0)
                     {
-                        uint pivotsLength = Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head);
                         Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, pivotsLength - 1, itemPlacementDef.PivotX);
                         Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, pivotsLength - 1, itemPlacementDef.PivotY);
                         Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, pivotsLength - 1, itemPlacementDef.PivotZ);
                     }
+                    currItemPivot.x = itemPlacementDef.PivotX;
+                    currItemPivot.y = itemPlacementDef.PivotY;
+                    currItemPivot.z = itemPlacementDef.PivotZ;
                 }
             }
         }

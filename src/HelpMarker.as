@@ -15,8 +15,10 @@ namespace EditorHelpers
             }
             else if (desc == lastTipHover && tipHoverTimer.Complete())
             {
+                // X value used as width, Y value ignored because text continues to wrap.
+                UI::SetNextWindowSize(300, 10);
                 UI::BeginTooltip();
-                UI::Text(desc);
+                UI::TextWrapped(desc);
                 UI::EndTooltip();
             }
         }
