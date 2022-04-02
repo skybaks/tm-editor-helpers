@@ -120,36 +120,36 @@ namespace EditorHelpers
         float VOffset = 0.0f;
     }
 
-    [Setting category="CustomItemPlacement" name="Enabled"]
-    bool settingCustomItemPlacementEnabled = true;
-    [Setting category="CustomItemPlacement" name="Ghost Mode"]
-    bool settingCustomItemPlacementGhostMode = false;
-    [Setting category="CustomItemPlacement" name="Apply Grid"]
-    bool settingCustomItemPlacementApplyGrid = false;
-    [Setting category="CustomItemPlacement" name="Horizontal Grid Size"]
-    float settingCustomItemPlacementHorizontalGridSize = 32.0f;
-    [Setting category="CustomItemPlacement" name="Vertical Grid Size"]
-    float settingCustomItemPlacementVerticalGridSize = 8.0f;
-    [Setting category="CustomItemPlacement" name="Apply Custom Pivot"]
-    bool Setting_CustomItemPlacement_ApplyPivot = false;
+    [Setting category="Functions" name="CustomItemPlacement: Enabled" description="Uncheck to disable plugin functions related to custom item placement"]
+    bool Setting_CustomItemPlacement_Enabled = true;
     class CustomItemPlacement : EditorHelpers::EditorFunction
     {
         private CGameItemModel@ currentItemModel = null;
         private dictionary defaultPlacement;
+        private bool forceGhostMode = false;
+        private bool applyGrid = false;
+        private bool applyPivot = false;
         private bool lastGhostMode = false;
         private bool lastApplyGrid = false;
         private bool lastApplyPivot = false;
+        private float gridSizeHoriz = 32.0f;
+        private float gridSizeVerti = 8.0f;
         private vec3 currItemPivot = vec3(0,0,0);
 
-        bool Enabled() override { return settingCustomItemPlacementEnabled; }
+        bool Enabled() override { return Setting_CustomItemPlacement_Enabled; }
 
         void Init() override
         {
             if (Editor is null || !Enabled())
             {
+                forceGhostMode = false;
+                applyGrid = false;
+                applyPivot = false;
                 lastGhostMode = false;
                 lastApplyGrid = false;
                 lastApplyPivot = false;
+                gridSizeHoriz = 32.0f;
+                gridSizeVerti = 8.0f;
                 currItemPivot = vec3(0,0,0);
 
                 if (currentItemModel !is null)
@@ -175,21 +175,21 @@ namespace EditorHelpers
                     EditorHelpers::HelpMarker("Forces Ghost Mode on all items");
                     UI::SameLine();
                 }
-                settingCustomItemPlacementGhostMode = UI::Checkbox("Ghost Item Mode", settingCustomItemPlacementGhostMode);
+                forceGhostMode = UI::Checkbox("Ghost Item Mode", forceGhostMode);
                 if (settingToolTipsEnabled)
                 {
                     EditorHelpers::HelpMarker("Forces the following placement grid on all items");
                     UI::SameLine();
                 }
-                settingCustomItemPlacementApplyGrid = UI::Checkbox("Apply Grid to Items", settingCustomItemPlacementApplyGrid);
-                settingCustomItemPlacementHorizontalGridSize = UI::InputFloat("Horizontal Grid", settingCustomItemPlacementHorizontalGridSize);
-                settingCustomItemPlacementVerticalGridSize = UI::InputFloat("Vertical Grid", settingCustomItemPlacementVerticalGridSize);
+                applyGrid = UI::Checkbox("Apply Grid to Items", applyGrid);
+                gridSizeHoriz = UI::InputFloat("Horizontal Grid", gridSizeHoriz);
+                gridSizeVerti = UI::InputFloat("Vertical Grid", gridSizeVerti);
                 if (settingToolTipsEnabled)
                 {
                     EditorHelpers::HelpMarker("Advanced manipulation of item pivot");
                     UI::SameLine();
                 }
-                Setting_CustomItemPlacement_ApplyPivot = UI::Checkbox("Apply Custom Pivot", Setting_CustomItemPlacement_ApplyPivot);
+                applyPivot = UI::Checkbox("Apply Custom Pivot", applyPivot);
                 currItemPivot.x = UI::InputFloat("Pivot X", currItemPivot.x);
                 currItemPivot.y = UI::InputFloat("Pivot Y", currItemPivot.y);
                 currItemPivot.z = UI::InputFloat("Pivot Z", currItemPivot.z);
@@ -253,48 +253,48 @@ namespace EditorHelpers
 
             if (currentItemModel !is null)
             {
-                if (settingCustomItemPlacementGhostMode)
+                if (forceGhostMode)
                 {
                     currentItemModel.DefaultPlacementParam_Head.GhostMode = true;
                 }
-                else if (!settingCustomItemPlacementGhostMode && lastGhostMode)
+                else if (!forceGhostMode && lastGhostMode)
                 {
                     auto currentItemPlacementDef = GetDefaultPlacement(currentItemModel.IdName);
                     currentItemModel.DefaultPlacementParam_Head.GhostMode = currentItemPlacementDef.GhostMode;
                 }
-                lastGhostMode = settingCustomItemPlacementGhostMode;
+                lastGhostMode = forceGhostMode;
 
-                if (settingCustomItemPlacementApplyGrid)
+                if (applyGrid)
                 {
-                    Compatibility::SetFlyStep(currentItemModel.DefaultPlacementParam_Head, settingCustomItemPlacementVerticalGridSize);
+                    Compatibility::SetFlyStep(currentItemModel.DefaultPlacementParam_Head, gridSizeVerti);
                     Compatibility::SetFlyOffset(currentItemModel.DefaultPlacementParam_Head, 0.0f);
-                    currentItemModel.DefaultPlacementParam_Head.GridSnap_HStep = settingCustomItemPlacementHorizontalGridSize;
-                    currentItemModel.DefaultPlacementParam_Head.GridSnap_VStep = settingCustomItemPlacementVerticalGridSize;
+                    currentItemModel.DefaultPlacementParam_Head.GridSnap_HStep = gridSizeHoriz;
+                    currentItemModel.DefaultPlacementParam_Head.GridSnap_VStep = gridSizeVerti;
                     currentItemModel.DefaultPlacementParam_Head.GridSnap_VOffset = 0.0f;
 
                     uint lastPivotIndex = Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head)-1;
                     float pivotX = Compatibility::GetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex);
                     float pivotZ = Compatibility::GetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex);
-                    currentItemModel.DefaultPlacementParam_Head.GridSnap_HOffset = settingCustomItemPlacementHorizontalGridSize - pivotX;
+                    currentItemModel.DefaultPlacementParam_Head.GridSnap_HOffset = gridSizeHoriz - pivotX;
                 }
-                else if (!settingCustomItemPlacementApplyGrid && lastApplyGrid)
+                else if (!applyGrid && lastApplyGrid)
                 {
                     ResetCurrentItemPlacement();
                 }
-                lastApplyGrid = settingCustomItemPlacementApplyGrid;
+                lastApplyGrid = applyGrid;
 
-                if (Setting_CustomItemPlacement_ApplyPivot)
+                if (applyPivot)
                 {
                     uint lastPivotIndex = Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head)-1;
                     Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, currItemPivot.x);
                     Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, currItemPivot.y);
                     Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, currItemPivot.z);
                 }
-                else if (!Setting_CustomItemPlacement_ApplyPivot && lastApplyPivot)
+                else if (!applyPivot && lastApplyPivot)
                 {
                     ResetCurrentItemPivot();
                 }
-                lastApplyPivot = Setting_CustomItemPlacement_ApplyPivot;
+                lastApplyPivot = applyPivot;
             }
         }
 

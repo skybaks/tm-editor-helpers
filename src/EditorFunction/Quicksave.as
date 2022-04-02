@@ -1,13 +1,13 @@
 
 namespace EditorHelpers
 {
-    [Setting category="Quicksave" name="Enabled"]
-    bool settingQuicksaveEnabled = true;
+    [Setting category="Functions" name="Quicksave: Enabled" description="Uncheck to disable plugin function for quicksave"]
+    bool Setting_Quicksave_Enabled = true;
     class Quicksave : EditorHelpers::EditorFunction
     {
         private EditorHelpers::CountdownTimer timerQuicksave;
 
-        bool Enabled() override { return settingQuicksaveEnabled; }
+        bool Enabled() override { return Setting_Quicksave_Enabled; }
 
         void Init() override
         {

@@ -13,15 +13,15 @@ namespace EditorHelpers
         }
     }
 
-    [Setting category="BlockHelpers" name="Enabled"]
-    bool settingBlockHelpers = true;
-    [Setting category="BlockHelpers" name="Block Helpers Off"]
-    bool settingBlockHelpersBlockHelpersOff = false;
+    [Setting category="Functions" name="BlockHelpers: Enabled" description="Uncheck to disable all plugin functions related to block helpers"]
+    bool Setting_BlockHelpers_Enabled = true;
+    [Setting category="Functions" name="BlockHelpers: Block Helpers Off"]
+    bool Setting_BlockHelpers_BlockHelpersOff = false;
     class BlockHelpers : EditorHelpers::EditorFunction
     {
         private bool lastBlockHelpersOff;
 
-        bool Enabled() override { return settingBlockHelpers; }
+        bool Enabled() override { return Setting_BlockHelpers_Enabled; }
 
         void Init() override 
         {
@@ -41,22 +41,22 @@ namespace EditorHelpers
                     EditorHelpers::HelpMarker("Hide/Show block clip helpers");
                     UI::SameLine();
                 }
-                settingBlockHelpersBlockHelpersOff = UI::Checkbox("Block Helpers Off", settingBlockHelpersBlockHelpersOff);
+                Setting_BlockHelpers_BlockHelpersOff = UI::Checkbox("Block Helpers Off", Setting_BlockHelpers_BlockHelpersOff);
             }
         }
 
         void Update(float) override
         {
             if (!Enabled() || Editor is null) return;
-            if (settingBlockHelpersBlockHelpersOff)
+            if (Setting_BlockHelpers_BlockHelpersOff)
             {
                 Compatibility::SetHideBlockHelpers(Editor, true);
             }
-            else if (lastBlockHelpersOff && !settingBlockHelpersBlockHelpersOff)
+            else if (lastBlockHelpersOff && !Setting_BlockHelpers_BlockHelpersOff)
             {
                 Compatibility::SetHideBlockHelpers(Editor, false);
             }
-            lastBlockHelpersOff = settingBlockHelpersBlockHelpersOff;
+            lastBlockHelpersOff = Setting_BlockHelpers_BlockHelpersOff;
         }
     }
 }

@@ -1,15 +1,15 @@
 
 namespace EditorHelpers
 {
-    [Setting category="PlacementGrid" name="Enabled"]
-    bool settingPlacementGridEnabled = true;
-    [Setting category="PlacementGrid" name="Placement Grid On"]
-    bool settingPlacementGridPlacementGridOn = false;
-    [Setting category="PlacementGrid" name="Placement Grid Transparent"]
-    bool settingPlacementGridPlacementGridTransparent = true;
+    [Setting category="Functions" name="PlacementGrid: Enabled" description="Uncheck to disable plugin function for helpers grid"]
+    bool Setting_PlacementGrid_Enabled = true;
+    [Setting category="Functions" name="PlacementGrid: Placement Grid On"]
+    bool Setting_PlacementGrid_PlacementGridOn = false;
+    [Setting category="Functions" name="PlacementGrid: Placement Grid Transparent"]
+    bool Setting_PlacementGrid_PlacementGridTransparent = true;
     class PlacementGrid : EditorHelpers::EditorFunction
     {
-        bool Enabled() override { return settingPlacementGridEnabled; }
+        bool Enabled() override { return Setting_PlacementGrid_Enabled; }
 
         void RenderInterface() override
         {
@@ -21,20 +21,20 @@ namespace EditorHelpers
                     EditorHelpers::HelpMarker("Display the horizontal block grid");
                     UI::SameLine();
                 }
-                settingPlacementGridPlacementGridOn = UI::Checkbox("Placement Grid On", settingPlacementGridPlacementGridOn);
+                Setting_PlacementGrid_PlacementGridOn = UI::Checkbox("Placement Grid On", Setting_PlacementGrid_PlacementGridOn);
                 UI::SameLine();
-                settingPlacementGridPlacementGridTransparent = UI::Checkbox("Transparent", settingPlacementGridPlacementGridTransparent);
+                Setting_PlacementGrid_PlacementGridTransparent = UI::Checkbox("Transparent", Setting_PlacementGrid_PlacementGridTransparent);
             }
         }
 
         void Update(float) override
         {
             if (!Enabled() || Editor is null) return;
-            if (settingPlacementGridPlacementGridOn != Editor.PluginMapType.ShowPlacementGrid)
+            if (Setting_PlacementGrid_PlacementGridOn != Editor.PluginMapType.ShowPlacementGrid)
             {
                 Editor.ButtonHelper1OnClick();
             }
-            if (settingPlacementGridPlacementGridTransparent)
+            if (Setting_PlacementGrid_PlacementGridTransparent)
             {
                 Editor.GridColorAlpha = 0.0;
             }

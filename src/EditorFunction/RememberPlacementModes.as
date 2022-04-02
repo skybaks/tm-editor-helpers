@@ -43,12 +43,12 @@ namespace EditorHelpers
         }
     }
 
-    [Setting category="RememberPlacementModes" name="Enabled"]
-    bool settingRememberPlacementModesEnabled = true;
-    [Setting category="RememberPlacementModes" name="Maintain Block/Item Mode After Test"]
-    bool settingRememberPlacementModesMaintainBlockModeAfterTest = true;
-    [Setting category="RememberPlacementModes" name="Maintain Selection Mode"]
-    bool settingRememberPlacementModesMaintainSelectionMode = true;
+    [Setting category="Functions" name="RememberPlacementModes: Enabled" description="Uncheck to disable plugin functions for RememberPlacementModes"]
+    bool Setting_RememberPlacementModes_Enabled = true;
+    [Setting category="Functions" name="RememberPlacementModes: Maintain Block/Item Mode After Test" description="Remember Block, Item, or Macroblock mode after 'Esc' from Test mode"]
+    bool Setting_RememberPlacementModes_MaintainBlockModeAfterTest = true;
+    [Setting category="Functions" name="RememberPlacementModes: Maintain Selection Mode" description="Remember selection add or remove mode while using camera"]
+    bool Setting_RememberPlacementModes_MaintainSelectionMode = true;
     class RememberPlacementModes : EditorHelpers::EditorFunction
     {
         private string lastPlaceModeCategory;
@@ -56,7 +56,7 @@ namespace EditorHelpers
         private bool lastSelectionModeAddSub;
         private string lastPlaceModeCategoryBeforeTest;
 
-        bool Enabled() override { return settingRememberPlacementModesEnabled; }
+        bool Enabled() override { return Setting_RememberPlacementModes_Enabled; }
 
         void Init() override 
         {
@@ -66,30 +66,6 @@ namespace EditorHelpers
                 lastSelectionEditMode = CGameEditorPluginMap::EditMode::Unknown;
                 lastSelectionModeAddSub = false;
                 lastPlaceModeCategoryBeforeTest = "";
-            }
-        }
-
-        void RenderInterface() override
-        {
-            if (!Enabled()) return;
-            if (UI::CollapsingHeader("Remember Placement Modes"))
-            {
-                if (settingToolTipsEnabled)
-                {
-                    EditorHelpers::HelpMarker("Remember Block, Item, or Macroblock mode after 'Esc' from Test mode");
-                    UI::SameLine();
-                }
-                settingRememberPlacementModesMaintainBlockModeAfterTest = UI::Checkbox("Maintain Block Mode After Test", settingRememberPlacementModesMaintainBlockModeAfterTest);
-
-                if (Compatibility::EnableCopySelectionTool())
-                {
-                    if (settingToolTipsEnabled)
-                    {
-                        EditorHelpers::HelpMarker("Remember selection add or remove mode while using camera");
-                        UI::SameLine();
-                    }
-                    settingRememberPlacementModesMaintainSelectionMode = UI::Checkbox("Maintain Copy Tool Selection Mode", settingRememberPlacementModesMaintainSelectionMode);
-                }
             }
         }
 
@@ -118,7 +94,7 @@ namespace EditorHelpers
 
             if (lastPlaceModeCategory != currentPlaceModeCategory)
             {
-                if (settingRememberPlacementModesMaintainBlockModeAfterTest
+                if (Setting_RememberPlacementModes_MaintainBlockModeAfterTest
                 && lastPlaceModeCategory == "Test")
                 {
                     if (lastPlaceModeCategoryBeforeTest == "Block")
@@ -141,7 +117,7 @@ namespace EditorHelpers
             }
 
             if (Compatibility::EnableCopySelectionTool()
-                &&  settingRememberPlacementModesMaintainSelectionMode
+                &&  Setting_RememberPlacementModes_MaintainSelectionMode
                 && Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::CopyPaste)
             {
                 if (Editor.PluginMapType.EditMode == CGameEditorPluginMap::EditMode::SelectionAdd

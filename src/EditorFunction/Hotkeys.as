@@ -48,17 +48,17 @@ namespace EditorHelpers
         }
     }
 
-    [Setting category="Hotkeys" name="Hotkeys Function Enabled"]
+    [Setting category="Functions" name="Hotkeys: Hotkeys Function Enabled" description="Uncheck to disable all hotkey plugin code"]
     bool Setting_Hotkeys_Enabled = true;
 
-    [Setting category="Hotkeys" name="AirBlock HotKey Enabled"]
+    [Setting category="Functions" name="Hotkeys: AirBlock HotKey Enabled"]
     bool Setting_Hotkeys_AirBlockHotKeyEnabled = true;
-    [Setting category="Hotkeys" name="AirBlock HotKey"]
+    [Setting category="Functions" name="Hotkeys: AirBlock HotKey"]
     VirtualKey Setting_Hotkeys_AirBlockHotKey = VirtualKey::A;
 
-    [Setting category="Hotkeys" name="ToggleColors HotKey Enabled"]
+    [Setting category="Functions" name="Hotkeys: ToggleColors HotKey Enabled"]
     bool Setting_Hotkeys_ToggleColorsHotKeyEnabled = false;
-    [Setting category="Hotkeys" name="ToggleColors HotKey"]
+    [Setting category="Functions" name="Hotkeys: ToggleColors HotKey"]
     VirtualKey Setting_Hotkeys_ToggleColorsHotKey = VirtualKey::F6;
 
     class Hotkeys : EditorHelpers::EditorFunction
@@ -72,27 +72,6 @@ namespace EditorHelpers
             if (!Enabled() || Editor is null)
             {
                 m_keysDown.RemoveRange(0, m_keysDown.Length - 1);
-            }
-        }
-
-        void RenderInterface() override
-        {
-            if (!Enabled()) return;
-            if (UI::CollapsingHeader("Hotkeys"))
-            {
-                if (settingToolTipsEnabled)
-                {
-                    EditorHelpers::HelpMarker("[" + tostring(Setting_Hotkeys_AirBlockHotKey) + "] Hotkey for airblock mode toggle");
-                    UI::SameLine();
-                }
-                Setting_Hotkeys_AirBlockHotKeyEnabled = UI::Checkbox("Enable AirBlockMode Hotkey", Setting_Hotkeys_AirBlockHotKeyEnabled);
-
-                if (settingToolTipsEnabled)
-                {
-                    EditorHelpers::HelpMarker("[" + tostring(Setting_Hotkeys_ToggleColorsHotKey) + "] Hotkey to cycle through block colors");
-                    UI::SameLine();
-                }
-                Setting_Hotkeys_ToggleColorsHotKeyEnabled = UI::Checkbox("Enable ColorToggle Hotkey", Setting_Hotkeys_ToggleColorsHotKeyEnabled);
             }
         }
 
