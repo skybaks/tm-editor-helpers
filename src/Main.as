@@ -100,12 +100,6 @@ bool OnKeyPress(bool down, VirtualKey key)
 
 void Main()
 {
-    if (!EditorHelpers::HasPermission())
-    {
-        error("Invalid permissions to run EditorHelpers plugin.");
-        return;
-    }
-
     int dt = 0;
     float dtSeconds = 0.0;
     int prevFrameTime = Time::Now;
@@ -116,11 +110,14 @@ void Main()
         dtSeconds = dt / 1000.0f;
 
         EditorHelpers::tipHoverTimer.Update(dtSeconds);
-        for (uint index = 0; index < functions.Length; index++)
+        if (EditorHelpers::HasPermission())
         {
-            functions[index].Init();
-            functions[index].Update(dt);
-            functions[index].FirstPass = false;
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                functions[index].Init();
+                functions[index].Update(dt);
+                functions[index].FirstPass = false;
+            }
         }
         prevFrameTime = Time::Now;
     }
