@@ -1,20 +1,16 @@
 
 namespace EditorHelpers
 {
-    bool _permissionChecked = false;
-    bool _permission = false;
     bool HasPermission()
     {
+        bool permission = false;
 #if TMNEXT
-        if (!_permissionChecked)
-        {
-            _permission = Permissions::OpenSimpleMapEditor()
-                        && Permissions::OpenAdvancedMapEditor()
-                        && Permissions::CreateLocalMap();
-        }
+        permission = Permissions::OpenSimpleMapEditor()
+                    && Permissions::OpenAdvancedMapEditor()
+                    && Permissions::CreateLocalMap();
 #else
-        _permission = true;
+        permission = true;
 #endif
-        return _permission;
+        return permission;
     }
 }
