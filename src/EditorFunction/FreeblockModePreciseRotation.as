@@ -45,7 +45,7 @@ namespace EditorHelpers
                 {
                     stepSize = 1.0f;
                 }
-                else if (stepSizeName == "BiBiSlope")
+                else if (stepSizeName == "Half-BiSlope")
                 {
                     stepSize = Math::ToDeg(Math::Atan(4.0f / 32.0f));
                 }
@@ -56,6 +56,14 @@ namespace EditorHelpers
                 else if (stepSizeName == "Slope2")
                 {
                     stepSize = Math::ToDeg(Math::Atan(16.0f / 32.0f));
+                }
+                else if (stepSizeName == "Slope3")
+                {
+                    stepSize = Math::ToDeg(Math::Atan(24.0f / 32.0f));
+                }
+                else if (stepSizeName == "Slope4")
+                {
+                    stepSize = Math::ToDeg(Math::Atan(32.0f / 32.0f));
                 }
             }
         }
@@ -79,10 +87,10 @@ namespace EditorHelpers
                     stepSize = 1.0f;
                     stepSizeName = "Default";
                 }
-                else if (UI::Selectable("BiBiSlope", false))
+                else if (UI::Selectable("Half-BiSlope", false))
                 {
                     stepSize = Math::ToDeg(Math::Atan(4.0f / 32.0f));
-                    stepSizeName = "BiBiSlope";
+                    stepSizeName = "Half-BiSlope";
                 }
                 else if (UI::Selectable("BiSlope", false))
                 {
@@ -94,8 +102,25 @@ namespace EditorHelpers
                     stepSize = Math::ToDeg(Math::Atan(16.0f / 32.0f));
                     stepSizeName = "Slope2";
                 }
+                else if (UI::Selectable("Slope3", false))
+                {
+                    stepSize = Math::ToDeg(Math::Atan(24.0f / 32.0f));
+                    stepSizeName = "Slope3";
+                }
+                else if (UI::Selectable("Slope4", false))
+                {
+                    stepSize = Math::ToDeg(Math::Atan(32.0f / 32.0f));
+                    stepSizeName = "Slope4";
+                }
                 UI::EndCombo();
             }
+
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Use the +/- below to step this exact amount.");
+                UI::SameLine();
+            }
+            UI::Text("Current Step: " + tostring(stepSize) + " deg");
 
             if (settingToolTipsEnabled)
             {
