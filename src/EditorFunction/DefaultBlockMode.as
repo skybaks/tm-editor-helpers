@@ -99,7 +99,7 @@ namespace EditorHelpers
     }
 
     [Setting category="Functions" name="DefaultBlockMode: Enabled" description="Uncheck to disable all plugin functions related to DefaultBlockMode"]
-    bool Setting_DefaultBlockMode_Enabled = true;
+    bool Setting_DefaultBlockMode_Enabled = false;
     [Setting category="Functions" name="DefaultBlockMode: Default Block Mode" description="Default when switching into block mode"]
     EditorHelpers::Compatibility::SelectableBlockModes Setting_DefaultBlockMode_BlockMode = Compatibility::SelectableBlockModes::Normal;
     [Setting category="Functions" name="DefaultBlockMode: Default Item Mode" description="Default when switching into item mode"]

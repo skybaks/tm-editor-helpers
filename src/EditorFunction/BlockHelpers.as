@@ -31,18 +31,16 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface() override
+        void RenderInterface_Display() override
         {
             if (!Enabled()) return;
-            if (UI::CollapsingHeader("Block Helpers"))
+
+            if (settingToolTipsEnabled)
             {
-                if (settingToolTipsEnabled)
-                {
-                    EditorHelpers::HelpMarker("Hide/Show block clip helpers");
-                    UI::SameLine();
-                }
-                Setting_BlockHelpers_BlockHelpersOff = UI::Checkbox("Block Helpers Off", Setting_BlockHelpers_BlockHelpersOff);
+                EditorHelpers::HelpMarker("Hide/Show block clip helpers");
+                UI::SameLine();
             }
+            Setting_BlockHelpers_BlockHelpersOff = UI::Checkbox("Block Helpers Off", Setting_BlockHelpers_BlockHelpersOff);
         }
 
         void Update(float) override

@@ -17,42 +17,40 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface() override
+        void RenderInterface_Action() override
         {
             if (!Enabled()) return;
-            if (UI::CollapsingHeader("Quicksave"))
+
+            string currentFileName = Editor.PluginMapType.MapFileName;
+            if (settingToolTipsEnabled)
             {
-                string currentFileName = Editor.PluginMapType.MapFileName;
-                if (settingToolTipsEnabled)
-                {
-                    EditorHelpers::HelpMarker("Save map in one click");
-                    UI::SameLine();
-                }
-                if (UI::Button("Save Map"))
-                {
-                    if (timerQuicksave.Complete())
-                    {
-                        if (currentFileName != "")
-                        {
-                            string[] mapPath = currentFileName.Split("\\");
-                            string saveName = "";
-                            for (uint i = 0; i < (mapPath.Length - 1); i++)
-                            {
-                                saveName += mapPath[i] + "\\";
-                            }
-                            saveName += Editor.PluginMapType.MapName + ".Map.Gbx";
-                            Editor.PluginMapType.SaveMap(saveName);
-                        }
-                        else
-                        {
-                            Editor.ButtonSaveOnClick();
-                        }
-                        timerQuicksave.StartNew();
-                    }
-                }
+                EditorHelpers::HelpMarker("Save map in one click");
                 UI::SameLine();
-                UI::Text(currentFileName);
             }
+            if (UI::Button("Save Map"))
+            {
+                if (timerQuicksave.Complete())
+                {
+                    if (currentFileName != "")
+                    {
+                        string[] mapPath = currentFileName.Split("\\");
+                        string saveName = "";
+                        for (uint i = 0; i < (mapPath.Length - 1); i++)
+                        {
+                            saveName += mapPath[i] + "\\";
+                        }
+                        saveName += Editor.PluginMapType.MapName + ".Map.Gbx";
+                        Editor.PluginMapType.SaveMap(saveName);
+                    }
+                    else
+                    {
+                        Editor.ButtonSaveOnClick();
+                    }
+                    timerQuicksave.StartNew();
+                }
+            }
+            UI::SameLine();
+            UI::Text(currentFileName);
         }
 
         void Update(float dt) override

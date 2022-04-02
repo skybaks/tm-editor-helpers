@@ -58,9 +58,29 @@ void RenderInterface()
     if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
     UI::SetNextWindowSize(300, 600, UI::Cond::FirstUseEver);
     UI::Begin(Icons::PuzzlePiece + " Editor Helpers", settingWindowVisible);
-    for (uint index = 0; index < functions.Length; index++)
+
+    if (UI::CollapsingHeader("Action"))
     {
-        functions[index].RenderInterface();
+        for (uint index = 0; index < functions.Length; index++)
+        {
+            functions[index].RenderInterface_Action();
+        }
+    }
+
+    if (UI::CollapsingHeader("Display"))
+    {
+        for (uint index = 0; index < functions.Length; index++)
+        {
+            functions[index].RenderInterface_Display();
+        }
+    }
+
+    if (UI::CollapsingHeader("Build"))
+    {
+        for (uint index = 0; index < functions.Length; index++)
+        {
+            functions[index].RenderInterface_Build();
+        }
     }
     UI::End();
 }

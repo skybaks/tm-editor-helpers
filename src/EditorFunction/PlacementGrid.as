@@ -11,20 +11,18 @@ namespace EditorHelpers
     {
         bool Enabled() override { return Setting_PlacementGrid_Enabled; }
 
-        void RenderInterface() override
+        void RenderInterface_Display() override
         {
             if (!Enabled()) return;
-            if (UI::CollapsingHeader("Placement Grid"))
+
+            if (settingToolTipsEnabled)
             {
-                if (settingToolTipsEnabled)
-                {
-                    EditorHelpers::HelpMarker("Display the horizontal block grid");
-                    UI::SameLine();
-                }
-                Setting_PlacementGrid_PlacementGridOn = UI::Checkbox("Placement Grid On", Setting_PlacementGrid_PlacementGridOn);
+                EditorHelpers::HelpMarker("Display the horizontal block grid");
                 UI::SameLine();
-                Setting_PlacementGrid_PlacementGridTransparent = UI::Checkbox("Transparent", Setting_PlacementGrid_PlacementGridTransparent);
             }
+            Setting_PlacementGrid_PlacementGridOn = UI::Checkbox("Placement Grid On", Setting_PlacementGrid_PlacementGridOn);
+            UI::SameLine();
+            Setting_PlacementGrid_PlacementGridTransparent = UI::Checkbox("Transparent", Setting_PlacementGrid_PlacementGridTransparent);
         }
 
         void Update(float) override

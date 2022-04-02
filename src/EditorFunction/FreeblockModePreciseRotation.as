@@ -60,65 +60,65 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface() override
+        void RenderInterface_Build() override
         {
             if (!Enabled()) return;
+
             UI::PushID("FreeblockModePreciseRotation::RenderInterface");
-            if (UI::CollapsingHeader(Compatibility::FreeblockModePreciseRotationName() + "Precise Rotation"))
+
+            UI::TextDisabled("\tRotation");
+            if (settingToolTipsEnabled)
             {
-                if (settingToolTipsEnabled)
+                EditorHelpers::HelpMarker("Sets the rotational step size of the pitch and roll inputs to a game slope.");
+                UI::SameLine();
+            }
+            if (UI::BeginCombo("Step Size", stepSizeName))
+            {
+                if (UI::Selectable("Default", false))
                 {
-                    EditorHelpers::HelpMarker("Sets the rotational step size of the pitch and roll inputs to a game slope.");
-                    UI::SameLine();
+                    stepSize = 1.0f;
+                    stepSizeName = "Default";
                 }
-                if (UI::BeginCombo("Step Size", stepSizeName))
+                else if (UI::Selectable("BiBiSlope", false))
                 {
-                    if (UI::Selectable("Default", false))
-                    {
-                        stepSize = 1.0f;
-                        stepSizeName = "Default";
-                    }
-                    else if (UI::Selectable("BiBiSlope", false))
-                    {
-                        stepSize = Math::ToDeg(Math::Atan(4.0f / 32.0f));
-                        stepSizeName = "BiBiSlope";
-                    }
-                    else if (UI::Selectable("BiSlope", false))
-                    {
-                        stepSize = Math::ToDeg(Math::Atan(8.0f / 32.0f));
-                        stepSizeName = "BiSlope";
-                    }
-                    else if (UI::Selectable("Slope2", false))
-                    {
-                        stepSize = Math::ToDeg(Math::Atan(16.0f / 32.0f));
-                        stepSizeName = "Slope2";
-                    }
-                    UI::EndCombo();
+                    stepSize = Math::ToDeg(Math::Atan(4.0f / 32.0f));
+                    stepSizeName = "BiBiSlope";
                 }
+                else if (UI::Selectable("BiSlope", false))
+                {
+                    stepSize = Math::ToDeg(Math::Atan(8.0f / 32.0f));
+                    stepSizeName = "BiSlope";
+                }
+                else if (UI::Selectable("Slope2", false))
+                {
+                    stepSize = Math::ToDeg(Math::Atan(16.0f / 32.0f));
+                    stepSizeName = "Slope2";
+                }
+                UI::EndCombo();
+            }
 
-                if (settingToolTipsEnabled)
-                {
-                    EditorHelpers::HelpMarker("Pitch of the block in degrees. Use the +/- to increment or enter any value.");
-                    UI::SameLine();
-                }
-                float inputPitchResult = UI::InputFloat("Pitch (deg)", inputPitch, stepSize);
-                if (inputPitchResult != inputPitch)
-                {
-                    inputPitch = inputPitchResult;
-                    newInputToApply = true;
-                }
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Pitch of the block in degrees. Use the +/- to increment or enter any value.");
+                UI::SameLine();
+            }
+            float inputPitchResult = UI::InputFloat("Pitch (deg)", inputPitch, stepSize);
+            if (inputPitchResult != inputPitch)
+            {
+                inputPitch = inputPitchResult;
+                newInputToApply = true;
+            }
 
-                if (settingToolTipsEnabled)
-                {
-                    EditorHelpers::HelpMarker("Roll of the block in degrees. Use the +/- to increment or enter any value.");
-                    UI::SameLine();
-                }
-                float inputRollResult = UI::InputFloat("Roll (deg)", inputRoll, stepSize);
-                if (inputRollResult != inputRoll)
-                {
-                    inputRoll = inputRollResult;
-                    newInputToApply = true;
-                }
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Roll of the block in degrees. Use the +/- to increment or enter any value.");
+                UI::SameLine();
+            }
+            float inputRollResult = UI::InputFloat("Roll (deg)", inputRoll, stepSize);
+            if (inputRollResult != inputRoll)
+            {
+                inputRoll = inputRollResult;
+                newInputToApply = true;
             }
             UI::PopID();
         }

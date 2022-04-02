@@ -164,36 +164,38 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface() override
+        void RenderInterface_Build() override
         {
             if (!Enabled()) return;
+
             UI::PushID("CustomItemPlacement::RenderInterface");
-            if (UI::CollapsingHeader("Custom Item Placement"))
+            if (settingToolTipsEnabled)
             {
-                if (settingToolTipsEnabled)
-                {
-                    EditorHelpers::HelpMarker("Forces Ghost Mode on all items");
-                    UI::SameLine();
-                }
-                forceGhostMode = UI::Checkbox("Ghost Item Mode", forceGhostMode);
-                if (settingToolTipsEnabled)
-                {
-                    EditorHelpers::HelpMarker("Forces the following placement grid on all items");
-                    UI::SameLine();
-                }
-                applyGrid = UI::Checkbox("Apply Grid to Items", applyGrid);
-                gridSizeHoriz = UI::InputFloat("Horizontal Grid", gridSizeHoriz);
-                gridSizeVerti = UI::InputFloat("Vertical Grid", gridSizeVerti);
-                if (settingToolTipsEnabled)
-                {
-                    EditorHelpers::HelpMarker("Advanced manipulation of item pivot");
-                    UI::SameLine();
-                }
-                applyPivot = UI::Checkbox("Apply Custom Pivot", applyPivot);
-                currItemPivot.x = UI::InputFloat("Pivot X", currItemPivot.x);
-                currItemPivot.y = UI::InputFloat("Pivot Y", currItemPivot.y);
-                currItemPivot.z = UI::InputFloat("Pivot Z", currItemPivot.z);
+                EditorHelpers::HelpMarker("Forces Ghost Mode on all items");
+                UI::SameLine();
             }
+            forceGhostMode = UI::Checkbox("Ghost Item Mode", forceGhostMode);
+
+            UI::TextDisabled("\tItem Placement");
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Forces the following placement grid on all items");
+                UI::SameLine();
+            }
+            applyGrid = UI::Checkbox("Apply Grid to Items", applyGrid);
+            gridSizeHoriz = UI::InputFloat("Horizontal Grid", gridSizeHoriz);
+            gridSizeVerti = UI::InputFloat("Vertical Grid", gridSizeVerti);
+
+            UI::TextDisabled("\tItem Pivot");
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Advanced manipulation of item pivot");
+                UI::SameLine();
+            }
+            applyPivot = UI::Checkbox("Apply Custom Pivot", applyPivot);
+            currItemPivot.x = UI::InputFloat("Pivot X", currItemPivot.x);
+            currItemPivot.y = UI::InputFloat("Pivot Y", currItemPivot.y);
+            currItemPivot.z = UI::InputFloat("Pivot Z", currItemPivot.z);
             UI::PopID();
         }
 
