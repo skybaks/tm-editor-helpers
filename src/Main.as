@@ -17,6 +17,7 @@ array<EditorHelpers::EditorFunction@> functions =
 {
       EditorHelpers::Quicksave()
     , EditorHelpers::BlockHelpers()
+    , EditorHelpers::BlockCursor()
     , EditorHelpers::PlacementGrid()
     , EditorHelpers::DefaultBlockMode()
     , EditorHelpers::RememberPlacementModes()

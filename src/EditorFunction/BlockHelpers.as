@@ -23,7 +23,7 @@ namespace EditorHelpers
 
         bool Enabled() override { return Setting_BlockHelpers_Enabled; }
 
-        void Init() override 
+        void Init() override
         {
             if (!Enabled() || Editor is null)
             {
