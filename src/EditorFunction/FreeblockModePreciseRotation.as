@@ -24,12 +24,17 @@ namespace EditorHelpers
 
     [Setting category="Functions" name="FreeblockModePreciseRotation: Enabled" description="Uncheck to disable all plugin functions related to Block/Item Precise Rotation"]
     bool Settings_FreeblockModePreciseRotation_Enabled = true;
+    [Setting category="Functions" name="FreeblockModePreciseRotation: Persist Step Size" description="Persist step size selection through sessions"]
+    bool Setting_FreeblockModePreciseRotation_PersistStep = false;
+
+    [Setting category="Functions" hidden]
+    string Setting_FreeblockModePreciseRotation_StepSizeName = "Default";
+
     class FreeblockModePreciseRotation : EditorHelpers::EditorFunction
     {
         float inputPitch = 0.0f;
         float inputRoll = 0.0f;
-        float stepSize = 1.0f;
-        string stepSizeName = "Default";
+        float stepSize = 15.0f;
         bool newInputToApply = false;
 
         bool Enabled() override { return Settings_FreeblockModePreciseRotation_Enabled; }
@@ -41,27 +46,33 @@ namespace EditorHelpers
                 inputPitch = 0.0f;
                 inputRoll = 0.0f;
                 newInputToApply = false;
-                if (stepSizeName == "Default")
+
+                if (!Setting_FreeblockModePreciseRotation_PersistStep)
                 {
-                    stepSize = 1.0f;
+                    Setting_FreeblockModePreciseRotation_StepSizeName = "Default";
                 }
-                else if (stepSizeName == "Half-BiSlope")
+
+                if (Setting_FreeblockModePreciseRotation_StepSizeName == "Default")
+                {
+                    stepSize = 15.0f;
+                }
+                else if (Setting_FreeblockModePreciseRotation_StepSizeName == "Half-BiSlope")
                 {
                     stepSize = Math::ToDeg(Math::Atan(4.0f / 32.0f));
                 }
-                else if (stepSizeName == "BiSlope")
+                else if (Setting_FreeblockModePreciseRotation_StepSizeName == "BiSlope")
                 {
                     stepSize = Math::ToDeg(Math::Atan(8.0f / 32.0f));
                 }
-                else if (stepSizeName == "Slope2")
+                else if (Setting_FreeblockModePreciseRotation_StepSizeName == "Slope2")
                 {
                     stepSize = Math::ToDeg(Math::Atan(16.0f / 32.0f));
                 }
-                else if (stepSizeName == "Slope3")
+                else if (Setting_FreeblockModePreciseRotation_StepSizeName == "Slope3")
                 {
                     stepSize = Math::ToDeg(Math::Atan(24.0f / 32.0f));
                 }
-                else if (stepSizeName == "Slope4")
+                else if (Setting_FreeblockModePreciseRotation_StepSizeName == "Slope4")
                 {
                     stepSize = Math::ToDeg(Math::Atan(32.0f / 32.0f));
                 }
@@ -80,37 +91,37 @@ namespace EditorHelpers
                 EditorHelpers::HelpMarker("Sets the rotational step size of the pitch and roll inputs to a game slope.");
                 UI::SameLine();
             }
-            if (UI::BeginCombo("Step Size", stepSizeName))
+            if (UI::BeginCombo("Step Size", Setting_FreeblockModePreciseRotation_StepSizeName))
             {
                 if (UI::Selectable("Default", false))
                 {
-                    stepSize = 1.0f;
-                    stepSizeName = "Default";
+                    stepSize = 15.0f;
+                    Setting_FreeblockModePreciseRotation_StepSizeName = "Default";
                 }
                 else if (UI::Selectable("Half-BiSlope", false))
                 {
                     stepSize = Math::ToDeg(Math::Atan(4.0f / 32.0f));
-                    stepSizeName = "Half-BiSlope";
+                    Setting_FreeblockModePreciseRotation_StepSizeName = "Half-BiSlope";
                 }
                 else if (UI::Selectable("BiSlope", false))
                 {
                     stepSize = Math::ToDeg(Math::Atan(8.0f / 32.0f));
-                    stepSizeName = "BiSlope";
+                    Setting_FreeblockModePreciseRotation_StepSizeName = "BiSlope";
                 }
                 else if (UI::Selectable("Slope2", false))
                 {
                     stepSize = Math::ToDeg(Math::Atan(16.0f / 32.0f));
-                    stepSizeName = "Slope2";
+                    Setting_FreeblockModePreciseRotation_StepSizeName = "Slope2";
                 }
                 else if (UI::Selectable("Slope3", false))
                 {
                     stepSize = Math::ToDeg(Math::Atan(24.0f / 32.0f));
-                    stepSizeName = "Slope3";
+                    Setting_FreeblockModePreciseRotation_StepSizeName = "Slope3";
                 }
                 else if (UI::Selectable("Slope4", false))
                 {
                     stepSize = Math::ToDeg(Math::Atan(32.0f / 32.0f));
-                    stepSizeName = "Slope4";
+                    Setting_FreeblockModePreciseRotation_StepSizeName = "Slope4";
                 }
                 UI::EndCombo();
             }
