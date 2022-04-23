@@ -1,3 +1,7 @@
+## 5.2
+* Remove use of 'handled' in OnKeyPress functions to match change in Openplanet API
+
+
 ## 5.1
 * Re-add selection persistence to item placement. See "Persist Ghost Mode", "Persist Item Grid", and "Persist Item Pivot" in the settings.
 * Add selection persistence to item/block rotation. See "Persist Step Size" in the settings.

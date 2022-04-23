@@ -3,9 +3,8 @@ namespace EditorHelpers
 {
     namespace Compatibility
     {
-        bool OnKeyPress_AirBlockModeHotkey(CGameCtnEditorFree@ Editor, VirtualKey key)
+        void OnKeyPress_AirBlockModeHotkey(CGameCtnEditorFree@ Editor, VirtualKey key)
         {
-            bool handled = false;
 #if TMNEXT
             if (Setting_Hotkeys_AirBlockHotKeyEnabled && key == Setting_Hotkeys_AirBlockHotKey
                 && (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block
@@ -13,29 +12,20 @@ namespace EditorHelpers
                     || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeBlock))
             {
                 Editor.ButtonAirBlockModeOnClick();
-                handled = true;
             }
-#elif MP4
-            handled = false;
 #endif
-            return handled;
         }
 
-        bool OnKeyPress_ToggleColorsHotkey(CGameCtnEditorFree@ Editor, VirtualKey key)
+        void OnKeyPress_ToggleColorsHotkey(CGameCtnEditorFree@ Editor, VirtualKey key)
         {
-            bool handled = false;
 #if TMNEXT
             if (Setting_Hotkeys_ToggleColorsHotKeyEnabled && key == Setting_Hotkeys_ToggleColorsHotKey)
             {
                 int currValue = int(Editor.PluginMapType.NextMapElemColor);
                 if (currValue < 5) { currValue += 1; } else { currValue = 0; }
                 Editor.PluginMapType.NextMapElemColor = CGameEditorPluginMap::EMapElemColor(currValue);
-                handled = true;
             }
-#elif MP4
-            handled = false;
 #endif
-            return handled;
         }
 
         bool EnableHotkeysFunction()
@@ -75,7 +65,7 @@ namespace EditorHelpers
             }
         }
 
-        bool OnKeyPress(bool down, VirtualKey key) override
+        void OnKeyPress(bool down, VirtualKey key) override
         {
             auto currKeyIndex = m_keysDown.Find(key);
             if (down && currKeyIndex < 0)
@@ -87,16 +77,12 @@ namespace EditorHelpers
                 m_keysDown.RemoveAt(currKeyIndex);
             }
 
-            bool handled = false;
-            if (!Enabled()) return handled;
+            if (!Enabled()) return;
             if (!down && m_keysDown.IsEmpty() && Editor.PluginMapType !is null && Editor.PluginMapType.IsEditorReadyForRequest)
             {
-                // '|| handled' second will result in multiple hotkeys being
-                // able to be handled together if assigned to the same key
-                handled = Compatibility::OnKeyPress_AirBlockModeHotkey(Editor, key) || handled;
-                handled = Compatibility::OnKeyPress_ToggleColorsHotkey(Editor, key) || handled;
+                Compatibility::OnKeyPress_AirBlockModeHotkey(Editor, key);
+                Compatibility::OnKeyPress_ToggleColorsHotkey(Editor, key);
             }
-            return handled;
         }
     }
 }

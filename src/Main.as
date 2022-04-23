@@ -86,17 +86,14 @@ void RenderInterface()
     UI::End();
 }
 
-bool OnKeyPress(bool down, VirtualKey key)
+void OnKeyPress(bool down, VirtualKey key)
 {
-    bool handled = false;
-    if (!EditorHelpers::HasPermission()) return handled;
-    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return handled;
+    if (!EditorHelpers::HasPermission()) return;
+    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
     for (uint index = 0; index < functions.Length; index++)
     {
-        handled = functions[index].OnKeyPress(down, key);
-        if (handled) { break; }
+        functions[index].OnKeyPress(down, key);
     }
-    return handled;
 }
 
 void Main()
