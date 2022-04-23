@@ -1,5 +1,6 @@
 ## 5.2
 * Remove use of 'handled' in OnKeyPress functions to match change in Openplanet API
+* Rework some internal logic in quicksave function
 
 
 ## 5.1

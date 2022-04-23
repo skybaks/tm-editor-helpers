@@ -11,7 +11,7 @@ namespace EditorHelpers
 
         void Init() override
         {
-            if (!Enabled() || Editor is null)
+            if (FirstPass)
             {
                 timerQuicksave.MaxTime = 2.0f;
             }
@@ -27,28 +27,27 @@ namespace EditorHelpers
                 EditorHelpers::HelpMarker("Save map in one click");
                 UI::SameLine();
             }
+            UI::BeginDisabled(!timerQuicksave.Complete());
             if (UI::Button("Save Map"))
             {
-                if (timerQuicksave.Complete())
+                if (currentFileName != "")
                 {
-                    if (currentFileName != "")
+                    string[] mapPath = currentFileName.Split("\\");
+                    string saveName = "";
+                    for (uint i = 0; i < (mapPath.Length - 1); i++)
                     {
-                        string[] mapPath = currentFileName.Split("\\");
-                        string saveName = "";
-                        for (uint i = 0; i < (mapPath.Length - 1); i++)
-                        {
-                            saveName += mapPath[i] + "\\";
-                        }
-                        saveName += Editor.PluginMapType.MapName + ".Map.Gbx";
-                        Editor.PluginMapType.SaveMap(saveName);
+                        saveName += mapPath[i] + "\\";
                     }
-                    else
-                    {
-                        Editor.ButtonSaveOnClick();
-                    }
-                    timerQuicksave.StartNew();
+                    saveName += Editor.PluginMapType.MapName + ".Map.Gbx";
+                    Editor.PluginMapType.SaveMap(saveName);
                 }
+                else
+                {
+                    Editor.ButtonSaveOnClick();
+                }
+                timerQuicksave.StartNew();
             }
+            UI::EndDisabled();
             UI::SameLine();
             UI::Text(currentFileName);
         }
