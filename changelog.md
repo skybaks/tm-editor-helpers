@@ -1,3 +1,7 @@
+## 5.3
+* Add new feature - Rotation Randomizer. Turning this on will cause your block/item cursor to be rotated randomly on the selected axis's after each placement.
+
+
 ## 5.2
 * Remove use of 'handled' in OnKeyPress functions to match change in Openplanet API
 * Rework some internal logic in quicksave function
