@@ -1,13 +1,4 @@
 
-// TODO: Features to investigate/add
-// - Custom pivot points for blocks
-// - more precise placement for blocks in free mode
-// - remember erase mode
-// - validate menu
-// - set medal times
-// - change map bases dynamically
-
-
 [Setting category="General" name="Window Visible In Editor"]
 bool settingWindowVisible = true;
 [Setting category="General" name="Tooltips Enabled"]
@@ -24,6 +15,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::CustomItemPlacement()
     , EditorHelpers::FreeblockModePreciseRotation()
     , EditorHelpers::Hotkeys()
+    , EditorHelpers::RotationRandomizer()
 };
 
 namespace Compatibility
