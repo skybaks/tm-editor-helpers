@@ -1,5 +1,5 @@
 ## 5.3
-* Add new feature - Rotation Randomizer. Turning this on will cause your block/item cursor to be rotated randomly on the selected axis's after each placement.
+* Add new feature - Rotation Randomizer. Turning this on will cause your block/item cursor to be rotated randomly on the selected axis's after each placement. (Thanks to Raveout for the idea)
 
 
 ## 5.2
