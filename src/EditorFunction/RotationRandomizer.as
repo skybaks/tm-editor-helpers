@@ -22,6 +22,8 @@ namespace EditorHelpers
         private bool axisX = false;
         private bool axisY = false;
         private bool axisZ = false;
+        private vec2 limitsX = vec2(-180.0, 180.0);
+        private vec2 limitsZ = vec2(-180.0, 180.0);
 
         private uint prevClassicBlockCount = 0;
         private uint prevGhostBlockCount = 0;
@@ -31,6 +33,12 @@ namespace EditorHelpers
 
         void Init() override
         {
+            if (!Enabled() || Editor is null)
+            {
+                randomizerEnabled = false;
+                limitsX = vec2(-180.0, 180.0);
+                limitsZ = vec2(-180.0, 180.0);
+            }
         }
 
         void RenderInterface_Build() override
@@ -44,18 +52,56 @@ namespace EditorHelpers
             }
             randomizerEnabled = UI::Checkbox("Enable Rotation Randomizer", randomizerEnabled);
 
-            if (settingToolTipsEnabled)
+            if (UI::BeginTable("RotationRandomizerAxisTable", 3))
             {
-                EditorHelpers::HelpMarker("Axis for randomizer to control\nX=Pitch; Y=Yaw; Z=Roll");
-                UI::SameLine();
+                UI::TableSetupColumn("Axis", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 65.0);
+                UI::TableSetupColumn("Min", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 95.0);
+                UI::TableSetupColumn("Max", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 95.0);
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                if (settingToolTipsEnabled)
+                {
+                    EditorHelpers::HelpMarker("Rotation Randomizer should rotate about the vertical axis (Yaw).");
+                    UI::SameLine();
+                }
+                axisY = UI::Checkbox("Y", axisY);
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                if (settingToolTipsEnabled)
+                {
+                    EditorHelpers::HelpMarker("Rotation Randomizer should rotate about the horizontal axis (Pitch).\n"
+                        + "Limit the randomized range on this axis using Min/Max");
+                    UI::SameLine();
+                }
+                axisX = UI::Checkbox("X", axisX);
+                UI::TableNextColumn();
+                float newMinLimitX = UI::InputFloat("Min##X", limitsX.x, 0.0);
+                limitsX.x = Math::Clamp(newMinLimitX, -180.0, Math::Min(limitsX.y, 180.0));
+                UI::TableNextColumn();
+                float newMaxLimitX = UI::InputFloat("Max##X", limitsX.y, 0.0);
+                limitsX.y = Math::Clamp(newMaxLimitX, Math::Max(limitsX.x, -180.0), 180.0);
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                if (settingToolTipsEnabled)
+                {
+                    EditorHelpers::HelpMarker("Rotation Randomizer should rotate about the horizontal axis (Roll)."
+                        + "\nLimit the randomized range on this axis using Min/Max");
+                    UI::SameLine();
+                }
+                axisZ = UI::Checkbox("Z", axisZ);
+                UI::TableNextColumn();
+                float newMinLimitZ = UI::InputFloat("Min##Z", limitsZ.x, 0.0);
+                limitsZ.x = Math::Clamp(newMinLimitZ, -180.0, Math::Min(limitsZ.y, 180.0));
+                UI::TableNextColumn();
+                float newMaxLimitZ = UI::InputFloat("Max##Z", limitsZ.y, 0.0);
+                limitsZ.y = Math::Clamp(newMaxLimitZ, Math::Max(limitsZ.x, -180.0), 180.0);
+
+                UI::EndTable();
             }
-            UI::Text("Axis:");
-            UI::SameLine();
-            axisX = UI::Checkbox("X", axisX);
-            UI::SameLine();
-            axisY = UI::Checkbox("Y", axisY);
-            UI::SameLine();
-            axisZ = UI::Checkbox("Z", axisZ);
+
             UI::PopID();
         }
 
@@ -71,7 +117,7 @@ namespace EditorHelpers
                 {
                     if (axisX && Compatibility::RotationRandomizerCanBeUsed(Editor))
                     {
-                        Editor.Cursor.Pitch = Math::ToRad(Math::Rand(-180.0, 180.0));
+                        Editor.Cursor.Pitch = Math::ToRad(Math::Rand(limitsX.x, limitsX.y));
                     }
 
                     if (axisY)
@@ -86,7 +132,7 @@ namespace EditorHelpers
 
                     if (axisZ && Compatibility::RotationRandomizerCanBeUsed(Editor))
                     {
-                        Editor.Cursor.Roll = Math::ToRad(Math::Rand(-180.0, 180.0));
+                        Editor.Cursor.Roll = Math::ToRad(Math::Rand(limitsZ.x, limitsZ.y));
                     }
                 }
             }
