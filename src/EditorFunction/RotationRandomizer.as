@@ -11,6 +11,15 @@ namespace EditorHelpers
             return editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item;
 #endif
         }
+
+        uint GetGhostBlocksCount(CGameCtnEditorFree@ editor)
+        {
+            uint count = 0;
+#if TMNEXT
+            count = editor.PluginMapType.GhostBlocks.Length;
+#endif
+            return count;
+        }
     }
 
     [Setting category="function" name="RotationRandomizer: Enabled" description="Uncheck to disable all plugin functions related to the Rotation Randomizer"]
@@ -110,7 +119,7 @@ namespace EditorHelpers
             if (!Enabled() || Editor is null) return;
 
             if (prevClassicBlockCount < Editor.PluginMapType.ClassicBlocks.Length
-                || prevGhostBlockCount < Editor.PluginMapType.GhostBlocks.Length
+                || prevGhostBlockCount < Compatibility::GetGhostBlocksCount(Editor)
                 || prevAnchoredObjectCount < Editor.Challenge.AnchoredObjects.Length)
             {
                 if (randomizerEnabled)
@@ -138,7 +147,7 @@ namespace EditorHelpers
             }
 
             prevClassicBlockCount = Editor.PluginMapType.ClassicBlocks.Length;
-            prevGhostBlockCount = Editor.PluginMapType.GhostBlocks.Length;
+            prevGhostBlockCount = Compatibility::GetGhostBlocksCount(Editor);
             prevAnchoredObjectCount = Editor.Challenge.AnchoredObjects.Length;
         }
     }
