@@ -29,7 +29,7 @@ namespace EditorHelpers
         FIXED_STEP = 2
     }
 
-    [Setting category="function" name="RotationRandomizer: Enabled" description="Uncheck to disable all plugin functions related to the Rotation Randomizer"]
+    [Setting category="Functions" name="RotationRandomizer: Enabled" description="Uncheck to disable all plugin functions related to the Rotation Randomizer"]
     bool Setting_RotationRandomizer_Enabled = true;
 
     class RotationRandomizer : EditorHelpers::EditorFunction

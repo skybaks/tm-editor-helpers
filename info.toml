@@ -4,7 +4,7 @@ author = "skybaxrider"
 category = "Map Editor"
 blocks = [ "Plugin_EditorHelpers" ]
 siteid = 69
-version = "5.3.1"
+version = "5.3.2"
 perms = "paid"
 
 [script]
