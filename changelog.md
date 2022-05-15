@@ -1,3 +1,7 @@
+## 5.4
+* Add FIXED_STEP option to rotation randomizer. This mode increments on the selected axis's after each block/item placement.
+
+
 ## 5.3
 * Add new feature - Rotation Randomizer. Turning this on will cause your block/item cursor to be rotated randomly on the selected axis's after each placement. (Thanks to Raveout for the idea)
 
