@@ -4,7 +4,7 @@ bool settingWindowVisible = true;
 [Setting category="General" name="Tooltips Enabled"]
 bool settingToolTipsEnabled = true;
 
-array<EditorHelpers::EditorFunction@> functions = 
+array<EditorHelpers::EditorFunction@> functions =
 {
       EditorHelpers::Quicksave()
     , EditorHelpers::BlockHelpers()
@@ -16,6 +16,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::FreeblockModePreciseRotation()
     , EditorHelpers::Hotkeys()
     , EditorHelpers::RotationRandomizer()
+    , EditorHelpers::CameraModes()
 };
 
 namespace Compatibility
