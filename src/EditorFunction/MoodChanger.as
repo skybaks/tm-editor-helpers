@@ -34,16 +34,22 @@ namespace EditorHelpers
                 EditorHelpers::HelpMarker("Sets the mood to a specific time of the day");
                 UI::SameLine();
             }
+            if (Editor !is null) UI::Text("Actual map time: " + Editor.MoodTimeOfDayStr);
+            UI::Text("Set map time:");
+            UI::SameLine();
             UI::SetNextItemWidth(UI::GetWindowSize().x * 0.4f);
-            UserTimeSet = UI::InputText("Map Time", Editor.MoodTimeOfDayStr);
-            if (TimeMatchesRegex(UserTimeSet))
-                Editor.MoodTimeOfDayStr = UserTimeSet;
-            else {
-                UI::SameLine();
-                UI::Text("\\$f00"+Icons::Times);
+            SetTime = UI::InputText("###Map Time", SetTime);
+            UI::SameLine();
+            if (TimeMatchesRegex(SetTime)) {
+                if (UI::Button("Set time")) {
+                    SettingChanged = true;
+                }
             }
-
-            Editor.MoodTimeOfDay01 = UI::SliderFloat("Map time", Editor.MoodTimeOfDay01, 0.0f, 1.0f);
+            else {
+                UI::Text("\\$f00"+Icons::Times);
+                UI::SameLine();
+                EditorHelpers::HelpMarker("Time format is invalid.\nFormat should be HH:MM:SS");
+            }
         }
     }
 }
