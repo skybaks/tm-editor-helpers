@@ -5,7 +5,9 @@ namespace EditorHelpers
 
     class MoodChanger : EditorHelpers::EditorFunction
     {
-        string UserTimeSet = Editor.MoodTimeOfDayStr;
+        string SetTime;
+        bool SettingChanged;
+        bool EntreingEditor;
 
         bool TimeMatchesRegex(const string &in time)
         {
@@ -14,6 +16,14 @@ namespace EditorHelpers
         }
 
         bool Enabled() override { return Setting_MoodChanger_Enabled; }
+
+        void Update(float dt) override
+        {
+            if (Editor !is null && SettingChanged) {
+                SettingChanged = false;
+                Editor.MoodTimeOfDayStr = SetTime;
+            }
+        }
 
         void RenderInterface_Display() override
         {
