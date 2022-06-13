@@ -17,6 +17,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::Hotkeys()
     , EditorHelpers::RotationRandomizer()
     , EditorHelpers::MoodChanger()
+    , EditorHelpers::CameraModes()
 };
 
 namespace Compatibility
