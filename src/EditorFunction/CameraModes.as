@@ -1,17 +1,38 @@
 namespace EditorHelpers
 {
-    array<string> CameraModesStr = {
-        "Orbital",
-        "Free"
-    };
+    namespace Compatibility
+    {
+        void SetCamMode(CGameCtnEditorFree@ editor, const string&in camMode)
+        {
+#if TMNEXT
+            if (camMode == "Free")
+            {
+                editor.CamMode = CGameCtnEditorCommon::Free;
+            }
+            else if (camMode == "Orbital")
+            {
+                editor.CamMode = CGameCtnEditorCommon::Orbital;
+            }
+#else
+            if (camMode == "Free")
+            {
+                editor.CamMode = CGameCtnEditorCommon::_EUnnamedEnum::Free;
+            }
+            else if (camMode == "Orbital")
+            {
+                editor.CamMode = CGameCtnEditorCommon::_EUnnamedEnum::Orbital;
+            }
+#endif
+        }
+    }
+
     [Setting category="Functions" name="Camera Modes: Enable" description="Enable"]
     bool Setting_CameraMode_Enabled = true;
-    string Setting_CameraMode_CurrentMode = CameraModesStr[0];
 
     class CameraModes : EditorHelpers::EditorFunction
     {
-
-        bool SettingUpdated = false;
+        private bool SettingUpdated = false;
+        private string Setting_CameraMode_CurrentMode = "Orbital";
 
         bool Enabled() override { return Setting_CameraMode_Enabled; }
 
@@ -21,13 +42,8 @@ namespace EditorHelpers
 
             if (SettingUpdated)
             {
-                if (Setting_CameraMode_CurrentMode == CameraModesStr[1]) {
-                    Editor.CamMode = CGameCtnEditorCommon::_EUnnamedEnum::Free;
-                } else {
-                    Editor.CamMode = CGameCtnEditorCommon::_EUnnamedEnum::Orbital;
-                }
+                Compatibility::SetCamMode(Editor, Setting_CameraMode_CurrentMode);
                 SettingUpdated = false;
-                return;
             }
         }
 
@@ -40,15 +56,16 @@ namespace EditorHelpers
                 EditorHelpers::HelpMarker("Switch between Orbital (default) camera and Free camera.");
                 UI::SameLine();
             }
+
             if (UI::BeginCombo("Camera mode", Setting_CameraMode_CurrentMode)) {
                 if (UI::Selectable("Orbital (default)", false))
                 {
-                    Setting_CameraMode_CurrentMode = CameraModesStr[0];
+                    Setting_CameraMode_CurrentMode = "Orbital";
                     SettingUpdated = true;
                 }
                 else if (UI::Selectable("Free", false))
                 {
-                    Setting_CameraMode_CurrentMode = CameraModesStr[1];
+                    Setting_CameraMode_CurrentMode = "Free";
                     SettingUpdated = true;
                 }
                 UI::EndCombo();
