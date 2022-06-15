@@ -25,9 +25,11 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface_Display() override
+        void RenderInterface_Build() override
         {
             if (!Enabled()) return;
+
+            UI::TextDisabled("\tMood");
 
             if (settingToolTipsEnabled)
             {
