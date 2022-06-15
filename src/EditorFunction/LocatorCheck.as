@@ -186,6 +186,14 @@ namespace EditorHelpers
             {
                 auto fidsSubfile = cast<CSystemFidFile>(fidsFolder.Leaves[i]);
                 paths.InsertLast(prefix + fidsSubfile.FileName);
+
+                // Some weirdness with the arrows. Add these other file paths
+                if (fidsSubfile.FileName.Contains("+FreezeRGB"))
+                {
+                    string tempFilename = fidsSubfile.FileName;
+                    tempFilename = tempFilename.Replace("+FreezeRGB", "");
+                    paths.InsertLast(prefix + tempFilename);
+                }
             }
         }
 
