@@ -78,6 +78,14 @@ void RenderInterface()
             functions[index].RenderInterface_Build();
         }
     }
+
+    if (UI::CollapsingHeader("Info"))
+    {
+        for (uint index = 0; index < functions.Length; index++)
+        {
+            functions[index].RenderInterface_Info();
+        }
+    }
     UI::End();
 }
 

@@ -34,22 +34,28 @@ namespace EditorHelpers
 
         void Init() override
         {
-            if (m_initGameResources)
+            if (Editor !is null)
             {
-                auto appFidFile = cast<CSystemFidFile>(GetFidFromNod(GetApp()));
-                if (appFidFile !is null)
+                if (m_initGameResources)
                 {
-                    m_initGameResources = false;
-                    CSystemFidsFolder@ skinsFidFolder = GetTreeFidsFolder(appFidFile.ParentFolder, "Skins");
-                    RecursiveAddDefaultSkinsPath(skinsFidFolder, "Skins\\", m_gameResources);
-                    CSystemFidsFolder@ mediaFidFolder = GetTreeFidsFolder(appFidFile.ParentFolder, "Media");
-                    RecursiveAddDefaultSkinsPath(mediaFidFolder, "Media\\", m_gameResources);
+                    auto appFidFile = cast<CSystemFidFile>(GetFidFromNod(GetApp()));
+                    if (appFidFile !is null)
+                    {
+                        m_initGameResources = false;
+                        CSystemFidsFolder@ skinsFidFolder = GetTreeFidsFolder(appFidFile.ParentFolder, "Skins");
+                        RecursiveAddDefaultSkinsPath(skinsFidFolder, "Skins\\", m_gameResources);
+                        CSystemFidsFolder@ mediaFidFolder = GetTreeFidsFolder(appFidFile.ParentFolder, "Media");
+                        RecursiveAddDefaultSkinsPath(mediaFidFolder, "Media\\", m_gameResources);
+                    }
                 }
             }
-
-            if (Editor is null && m_deps.Length != 0)
+            else
             {
-                m_deps = {};
+                if (m_deps.Length != 0)
+                {
+                    m_deps = {};
+                }
+                m_initGameResources = true;
             }
         }
 
@@ -79,11 +85,10 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface_Action()
+        void RenderInterface_Info()
         {
             if (!Enabled()) return;
 
-            UI::BeginDisabled(m_deps.Length == 0);
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Check locators embedded in the map");
@@ -91,7 +96,7 @@ namespace EditorHelpers
             }
             if (UI::TreeNode("Locators"))
             {
-                if (UI::BeginTable("LocatorInfoTable", 4))
+                if (m_deps.Length > 0 && UI::BeginTable("LocatorInfoTable", 4))
                 {
                     UI::TableSetupColumn("", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 15.0f);
                     UI::TableSetupColumn("File");
@@ -155,10 +160,13 @@ namespace EditorHelpers
 
                     UI::EndTable();
                 }
+                else
+                {
+                    UI::Text("No dependencies found");
+                }
 
                 UI::TreePop();
             }
-            UI::EndDisabled();
         }
 
         private CSystemFidsFolder@ GetTreeFidsFolder(CSystemFids@ fids, const string&in dirName)
