@@ -28,7 +28,7 @@ namespace EditorHelpers
         private bool m_initGameResources = true;
         private string[] m_gameResources = {};
         private XmlHeaderDependency[] m_deps = {};
-        private string m_lastTimeWrite = "";
+        private string m_lastUidPlusBytes = "";
 
         bool Enabled() override { return Setting_LocatorCheck_Enabled; }
 
@@ -66,7 +66,8 @@ namespace EditorHelpers
             auto challengeFidFile = cast<CSystemFidFile>(GetFidFromNod(Editor.Challenge));
             if (challengeFidFile !is null)
             {
-                if (m_lastTimeWrite != challengeFidFile.TimeWrite)
+                string uidPlusBytes = Editor.Challenge.EdChallengeId + tostring(challengeFidFile.ByteSize);
+                if (m_lastUidPlusBytes != uidPlusBytes)
                 {
                     string xmlHeaderString = ReadGbxXmlHeader();
                     m_deps = {};
@@ -77,11 +78,11 @@ namespace EditorHelpers
                     }
                 }
 
-                m_lastTimeWrite = challengeFidFile.TimeWrite;
+                m_lastUidPlusBytes = uidPlusBytes;
             }
             else
             {
-                m_lastTimeWrite = "";
+                m_lastUidPlusBytes = "";
             }
         }
 
@@ -258,14 +259,14 @@ namespace EditorHelpers
                 XML::Node headerNode = doc.Root().FirstChild();
                 XML::Node depsHeaderNode = headerNode.Child("deps");
                 XML::Node depsNode = depsHeaderNode.FirstChild();
-                do
+                while (depsNode)
                 {
                     XmlHeaderDependency newDep;
                     newDep.File = depsNode.Attribute("file");
                     newDep.Url = depsNode.Attribute("url");
                     m_deps.InsertLast(newDep);
                     depsNode = depsNode.NextSibling();
-                } while (depsNode);
+                }
 
             }
             catch
