@@ -34,10 +34,13 @@ namespace EditorHelpers
 
         void Init() override
         {
+            if (!Enabled()) return;
+
             if (Editor !is null)
             {
                 if (m_initGameResources)
                 {
+                    m_lastUidPlusBytes = "";
                     auto appFidFile = cast<CSystemFidFile>(GetFidFromNod(GetApp()));
                     if (appFidFile !is null)
                     {
