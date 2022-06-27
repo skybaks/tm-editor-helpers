@@ -1,7 +1,7 @@
 ## 5.4
 * Add FIXED_STEP option to rotation randomizer. This mode increments on the selected axis's after each block/item placement.
-* From Greep - Add Mood Changer function which allows you to set your map's time of day down to the second
-* From Greep - Add Camera Modes function which lets you switch between orbital and free cam in the editor
+* From Greep (thanks!) - Add Mood Changer function which allows you to set your map's time of day down to the second
+* From Greep (thanks!) - Add Camera Modes function which lets you switch between orbital and free cam in the editor
 * Add Locator Check function. This scans your map file header and checks that all embedded media has a url linked to it (excluding game resources).
 
 

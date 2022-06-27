@@ -211,6 +211,9 @@ namespace EditorHelpers
 
         private string ReadGbxXmlHeader()
         {
+            // refs
+            // https://github.com/BigBang1112/gbx-net/blob/master/Src/GBX.NET/Engines/Game/CGameCtnChallenge.md
+            // https://github.com/PyPlanet/PyPlanet/blob/master/pyplanet/utils/gbxparser.py
             string xmlString = "";
             auto fidFile = cast<CSystemFidFile>(GetFidFromNod(Editor.Challenge));
             if (fidFile !is null)
