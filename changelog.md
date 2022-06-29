@@ -1,3 +1,7 @@
+## 5.5
+* Add hotkey to flip item/freeblock 180 deg. Defaulted off, needs to be enabled in settings. Default key is `.`
+
+
 ## 5.4
 * Add FIXED_STEP option to rotation randomizer. This mode increments on the selected axis's after each block/item placement.
 * From Greep (thanks!) - Add Mood Changer function which allows you to set your map's time of day down to the second

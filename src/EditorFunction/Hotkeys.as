@@ -28,6 +28,23 @@ namespace EditorHelpers
 #endif
         }
 
+        void OnKeyPress_FlipCursor180(CGameCtnEditorFree@ Editor, VirtualKey key)
+        {
+            if (Setting_Hotkeys_FlipCursor180HotKeyEnabled
+                && Setting_Hotkeys_FlipCursor180HotKey == key
+                && Compatibility::FreeblockModePreciseRotationShouldBeActive(Editor))
+            {
+                if (Editor.Cursor.Pitch < 0.0)
+                {
+                    Editor.Cursor.Pitch = 0.0;
+                }
+                else
+                {
+                    Editor.Cursor.Pitch = Math::ToRad(-180.0);
+                }
+            }
+        }
+
         bool EnableHotkeysFunction()
         {
 #if TMNEXT
@@ -50,6 +67,11 @@ namespace EditorHelpers
     bool Setting_Hotkeys_ToggleColorsHotKeyEnabled = false;
     [Setting category="Functions" name="Hotkeys: ToggleColors HotKey"]
     VirtualKey Setting_Hotkeys_ToggleColorsHotKey = VirtualKey::F6;
+
+    [Setting category="Functions" name="Hotkeys: FlipCursor180 HotKey Enabled"]
+    bool Setting_Hotkeys_FlipCursor180HotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: FlipCursor180 HotKey"]
+    VirtualKey Setting_Hotkeys_FlipCursor180HotKey = VirtualKey::OemPeriod;
 
     class Hotkeys : EditorHelpers::EditorFunction
     {
@@ -82,6 +104,7 @@ namespace EditorHelpers
             {
                 Compatibility::OnKeyPress_AirBlockModeHotkey(Editor, key);
                 Compatibility::OnKeyPress_ToggleColorsHotkey(Editor, key);
+                Compatibility::OnKeyPress_FlipCursor180(Editor, key);
             }
         }
     }
