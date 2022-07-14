@@ -16,6 +16,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::FreeblockModePreciseRotation()
     , EditorHelpers::Hotkeys()
     , EditorHelpers::RotationRandomizer()
+    , EditorHelpers::FreeblockModePreciseTranslation()
     , EditorHelpers::MoodChanger()
     , EditorHelpers::CameraModes()
     , EditorHelpers::LocatorCheck()
