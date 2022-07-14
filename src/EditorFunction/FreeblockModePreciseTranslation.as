@@ -1,15 +1,12 @@
 
+#if TMNEXT
 namespace EditorHelpers
 {
     namespace Compatibility
     {
         bool FreeblockModePreciseTranslationShouldBeActive(CGameCtnEditorFree@ editor)
         {
-#if TMNEXT
             return editor.Cursor.UseFreePos || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item;
-#else
-            return false;
-#endif
         }
     }
 
@@ -70,3 +67,4 @@ namespace EditorHelpers
         }
     }
 }
+#endif
