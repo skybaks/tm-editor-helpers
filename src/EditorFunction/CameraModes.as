@@ -16,11 +16,11 @@ namespace EditorHelpers
 #else
             if (camMode == "Free")
             {
-                editor.CamMode = CGameCtnEditorCommon::_EUnnamedEnum::Free;
+                editor.CamMode = CGameCtnEditorCommon::Free;
             }
             else if (camMode == "Orbital")
             {
-                editor.CamMode = CGameCtnEditorCommon::_EUnnamedEnum::Orbital;
+                editor.CamMode = CGameCtnEditorCommon::Orbital;
             }
 #endif
         }
