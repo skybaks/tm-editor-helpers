@@ -1,5 +1,7 @@
 ## 5.5
 * Add hotkey to flip item/freeblock 180 deg. Defaulted off, needs to be enabled in settings. Default key is `.`
+* Fix issue with changing openplanet API in MP4
+* From Rxelux - Add Freeblock Precise Translation function which allows you to set a numeric placement offset while in freeblock mode
 
 
 ## 5.4
