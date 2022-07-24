@@ -3,7 +3,7 @@ namespace EditorHelpers
 {
     [Setting category="Functions" name="RouteDebug: RouteDebug Function Enabled" description="Uncheck to disable all route debug plugin code"]
     bool Setting_RouteDebug_Enabled = true;
-    [Setting category="Function" name="RouteDebug: Show test run overlay" description="Show the overlay of the last test run"]
+    [Setting category="Functions" name="RouteDebug: Show test run overlay" description="Show the overlay of the last test run"]
     bool Setting_RouteDebug_ShowOverlay = false;
 
     class DrivingShapshot
