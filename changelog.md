@@ -1,3 +1,8 @@
+# 5.6
+* Change behavior of color toggle hotkey. New behavior is to quickswitch to your previous selected color. (Old behavior was simply to cycle through all colors.)
+* Add UI showing what plugin hotkeys are currently active.
+
+
 ## 5.5
 * Add hotkey to flip item/freeblock 180 deg. Defaulted off, needs to be enabled in settings. Default key is `.`
 * Fix issue with changing openplanet API in MP4
