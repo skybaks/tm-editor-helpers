@@ -12,6 +12,7 @@ namespace EditorHelpers
         void RenderInterface_Display(){}
         void RenderInterface_Build(){}
         void RenderInterface_Info(){}
+        void RenderDrawing(){}
         void Update(float){}
         void OnKeyPress(bool down, VirtualKey key){}
     }

@@ -22,6 +22,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::MoodChanger()
     , EditorHelpers::CameraModes()
     , EditorHelpers::LocatorCheck()
+    , EditorHelpers::RouteDebug()
 };
 
 namespace Compatibility
@@ -90,6 +91,17 @@ void RenderInterface()
         }
     }
     UI::End();
+}
+
+void Render()
+{
+    if (!EditorHelpers::HasPermission()) return;
+    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
+
+    for (uint index = 0; index < functions.Length; index++)
+    {
+        functions[index].RenderDrawing();
+    }
 }
 
 void OnKeyPress(bool down, VirtualKey key)

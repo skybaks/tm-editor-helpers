@@ -99,8 +99,10 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface_Action()
+        void RenderInterface_Action() override
         {
+            if (!Enabled()) return;
+
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Plugin Hotkeys are managed in the settings");
