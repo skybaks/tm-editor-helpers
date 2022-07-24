@@ -16,14 +16,12 @@ namespace EditorHelpers
 #endif
         }
 
-        void OnKeyPress_ToggleColorsHotkey(CGameCtnEditorFree@ Editor, VirtualKey key)
+        void OnKeyPress_ToggleColorsHotkey(CGameCtnEditorFree@ Editor, VirtualKey key, int previousColor)
         {
 #if TMNEXT
             if (Setting_Hotkeys_ToggleColorsHotKeyEnabled && key == Setting_Hotkeys_ToggleColorsHotKey)
             {
-                int currValue = int(Editor.PluginMapType.NextMapElemColor);
-                if (currValue < 5) { currValue += 1; } else { currValue = 0; }
-                Editor.PluginMapType.NextMapElemColor = CGameEditorPluginMap::EMapElemColor(currValue);
+                Editor.PluginMapType.NextMapElemColor = CGameEditorPluginMap::EMapElemColor(previousColor);
             }
 #endif
         }
@@ -43,6 +41,16 @@ namespace EditorHelpers
                     Editor.Cursor.Pitch = Math::ToRad(-180.0);
                 }
             }
+        }
+
+        int GetCurrentMapElemColor(CGameCtnEditorFree@ Editor)
+        {
+            int elemColor = 0;
+#if TMNEXT
+            elemColor = int(Editor.PluginMapType.NextMapElemColor);
+#elif MP4
+#endif
+            return elemColor;
         }
 
         bool EnableHotkeysFunction()
@@ -76,6 +84,8 @@ namespace EditorHelpers
     class Hotkeys : EditorHelpers::EditorFunction
     {
         VirtualKey[] m_keysDown = {};
+        int m_mapElemColorPrev = 0;
+        int m_mapElemColorPrevPrev = 0;
 
         bool Enabled() override { return Compatibility::EnableHotkeysFunction(); }
 
@@ -84,6 +94,48 @@ namespace EditorHelpers
             if (!Enabled() || Editor is null)
             {
                 m_keysDown.RemoveRange(0, m_keysDown.Length - 1);
+                m_mapElemColorPrev = 0;
+                m_mapElemColorPrevPrev = 0;
+            }
+        }
+
+        void RenderInterface_Action()
+        {
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Plugin Hotkeys are managed in the settings");
+                UI::SameLine();
+            }
+            UI::Text("Hover for Active Hotkeys");
+            if (UI::IsItemHovered())
+            {
+                UI::BeginTooltip();
+                string activeHotkeysHelper = "";
+                if (Setting_Hotkeys_AirBlockHotKeyEnabled)
+                {
+                    activeHotkeysHelper += "[ " + tostring(Setting_Hotkeys_AirBlockHotKey) + " ]\tToggle Airblock Mode\n";
+                }
+                if (Setting_Hotkeys_ToggleColorsHotKeyEnabled)
+                {
+                    activeHotkeysHelper += "[ " + tostring(Setting_Hotkeys_ToggleColorsHotKey) + " ]\tQuickswitch Last Element Color\n";
+                }
+                if (Setting_Hotkeys_FlipCursor180HotKeyEnabled)
+                {
+                    activeHotkeysHelper += "[ " + tostring(Setting_Hotkeys_FlipCursor180HotKey) + " ]\tFlip Block/Item 180 degrees\n";
+                }
+                UI::Text(activeHotkeysHelper);
+                UI::EndTooltip();
+            }
+        }
+
+        void Update(float)
+        {
+            if (!Enabled() || Editor is null) return;
+
+            if (m_mapElemColorPrev != Compatibility::GetCurrentMapElemColor(Editor))
+            {
+                m_mapElemColorPrevPrev = m_mapElemColorPrev;
+                m_mapElemColorPrev = Compatibility::GetCurrentMapElemColor(Editor);
             }
         }
 
@@ -103,7 +155,7 @@ namespace EditorHelpers
             if (!down && m_keysDown.IsEmpty() && Editor.PluginMapType !is null && Editor.PluginMapType.IsEditorReadyForRequest)
             {
                 Compatibility::OnKeyPress_AirBlockModeHotkey(Editor, key);
-                Compatibility::OnKeyPress_ToggleColorsHotkey(Editor, key);
+                Compatibility::OnKeyPress_ToggleColorsHotkey(Editor, key, m_mapElemColorPrevPrev);
                 Compatibility::OnKeyPress_FlipCursor180(Editor, key);
             }
         }
