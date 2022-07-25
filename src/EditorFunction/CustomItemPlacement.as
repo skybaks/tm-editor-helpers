@@ -120,13 +120,13 @@ namespace EditorHelpers
         float VOffset = 0.0f;
     }
 
-    [Setting category="Functions" name="CustomItemPlacement: Enabled" description="Uncheck to disable plugin functions related to custom item placement"]
+    [Setting category="Functions" name="CustomItemPlacement: Enabled" hidden]
     bool Setting_CustomItemPlacement_Enabled = true;
-    [Setting category="Functions" name="CustomItemPlacement: Persist Ghost Mode" description="Persist ghost item mode selection though sessions"]
+    [Setting category="Functions" name="CustomItemPlacement: Persist Ghost Mode" hidden]
     bool Setting_CustomItemPlacement_PersistGhost = false;
-    [Setting category="Functions" name="CustomItemPlacement: Persist Item Grid" description="Persist item grid selection through sessions"]
+    [Setting category="Functions" name="CustomItemPlacement: Persist Item Grid" hidden]
     bool Setting_CustomItemPlacement_PersistGrid = false;
-    [Setting category="Functions" name="CustomItemPlacement: Persist Item Pivot" description="Persist item pivot selection through sessions"]
+    [Setting category="Functions" name="CustomItemPlacement: Persist Item Pivot" hidden]
     bool Setting_CustomItemPlacement_PersistPivot = false;
 
     [Setting category="Functions" hidden]
@@ -150,7 +150,23 @@ namespace EditorHelpers
         private bool lastApplyGrid = false;
         private bool lastApplyPivot = false;
 
+        string Name() override { return "Custom Item Placement"; }
         bool Enabled() override { return Setting_CustomItemPlacement_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_CustomItemPlacement_Enabled = UI::Checkbox("Enabled", Setting_CustomItemPlacement_Enabled);
+            UI::BeginDisabled(!Setting_CustomItemPlacement_Enabled);
+            UI::TextWrapped("Provides the ability to modify aspects of item placement on the fly. This includes changing an item's placement grid, changing an item's primary pivot point, and/or forcing ghost mode on the item.");
+            Setting_CustomItemPlacement_PersistGhost = UI::Checkbox("Persist Force Item Ghost Mode selection between editor sessions", Setting_CustomItemPlacement_PersistGhost);
+            Setting_CustomItemPlacement_PersistGrid = UI::Checkbox("Persist Force Item Grid selection between editor sessions", Setting_CustomItemPlacement_PersistGrid);
+            Setting_CustomItemPlacement_PersistPivot = UI::Checkbox("Persist Force Item Pivot selection between editor sessions", Setting_CustomItemPlacement_PersistPivot);
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override
         {

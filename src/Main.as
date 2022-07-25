@@ -104,6 +104,16 @@ void Render()
     }
 }
 
+[SettingsTab name="Settings"]
+void RenderSettingsPage()
+{
+    for (uint index = 0; index < functions.Length; index++)
+    {
+        functions[index].RenderInterface_Settings();
+        UI::Separator();
+    }
+}
+
 void OnKeyPress(bool down, VirtualKey key)
 {
     if (!EditorHelpers::HasPermission()) return;

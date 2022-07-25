@@ -26,7 +26,7 @@ namespace EditorHelpers
         }
     }
 
-    [Setting category="Functions" name="Camera Modes: Enable" description="Enable"]
+    [Setting category="Functions" name="Camera Modes: Enable" hidden]
     bool Setting_CameraMode_Enabled = true;
 
     class CameraModes : EditorHelpers::EditorFunction
@@ -34,7 +34,20 @@ namespace EditorHelpers
         private bool SettingUpdated = false;
         private string Setting_CameraMode_CurrentMode = "Orbital";
 
+        string Name() override { return "Camera Modes"; }
         bool Enabled() override { return Setting_CameraMode_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_CameraMode_Enabled = UI::Checkbox("Enabled", Setting_CameraMode_Enabled);
+            UI::BeginDisabled(!Setting_CameraMode_Enabled);
+            UI::TextWrapped("Provides an interface for switching to other cameras in the map editor.");
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Update(float dt) override
         {

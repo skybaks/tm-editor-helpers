@@ -71,46 +71,103 @@ namespace EditorHelpers
 #endif
         }
 
-        enum SelectableBlockModes
+        string[] SelectableBlockModes =
         {
-            Normal
-            , Ghost
+            "Normal"
+            , "Ghost"
 #if TMNEXT
-            , Free
+            , "Free"
 #endif
-        }
+        };
 
-        enum SelectableItemModes
+        string[] SelectableItemModes =
         {
-            Normal
+            "Normal"
 #if TMNEXT
-            , FreeGround
-            , Free
+            , "FreeGround"
+            , "Free"
 #endif
-        }
+        };
 
-        enum SelectableMacroblockModes
+        string[] SelectableMacroblockModes =
         {
-            Normal
+            "Normal"
 #if TMNEXT
-            , Free
+            , "Free"
 #endif
-        }
+        };
     }
 
-    [Setting category="Functions" name="DefaultBlockMode: Enabled" description="Uncheck to disable all plugin functions related to DefaultBlockMode"]
+    [Setting category="Functions" name="DefaultBlockMode: Enabled" hidden]
     bool Setting_DefaultBlockMode_Enabled = false;
-    [Setting category="Functions" name="DefaultBlockMode: Default Block Mode" description="Default when switching into block mode"]
-    EditorHelpers::Compatibility::SelectableBlockModes Setting_DefaultBlockMode_BlockMode = Compatibility::SelectableBlockModes::Normal;
-    [Setting category="Functions" name="DefaultBlockMode: Default Item Mode" description="Default when switching into item mode"]
-    EditorHelpers::Compatibility::SelectableItemModes Setting_DefaultBlockMode_ItemMode = Compatibility::SelectableItemModes::Normal;
-    [Setting category="Functions" name="DefaultBlockMode: Default Macroblock Mode" description="Default when switching into macroblock mode"]
-    EditorHelpers::Compatibility::SelectableMacroblockModes Setting_DefaultBlockMode_MacroblockMode = Compatibility::SelectableMacroblockModes::Normal;
+    [Setting category="Functions" name="DefaultBlockMode: Default Block Mode" hidden]
+    string Setting_DefaultBlockMode_BlockMode = "Normal";
+    [Setting category="Functions" name="DefaultBlockMode: Default Item Mode" hidden]
+    string Setting_DefaultBlockMode_ItemMode = "Normal";
+    [Setting category="Functions" name="DefaultBlockMode: Default Macroblock Mode" hidden]
+    string Setting_DefaultBlockMode_MacroblockMode = "Normal";
+
     class DefaultBlockMode : EditorHelpers::EditorFunction
     {
         private string lastPlaceModeCategory;
 
+        string Name() override { return "Default Block Mode"; }
         bool Enabled() override { return Setting_DefaultBlockMode_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_DefaultBlockMode_Enabled = UI::Checkbox("Enabled", Setting_DefaultBlockMode_Enabled);
+            UI::BeginDisabled(!Setting_DefaultBlockMode_Enabled);
+            UI::TextWrapped("This allows you to choose a default mode for block, item, and macroblock modes. That means that when you switch to block, item, or macroblock mode your default will be picked.");
+
+            UI::Text("Default Block Mode:");
+            UI::SameLine();
+            for (uint i = 0; i < Compatibility::SelectableBlockModes.Length; i++)
+            {
+                if (UI::RadioButton(Compatibility::SelectableBlockModes[i] + "##Block", Compatibility::SelectableBlockModes[i] == Setting_DefaultBlockMode_BlockMode))
+                {
+                    Setting_DefaultBlockMode_BlockMode = Compatibility::SelectableBlockModes[i];
+                }
+                if (i < (Compatibility::SelectableBlockModes.Length - 1))
+                {
+                    UI::SameLine();
+                }
+            }
+
+            UI::Text("Default Item Mode:");
+            UI::SameLine();
+            for (uint i = 0; i < Compatibility::SelectableItemModes.Length; i++)
+            {
+                if (UI::RadioButton(Compatibility::SelectableItemModes[i] + "##Item", Compatibility::SelectableItemModes[i] == Setting_DefaultBlockMode_ItemMode))
+                {
+                    Setting_DefaultBlockMode_ItemMode = Compatibility::SelectableItemModes[i];
+                }
+                if (i < (Compatibility::SelectableItemModes.Length - 1))
+                {
+                    UI::SameLine();
+                }
+            }
+
+            UI::Text("Default Macroblock Mode:");
+            UI::SameLine();
+            for (uint i = 0; i < Compatibility::SelectableMacroblockModes.Length; i++)
+            {
+                if (UI::RadioButton(Compatibility::SelectableMacroblockModes[i] + "##Macroblock", Compatibility::SelectableMacroblockModes[i] == Setting_DefaultBlockMode_MacroblockMode))
+                {
+                    Setting_DefaultBlockMode_MacroblockMode = Compatibility::SelectableMacroblockModes[i];
+                }
+                if (i < (Compatibility::SelectableMacroblockModes.Length - 1))
+                {
+                    UI::SameLine();
+                }
+            }
+
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override 
         {

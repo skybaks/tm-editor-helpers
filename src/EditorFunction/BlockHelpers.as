@@ -13,15 +13,30 @@ namespace EditorHelpers
         }
     }
 
-    [Setting category="Functions" name="BlockHelpers: Enabled" description="Uncheck to disable all plugin functions related to block helpers"]
+    [Setting category="Functions" name="BlockHelpers: Enabled" hidden]
     bool Setting_BlockHelpers_Enabled = true;
-    [Setting category="Functions" name="BlockHelpers: Block Helpers Off"]
+    [Setting category="Functions" name="BlockHelpers: Block Helpers Off" hidden]
     bool Setting_BlockHelpers_BlockHelpersOff = false;
+
     class BlockHelpers : EditorHelpers::EditorFunction
     {
         private bool lastBlockHelpersOff;
 
+        string Name() override { return "Block Helpers"; }
         bool Enabled() override { return Setting_BlockHelpers_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_BlockHelpers_Enabled = UI::Checkbox("Enabled", Setting_BlockHelpers_Enabled);
+            UI::BeginDisabled(!Setting_BlockHelpers_Enabled);
+            UI::TextWrapped("Enables hiding/showing the clip helpers on placed blocks in the editor.");
+            Setting_BlockHelpers_BlockHelpersOff = UI::Checkbox("Block Helpers Off", Setting_BlockHelpers_BlockHelpersOff);
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override
         {

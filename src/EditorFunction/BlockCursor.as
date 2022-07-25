@@ -1,15 +1,30 @@
 
 namespace EditorHelpers
 {
-    [Setting category="Functions" name="BlockCursor: Enabled" description="Uncheck to disable all plugin functions relating to Block Cursor"]
+    [Setting category="Functions" name="BlockCursor: Enabled" hidden]
     bool Setting_BlockCursor_Enabled = true;
-    [Setting category="Functions" name="BlockCursor: Hide Block Cursor"]
+    [Setting category="Functions" name="BlockCursor: Hide Block Cursor" hidden]
     bool Setting_BlockCursor_HideBlockCursor = false;
+
     class BlockCursor : EditorHelpers::EditorFunction
     {
         private bool lastBlockCursorOff;
 
+        string Name() override { return "Block Cursor"; }
         bool Enabled() override { return Setting_BlockCursor_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_BlockCursor_Enabled = UI::Checkbox("Enabled", Setting_BlockCursor_Enabled);
+            UI::BeginDisabled(!Setting_BlockCursor_Enabled);
+            UI::TextWrapped("Enables hiding/showing the colored box that surrounds the current block or item in your cursor.");
+            Setting_BlockCursor_HideBlockCursor = UI::Checkbox("Block Cursor Hidden", Setting_BlockCursor_HideBlockCursor);
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override
         {
