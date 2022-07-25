@@ -132,6 +132,8 @@ namespace EditorHelpers
     [Setting category="Functions" hidden]
     bool Setting_CustomItemPlacement_ApplyGhost = false;
     [Setting category="Functions" hidden]
+    bool Setting_CustomItemPlacement_ApplyAutoRotation = false;
+    [Setting category="Functions" hidden]
     bool Setting_CustomItemPlacement_ApplyGrid = false;
     [Setting category="Functions" hidden]
     float Setting_CustomItemPlacement_GridSizeHoriz = 32.0f;
@@ -147,6 +149,7 @@ namespace EditorHelpers
         private CGameItemModel@ currentItemModel = null;
         private dictionary defaultPlacement;
         private bool lastGhostMode = false;
+        private bool lastAutoRotation = false;
         private bool lastApplyGrid = false;
         private bool lastApplyPivot = false;
 
@@ -173,6 +176,7 @@ namespace EditorHelpers
             if (Editor is null || !Enabled())
             {
                 lastGhostMode = false;
+                lastAutoRotation = false;
                 lastApplyGrid = false;
                 lastApplyPivot = false;
 
@@ -180,6 +184,8 @@ namespace EditorHelpers
                 {
                     Setting_CustomItemPlacement_ApplyGhost = false;
                 }
+
+                Setting_CustomItemPlacement_ApplyAutoRotation = false;
 
                 if (!Setting_CustomItemPlacement_PersistGrid)
                 {
@@ -217,6 +223,13 @@ namespace EditorHelpers
                 UI::SameLine();
             }
             Setting_CustomItemPlacement_ApplyGhost = UI::Checkbox("Ghost Item Mode", Setting_CustomItemPlacement_ApplyGhost);
+
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Activate AutoRotation for the current item. Also forces placement grid to <0, 0> so autorotation can operate.");
+                UI::SameLine();
+            }
+            Setting_CustomItemPlacement_ApplyAutoRotation = UI::Checkbox("Item AutoRotation", Setting_CustomItemPlacement_ApplyAutoRotation);
 
             UI::TextDisabled("\tItem Placement");
             if (settingToolTipsEnabled)
@@ -307,6 +320,20 @@ namespace EditorHelpers
                     currentItemModel.DefaultPlacementParam_Head.GhostMode = currentItemPlacementDef.GhostMode;
                 }
                 lastGhostMode = Setting_CustomItemPlacement_ApplyGhost;
+
+                if (Setting_CustomItemPlacement_ApplyAutoRotation && !lastAutoRotation)
+                {
+                    currentItemModel.DefaultPlacementParam_Head.AutoRotation = true;
+                    Setting_CustomItemPlacement_ApplyGrid = true;
+                    Setting_CustomItemPlacement_GridSizeHoriz = 0.0f;
+                    Setting_CustomItemPlacement_GridSizeVerti = 0.0f;
+                }
+                else if (!Setting_CustomItemPlacement_ApplyAutoRotation && lastAutoRotation)
+                {
+                    auto currentItemPlacementDef = GetDefaultPlacement(currentItemModel.IdName);
+                    currentItemModel.DefaultPlacementParam_Head.AutoRotation = currentItemPlacementDef.AutoRotation;
+                }
+                lastAutoRotation = Setting_CustomItemPlacement_ApplyAutoRotation;
 
                 if (Setting_CustomItemPlacement_ApplyGrid)
                 {

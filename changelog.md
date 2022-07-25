@@ -1,6 +1,7 @@
 # 5.6
 * Change behavior of color toggle hotkey. New behavior is to quickswitch to your previous selected color. (Old behavior was simply to cycle through all colors.)
 * Add UI showing what plugin hotkeys are currently active.
+* Add toggle for item AutoRotation to custom item placement function. Thanks to Plantathon for the suggestion! Activating this will apply AutoRotation to the current item as well as force the item grid to 0, 0.
 
 
 ## 5.5
