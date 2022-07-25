@@ -1,7 +1,7 @@
 
-[Setting category="General" name="Window Visible In Editor"]
+[Setting category="General" name="Window Visible" hidden]
 bool settingWindowVisible = true;
-[Setting category="General" name="Tooltips Enabled"]
+[Setting category="General" name="Tooltips Enabled" hidden]
 bool settingToolTipsEnabled = true;
 
 array<EditorHelpers::EditorFunction@> functions =
@@ -107,6 +107,13 @@ void Render()
 [SettingsTab name="Settings"]
 void RenderSettingsPage()
 {
+    UI::PushID("GeneralSettingsPage");
+    UI::Markdown("# Editor Helpers");
+    settingToolTipsEnabled = UI::Checkbox("Show tooltips in the editor helpers window", settingToolTipsEnabled);
+    UI::TextWrapped("Listed in these settings are each individual function of the editor helpers plugin. You can enable or disable each plugin individually. Disabling a function will remove any UI associated with it and stop it from operating. Turn on and off the things you want to customize your experience with this plugin.");
+    UI::Dummy(vec2(20.0f, 20.0f));
+    UI::PopID();
+
     for (uint index = 0; index < functions.Length; index++)
     {
         functions[index].RenderInterface_Settings();
