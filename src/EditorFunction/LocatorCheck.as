@@ -20,7 +20,7 @@ namespace EditorHelpers
         }
     }
 
-    [Setting category="Functions" name="LocatorCheck: Enabled" description="Uncheck to disable plugin function for LocatorCheck"]
+    [Setting category="Functions" name="LocatorCheck: Enabled" hidden]
     bool Setting_LocatorCheck_Enabled = true;
 
     class LocatorCheck : EditorHelpers::EditorFunction
@@ -30,7 +30,20 @@ namespace EditorHelpers
         private XmlHeaderDependency[] m_deps = {};
         private string m_lastUidPlusBytes = "";
 
+        string Name() override { return "Locator Check"; }
         bool Enabled() override { return Setting_LocatorCheck_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_LocatorCheck_Enabled = UI::Checkbox("Enabled", Setting_LocatorCheck_Enabled);
+            UI::BeginDisabled(!Setting_LocatorCheck_Enabled);
+            UI::TextWrapped("This function will read the file header information from your map file each time you save to check the linked media dependencies and the results will be displayed. This should let you know if your media locators are working or not.");
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override
         {

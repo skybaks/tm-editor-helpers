@@ -1,13 +1,27 @@
 
 namespace EditorHelpers
 {
-    [Setting category="Functions" name="Quicksave: Enabled" description="Uncheck to disable plugin function for quicksave"]
+    [Setting category="Functions" name="Quicksave: Enabled" hidden]
     bool Setting_Quicksave_Enabled = true;
+
     class Quicksave : EditorHelpers::EditorFunction
     {
         private EditorHelpers::CountdownTimer timerQuicksave;
 
+        string Name() override { return "Quicksave"; }
         bool Enabled() override { return Setting_Quicksave_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_Quicksave_Enabled = UI::Checkbox("Enabled", Setting_Quicksave_Enabled);
+            UI::BeginDisabled(!Setting_Quicksave_Enabled);
+            UI::TextWrapped("Provides an interface to be able to save your map in one click without popup dialogs.");
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override
         {

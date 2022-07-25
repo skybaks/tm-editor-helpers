@@ -29,7 +29,7 @@ namespace EditorHelpers
         FIXED_STEP = 2
     }
 
-    [Setting category="Functions" name="RotationRandomizer: Enabled" description="Uncheck to disable all plugin functions related to the Rotation Randomizer"]
+    [Setting category="Functions" name="RotationRandomizer: Enabled" hidden]
     bool Setting_RotationRandomizer_Enabled = true;
 
     class RotationRandomizer : EditorHelpers::EditorFunction
@@ -49,7 +49,20 @@ namespace EditorHelpers
         private uint prevGhostBlockCount = 0;
         private uint prevAnchoredObjectCount = 0;
 
+        string Name() override { return "Rotation Randomizer"; }
         bool Enabled() override { return Setting_RotationRandomizer_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_RotationRandomizer_Enabled = UI::Checkbox("Enabled", Setting_RotationRandomizer_Enabled);
+            UI::BeginDisabled(!Setting_RotationRandomizer_Enabled);
+            UI::TextWrapped("Provides an interface which allows you to activate and customize the limits of the rotation randomizer. When the randomizer is turned on a random rotation within the defined limits will be chosen for each selected axis after you place a block or item.");
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override
         {

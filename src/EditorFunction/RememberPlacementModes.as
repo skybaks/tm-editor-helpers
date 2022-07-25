@@ -43,12 +43,13 @@ namespace EditorHelpers
         }
     }
 
-    [Setting category="Functions" name="RememberPlacementModes: Enabled" description="Uncheck to disable plugin functions for RememberPlacementModes"]
+    [Setting category="Functions" name="RememberPlacementModes: Enabled" hidden]
     bool Setting_RememberPlacementModes_Enabled = true;
-    [Setting category="Functions" name="RememberPlacementModes: Maintain Block/Item Mode After Test" description="Remember Block, Item, or Macroblock mode after 'Esc' from Test mode"]
+    [Setting category="Functions" name="RememberPlacementModes: Maintain Block/Item Mode After Test" hidden]
     bool Setting_RememberPlacementModes_MaintainBlockModeAfterTest = true;
-    [Setting category="Functions" name="RememberPlacementModes: Maintain Selection Mode" description="Remember selection add or remove mode while using camera"]
+    [Setting category="Functions" name="RememberPlacementModes: Maintain Selection Mode" hidden]
     bool Setting_RememberPlacementModes_MaintainSelectionMode = true;
+
     class RememberPlacementModes : EditorHelpers::EditorFunction
     {
         private string lastPlaceModeCategory;
@@ -56,7 +57,22 @@ namespace EditorHelpers
         private bool lastSelectionModeAddSub;
         private string lastPlaceModeCategoryBeforeTest;
 
+        string Name() override { return "Remember Placement Modes"; }
         bool Enabled() override { return Setting_RememberPlacementModes_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_RememberPlacementModes_Enabled = UI::Checkbox("Enabled", Setting_RememberPlacementModes_Enabled);
+            UI::BeginDisabled(!Setting_RememberPlacementModes_Enabled);
+            UI::TextWrapped("This function will remember the placement mode you were using before testing your map and switch you back to it afterwards. For example, if you were in Item or Macroblock modes prior to entering test mode then this can switch you back to those modes instead of always to block mode. This works best when you use the ESC or CTRL keys to leave test mode (when the car is in your cursor). Additionally, the option to remember add or remove selection modes between camera usage covers the case where you are using remove selection mode and you move the camera. In that case the plugin will return you to remove selection mode instead of the default behavior to always return you to add selection mode.");
+            Setting_RememberPlacementModes_MaintainBlockModeAfterTest = UI::Checkbox("Remember placement mode after exiting test mode", Setting_RememberPlacementModes_MaintainBlockModeAfterTest);
+            Setting_RememberPlacementModes_MaintainSelectionMode = UI::Checkbox("Remember selection add/remove mode after using camera", Setting_RememberPlacementModes_MaintainSelectionMode);
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override 
         {

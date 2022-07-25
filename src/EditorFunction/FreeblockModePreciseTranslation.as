@@ -10,7 +10,7 @@ namespace EditorHelpers
         }
     }
 
-    [Setting category="Functions" name="FreeblockModePreciseTranslation: Enabled" description="Uncheck to disable all plugin functions related to Block Precise Rotation"]
+    [Setting category="Functions" name="FreeblockModePreciseTranslation: Enabled" hidden]
     bool Settings_FreeblockModePreciseTranslation_Enabled = true;
     [Setting category="Functions" hidden]
     bool Settings_FreeblockModePreciseTranslation_ApplyTranslation = false;
@@ -20,8 +20,20 @@ namespace EditorHelpers
         vec3 translation;
         vec3 prevPosInMap;
 
-
+        string Name() override { return "Freeblock Mode Precise Translation"; }
         bool Enabled() override { return Settings_FreeblockModePreciseTranslation_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Settings_FreeblockModePreciseTranslation_Enabled = UI::Checkbox("Enabled", Settings_FreeblockModePreciseTranslation_Enabled);
+            UI::BeginDisabled(!Settings_FreeblockModePreciseTranslation_Enabled);
+            UI::TextWrapped("Provides an interface which allows you to insert a offset to the current position of a block in free block mode. Using this function you will be able to place blocks off the 1m free mode grid.");
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override
         {

@@ -22,9 +22,9 @@ namespace EditorHelpers
         }
     }
 
-    [Setting category="Functions" name="FreeblockModePreciseRotation: Enabled" description="Uncheck to disable all plugin functions related to Block/Item Precise Rotation"]
+    [Setting category="Functions" name="FreeblockModePreciseRotation: Enabled" hidden]
     bool Settings_FreeblockModePreciseRotation_Enabled = true;
-    [Setting category="Functions" name="FreeblockModePreciseRotation: Persist Step Size" description="Persist step size selection through sessions"]
+    [Setting category="Functions" name="FreeblockModePreciseRotation: Persist Step Size" hidden]
     bool Setting_FreeblockModePreciseRotation_PersistStep = false;
 
     [Setting category="Functions" hidden]
@@ -37,7 +37,21 @@ namespace EditorHelpers
         float stepSize = 15.0f;
         bool newInputToApply = false;
 
+        string Name() override { return Compatibility::FreeblockModePreciseRotationName() + "Precise Rotation"; }
         bool Enabled() override { return Settings_FreeblockModePreciseRotation_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Settings_FreeblockModePreciseRotation_Enabled = UI::Checkbox("Enabled", Settings_FreeblockModePreciseRotation_Enabled);
+            UI::BeginDisabled(!Settings_FreeblockModePreciseRotation_Enabled);
+            UI::TextWrapped("Provides an interface to set any rotation angle in degrees. Also includes step presets for Nadeo slope angles.");
+            Setting_FreeblockModePreciseRotation_PersistStep = UI::Checkbox("Persist angle step size selection between editor sessions", Setting_FreeblockModePreciseRotation_PersistStep);
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override
         {

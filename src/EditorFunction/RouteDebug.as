@@ -1,9 +1,9 @@
 
 namespace EditorHelpers
 {
-    [Setting category="Functions" name="RouteDebug: RouteDebug Function Enabled" description="Uncheck to disable all route debug plugin code"]
+    [Setting category="Functions" name="RouteDebug: RouteDebug Function Enabled" hidden]
     bool Setting_RouteDebug_Enabled = true;
-    [Setting category="Functions" name="RouteDebug: Show test run overlay" description="Show the overlay of the last test run"]
+    [Setting category="Functions" name="RouteDebug: Show test run overlay" hidden]
     bool Setting_RouteDebug_ShowOverlay = false;
 
     class DrivingShapshot
@@ -17,7 +17,21 @@ namespace EditorHelpers
         float m_timeSinceLastSnapshot = 0.0f;
         bool m_isMapTestingPrev = false;
 
+        string Name() override { return "Route Overlay Info"; }
         bool Enabled() override { return Setting_RouteDebug_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_RouteDebug_Enabled = UI::Checkbox("Enabled", Setting_RouteDebug_Enabled);
+            UI::BeginDisabled(!Setting_RouteDebug_Enabled);
+            UI::TextWrapped("Records information while you are driving in test mode and displays it as an overlay in the editor.");
+            Setting_RouteDebug_ShowOverlay = UI::Checkbox("Show the last test run overlay", Setting_RouteDebug_ShowOverlay);
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override
         {

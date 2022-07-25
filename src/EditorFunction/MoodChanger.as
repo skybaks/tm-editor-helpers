@@ -1,6 +1,6 @@
 namespace EditorHelpers
 {
-    [Setting category="Functions" name="Mood Changer: Enabled" description="Uncheck to disable plugin function for mood changer"]
+    [Setting category="Functions" name="Mood Changer: Enabled" hidden]
     bool Setting_MoodChanger_Enabled = true;
 
     class MoodChanger : EditorHelpers::EditorFunction
@@ -15,7 +15,20 @@ namespace EditorHelpers
             return Regex::IsMatch(time, regex);
         }
 
+        string Name() override { return "Mood Changer"; }
         bool Enabled() override { return Setting_MoodChanger_Enabled; }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_MoodChanger_Enabled = UI::Checkbox("Enabled", Setting_MoodChanger_Enabled);
+            UI::BeginDisabled(!Setting_MoodChanger_Enabled);
+            UI::TextWrapped("This provides an interface to modify the game time of a map down to the second for a 24 hour period.");
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Update(float dt) override
         {
