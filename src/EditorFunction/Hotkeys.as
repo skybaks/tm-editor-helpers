@@ -63,31 +63,116 @@ namespace EditorHelpers
         }
     }
 
-    [Setting category="Functions" name="Hotkeys: Hotkeys Function Enabled" description="Uncheck to disable all hotkey plugin code"]
+    [Setting category="Functions" name="Hotkeys: Hotkeys Function Enabled" hidden]
     bool Setting_Hotkeys_Enabled = true;
 
-    [Setting category="Functions" name="Hotkeys: AirBlock HotKey Enabled"]
+    [Setting category="Functions" name="Hotkeys: AirBlockHotKey Enabled" hidden]
     bool Setting_Hotkeys_AirBlockHotKeyEnabled = true;
-    [Setting category="Functions" name="Hotkeys: AirBlock HotKey"]
+    [Setting category="Functions" name="Hotkeys: AirBlockHotKey" hidden]
     VirtualKey Setting_Hotkeys_AirBlockHotKey = VirtualKey::A;
 
-    [Setting category="Functions" name="Hotkeys: ToggleColors HotKey Enabled"]
+    [Setting category="Functions" name="Hotkeys: ToggleColors HotKey Enabled" hidden]
     bool Setting_Hotkeys_ToggleColorsHotKeyEnabled = false;
-    [Setting category="Functions" name="Hotkeys: ToggleColors HotKey"]
+    [Setting category="Functions" name="Hotkeys: ToggleColors HotKey" hidden]
     VirtualKey Setting_Hotkeys_ToggleColorsHotKey = VirtualKey::F6;
 
-    [Setting category="Functions" name="Hotkeys: FlipCursor180 HotKey Enabled"]
+    [Setting category="Functions" name="Hotkeys: FlipCursor180 HotKey Enabled" hidden]
     bool Setting_Hotkeys_FlipCursor180HotKeyEnabled = false;
-    [Setting category="Functions" name="Hotkeys: FlipCursor180 HotKey"]
+    [Setting category="Functions" name="Hotkeys: FlipCursor180 HotKey" hidden]
     VirtualKey Setting_Hotkeys_FlipCursor180HotKey = VirtualKey::OemPeriod;
 
     class Hotkeys : EditorHelpers::EditorFunction
     {
-        VirtualKey[] m_keysDown = {};
-        int m_mapElemColorPrev = 0;
-        int m_mapElemColorPrevPrev = 0;
+        private VirtualKey[] m_keysDown = {};
+        private int m_mapElemColorPrev = 0;
+        private int m_mapElemColorPrevPrev = 0;
 
+        private string m_rebindKeyName = "";
+
+        string Name() override { return "Hotkeys"; }
         bool Enabled() override { return Compatibility::EnableHotkeysFunction(); }
+
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_Hotkeys_Enabled = UI::Checkbox("Enabled", Setting_Hotkeys_Enabled);
+            UI::BeginDisabled(!Setting_Hotkeys_Enabled);
+            UI::TextWrapped("Adds some custom hotkeys to the editor to manage things that are not already hotkeys the game.");
+            if (UI::BeginTable("SettingsHotkeysTable", 4 /*columns*/))
+            {
+                UI::TableSetupColumn("Action");
+                UI::TableSetupColumn("Key");
+                UI::TableSetupColumn("Enabled");
+                UI::TableSetupColumn("");
+                UI::TableHeadersRow();
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Toggle AirBlock Mode");
+                UI::TableNextColumn();
+                UI::Text(tostring(Setting_Hotkeys_AirBlockHotKey));
+                UI::TableNextColumn();
+                Setting_Hotkeys_AirBlockHotKeyEnabled = UI::Checkbox("Enabled##AirBlockHotkey", Setting_Hotkeys_AirBlockHotKeyEnabled);
+                UI::TableNextColumn();
+                if (m_rebindKeyName == "AirBlockHotkey")
+                {
+                    if (UI::Button("Cancel##AirBlockHotkey"))
+                    {
+                        m_rebindKeyName = "";
+                    }
+                }
+                else if (UI::Button("Rebind##AirBlockHotkey"))
+                {
+                    m_rebindKeyName = "AirBlockHotkey";
+                }
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Quickswitch To Last Color");
+                UI::TableNextColumn();
+                UI::Text(tostring(Setting_Hotkeys_ToggleColorsHotKey));
+                UI::TableNextColumn();
+                Setting_Hotkeys_ToggleColorsHotKeyEnabled = UI::Checkbox("Enabled##ToggleColors", Setting_Hotkeys_ToggleColorsHotKeyEnabled);
+                UI::TableNextColumn();
+                if (m_rebindKeyName == "ToggleColors")
+                {
+                    if (UI::Button("Cancel##ToggleColors"))
+                    {
+                        m_rebindKeyName = "";
+                    }
+                }
+                else if (UI::Button("Rebind##ToggleColors"))
+                {
+                    m_rebindKeyName = "ToggleColors";
+                }
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Flip Block 180 deg");
+                UI::TableNextColumn();
+                UI::Text(tostring(Setting_Hotkeys_FlipCursor180HotKey));
+                UI::TableNextColumn();
+                Setting_Hotkeys_FlipCursor180HotKeyEnabled = UI::Checkbox("Enabled##FlipCursor180", Setting_Hotkeys_FlipCursor180HotKeyEnabled);
+                UI::TableNextColumn();
+                if (m_rebindKeyName == "FlipCursor180")
+                {
+                    if (UI::Button("Cancel##FlipCursor180"))
+                    {
+                        m_rebindKeyName = "";
+                    }
+                }
+                else if (UI::Button("Rebind##FlipCursor180"))
+                {
+                    m_rebindKeyName = "FlipCursor180";
+                }
+
+                UI::EndTable();
+            }
+            UI::EndDisabled();
+            UI::PopID();
+        }
 
         void Init() override
         {
@@ -153,7 +238,26 @@ namespace EditorHelpers
                 m_keysDown.RemoveAt(currKeyIndex);
             }
 
-            if (!Enabled()) return;
+            if (!down && m_rebindKeyName != "")
+            {
+                if (m_rebindKeyName == "AirBlockHotkey")
+                {
+                    Setting_Hotkeys_AirBlockHotKey = key;
+                }
+                else if (m_rebindKeyName == "ToggleColors")
+                {
+                    Setting_Hotkeys_ToggleColorsHotKey = key;
+                }
+                else if (m_rebindKeyName == "FlipCursor180")
+                {
+                    Setting_Hotkeys_FlipCursor180HotKey = key;
+                }
+
+                m_rebindKeyName = "";
+                return;
+            }
+
+            if (!Enabled() || Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
             if (!down && m_keysDown.IsEmpty() && Editor.PluginMapType !is null && Editor.PluginMapType.IsEditorReadyForRequest)
             {
                 Compatibility::OnKeyPress_AirBlockModeHotkey(Editor, key);

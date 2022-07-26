@@ -114,9 +114,11 @@ void RenderSettingsPage()
     UI::Dummy(vec2(20.0f, 20.0f));
     UI::PopID();
 
+    UI::Separator();
     for (uint index = 0; index < functions.Length; index++)
     {
         functions[index].RenderInterface_Settings();
+        UI::Dummy(vec2(10.0f, 10.0f));
         UI::Separator();
     }
 }
@@ -124,7 +126,6 @@ void RenderSettingsPage()
 void OnKeyPress(bool down, VirtualKey key)
 {
     if (!EditorHelpers::HasPermission()) return;
-    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
     for (uint index = 0; index < functions.Length; index++)
     {
         functions[index].OnKeyPress(down, key);
