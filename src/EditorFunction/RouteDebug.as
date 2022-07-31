@@ -13,7 +13,8 @@ namespace EditorHelpers
 
     class RouteDebug : EditorHelpers::EditorFunction
     {
-        DrivingShapshot[] m_mapPositions = {};
+        DrivingShapshot[] m_snapshots = array<DrivingShapshot>(10000);
+        uint m_snapshotLength = 0;
         float m_timeSinceLastSnapshot = 0.0f;
         bool m_isMapTestingPrev = false;
 
@@ -37,7 +38,7 @@ namespace EditorHelpers
         {
             if (!Enabled() || Editor is null)
             {
-                m_mapPositions.RemoveRange(0, m_mapPositions.Length - 1);
+                m_snapshotLength = 0;
                 m_timeSinceLastSnapshot = 0.0f;
                 m_isMapTestingPrev = false;
             }
@@ -63,17 +64,16 @@ namespace EditorHelpers
             {
                 if (!m_isMapTestingPrev)
                 {
-                    m_mapPositions.RemoveRange(0, m_mapPositions.Length - 1);
+                    m_snapshotLength = 0;
                     m_timeSinceLastSnapshot = 0.0f;
                 }
 
                 auto state = VehicleState::ViewingPlayerState();
-                if (state !is null && m_timeSinceLastSnapshot > 100.0f && m_mapPositions.Length < 2000)
+                if (state !is null && m_timeSinceLastSnapshot > 10.0f && m_snapshotLength < m_snapshots.Length)
                 {
-                    DrivingShapshot newSnapshot = DrivingShapshot();
-                    newSnapshot.Position = state.Position;
-                    m_mapPositions.InsertLast(newSnapshot);
+                    m_snapshots[m_snapshotLength].Position = state.Position;
 
+                    m_snapshotLength++;
                     m_timeSinceLastSnapshot = 0.0f;
                 }
 
@@ -88,23 +88,23 @@ namespace EditorHelpers
             if (!Enabled() || Editor is null) return;
             if (!Setting_RouteDebug_ShowOverlay) return;
 
-            if (m_mapPositions.Length > 1)
+            if (m_snapshotLength > 1)
             {
                 nvg::StrokeColor(vec4(1.0, 0.2, 0.2, 1.0));
                 nvg::StrokeWidth(1.0);
                 nvg::BeginPath();
                 int pointsDrawn = 0;
-                for (uint i = 1; i < m_mapPositions.Length; i++)
+                for (uint i = 1; i < m_snapshotLength; i++)
                 {
-                    if (!Camera::IsBehind(m_mapPositions[i].Position))
+                    if (!Camera::IsBehind(m_snapshots[i].Position))
                     {
                         if (pointsDrawn == 0)
                         {
-                            nvg::MoveTo(Camera::ToScreenSpace(m_mapPositions[i].Position));
+                            nvg::MoveTo(Camera::ToScreenSpace(m_snapshots[i].Position));
                         }
                         else
                         {
-                            nvg::LineTo(Camera::ToScreenSpace(m_mapPositions[i].Position));
+                            nvg::LineTo(Camera::ToScreenSpace(m_snapshots[i].Position));
                         }
 
                         pointsDrawn++;
