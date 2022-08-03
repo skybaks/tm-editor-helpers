@@ -22,7 +22,6 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::MoodChanger()
     , EditorHelpers::CameraModes()
     , EditorHelpers::LocatorCheck()
-    , EditorHelpers::RouteDebug()
 };
 
 namespace Compatibility
