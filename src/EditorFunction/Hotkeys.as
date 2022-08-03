@@ -217,29 +217,45 @@ namespace EditorHelpers
 
         void Update(float)
         {
-            if (!Enabled() || Editor is null) return;
+            Debug_EnterMethod("Update");
+
+            if (!Enabled() || Editor is null)
+            {
+                Debug("!Enabled:" + tostring(!Enabled()) + " Editor is null:" + tostring(Editor is null));
+                Debug_LeaveMethod();
+                return;
+            }
 
             if (m_mapElemColorPrev != Compatibility::GetCurrentMapElemColor(Editor))
             {
                 m_mapElemColorPrevPrev = m_mapElemColorPrev;
                 m_mapElemColorPrev = Compatibility::GetCurrentMapElemColor(Editor);
+                Debug("NEW COLOR! Prev color is: " + tostring(m_mapElemColorPrev) + " PrevPrev color is: " + tostring(m_mapElemColorPrevPrev));
             }
+
+            Debug_LeaveMethod();
         }
 
         void OnKeyPress(bool down, VirtualKey key) override
         {
+            Debug_EnterMethod("OnKeyPress");
+
             auto currKeyIndex = m_keysDown.Find(key);
             if (down && currKeyIndex < 0)
             {
                 m_keysDown.InsertLast(key);
+                Debug("Add \"" + tostring(key) + "\" to m_keysDown");
             }
             else if (!down && currKeyIndex >= 0)
             {
                 m_keysDown.RemoveAt(currKeyIndex);
+                Debug("Remove \"" + tostring(key) + "\" from m_keysDown");
             }
 
             if (!down && m_rebindKeyName != "")
             {
+                Debug("Rebind " + tostring(m_rebindKeyName) + " to " + tostring(key));
+
                 if (m_rebindKeyName == "AirBlockHotkey")
                 {
                     Setting_Hotkeys_AirBlockHotKey = key;
@@ -254,16 +270,25 @@ namespace EditorHelpers
                 }
 
                 m_rebindKeyName = "";
+                Debug_LeaveMethod();
                 return;
             }
 
-            if (!Enabled() || Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
+            if (!Enabled() || Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible)
+            {
+                Debug("!Enabled():" + tostring(!Enabled()) + " Compatibility::EditorIsNull():" + tostring(Compatibility::EditorIsNull()) + " Compatibility::IsMapTesting():" + tostring(Compatibility::IsMapTesting()) + " !settingWindowVisible:" + tostring(!settingWindowVisible));
+                Debug_LeaveMethod();
+                return;
+            }
             if (!down && m_keysDown.IsEmpty() && Editor.PluginMapType !is null && Editor.PluginMapType.IsEditorReadyForRequest)
             {
+                Debug("Passing keypress \"" + tostring(key) + "\" to hotkey processing methods");
                 Compatibility::OnKeyPress_AirBlockModeHotkey(Editor, key);
                 Compatibility::OnKeyPress_ToggleColorsHotkey(Editor, key, m_mapElemColorPrevPrev);
                 Compatibility::OnKeyPress_FlipCursor180(Editor, key);
             }
+
+            Debug_LeaveMethod();
         }
     }
 }
