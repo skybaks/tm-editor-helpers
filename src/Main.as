@@ -146,6 +146,7 @@ void Main()
         dtSeconds = dt / 1000.0f;
 
         EditorHelpers::tipHoverTimer.Update(dtSeconds);
+        EditorHelpers::permissionReduceSpamTimer.Update(dtSeconds);
         if (EditorHelpers::HasPermission())
         {
             for (uint index = 0; index < functions.Length; index++)
