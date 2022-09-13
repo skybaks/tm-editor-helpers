@@ -274,9 +274,9 @@ namespace EditorHelpers
                 return;
             }
 
-            if (!Enabled() || Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible)
+            if (!Enabled() || Compatibility::EditorIsNull() || Compatibility::IsMapTesting())
             {
-                Debug("!Enabled():" + tostring(!Enabled()) + " Compatibility::EditorIsNull():" + tostring(Compatibility::EditorIsNull()) + " Compatibility::IsMapTesting():" + tostring(Compatibility::IsMapTesting()) + " !settingWindowVisible:" + tostring(!settingWindowVisible));
+                Debug("!Enabled():" + tostring(!Enabled()) + " Compatibility::EditorIsNull():" + tostring(Compatibility::EditorIsNull()) + " Compatibility::IsMapTesting():" + tostring(Compatibility::IsMapTesting()));
                 Debug_LeaveMethod();
                 return;
             }
