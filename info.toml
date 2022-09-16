@@ -4,8 +4,8 @@ author = "skybaxrider"
 category = "Map Editor"
 blocks = [ "Plugin_EditorHelpers" ]
 siteid = 69
-version = "5.5.6"
+version = "5.6"
 perms = "paid"
 
 [script]
-imports = [ "Icons.as", "Time.as", "Permissions.as" ]
+imports = []
