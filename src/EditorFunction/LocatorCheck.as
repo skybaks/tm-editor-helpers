@@ -102,7 +102,7 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface_Info()
+        void RenderInterface_Info() override
         {
             if (!Enabled()) return;
 

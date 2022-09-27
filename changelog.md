@@ -1,3 +1,6 @@
+# 5.7
+* Remove directive blocking non-paid players from loading the plugin
+
 # 5.6
 * From nbeerten - Change behavior of hotkeys so that they will now work even when the helpers window is hidden
 * Change behavior of color toggle hotkey. New behavior is to quickswitch to your previous selected color. (Old behavior was simply to cycle through all colors.)

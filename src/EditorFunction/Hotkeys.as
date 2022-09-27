@@ -215,7 +215,7 @@ namespace EditorHelpers
             }
         }
 
-        void Update(float)
+        void Update(float) override
         {
             Debug_EnterMethod("Update");
 

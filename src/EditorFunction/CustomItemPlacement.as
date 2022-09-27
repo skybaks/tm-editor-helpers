@@ -369,7 +369,7 @@ namespace EditorHelpers
             }
         }
 
-        private CustomItemPlacementSettings@ GetDefaultPlacement(string idName)
+        private CustomItemPlacementSettings@ GetDefaultPlacement(const string &in idName)
         {
             if (!defaultPlacement.Exists(idName))
             {

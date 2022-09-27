@@ -3,7 +3,7 @@ namespace EditorHelpers
 {
     string lastTipHover = "";
     CountdownTimer tipHoverTimer = CountdownTimer(0.5f);
-    void HelpMarker(string desc)
+    void HelpMarker(const string &in desc)
     {
         UI::TextDisabled(Icons::QuestionCircle);
         if (UI::IsItemHovered())
