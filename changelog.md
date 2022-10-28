@@ -1,5 +1,10 @@
+# 5.8
+* Update the behavior of item pivot position override. Previously, the item pivot position would be reset each time you select a new item. Now if the pivot position override is applied the pivot position will remain in place when switching between items. If the pivot position override is not applied then the display window will be updated with the item's current pivot position.
+
+
 # 5.7
 * Remove directive blocking non-paid players from loading the plugin
+
 
 # 5.6
 * From nbeerten - Change behavior of hotkeys so that they will now work even when the helpers window is hidden
