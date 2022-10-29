@@ -94,17 +94,6 @@ void RenderInterface()
     UI::End();
 }
 
-void Render()
-{
-    if (!EditorHelpers::HasPermission()) return;
-    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
-
-    for (uint index = 0; index < functions.Length; index++)
-    {
-        functions[index].RenderDrawing();
-    }
-}
-
 [SettingsTab name="Settings"]
 void RenderSettingsPage()
 {
