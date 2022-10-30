@@ -18,6 +18,8 @@ namespace EditorHelpers
 
     class PodiumReminder : EditorHelpers::EditorFunction
     {
+        private int m_podiumCount = 0;
+
         string Name() override { return "Podium Reminder"; }
         bool Enabled() override { return Setting_PodiumReminder_Enabled; }
 
@@ -49,8 +51,8 @@ namespace EditorHelpers
 
             if (Signal_MapFileUpdated())
             {
-                int podiums = GetPodiumCount();
-                Debug("Podiums:" + tostring(podiums));
+                m_podiumCount = GetPodiumCount();
+                Debug("Podiums:" + tostring(m_podiumCount));
             }
 
             // notification methods
@@ -59,6 +61,34 @@ namespace EditorHelpers
             // * UI dialog appearing in center screen with message
 
             Debug_LeaveMethod();
+        }
+
+        void RenderInterface_Info() override
+        {
+            if (!Enabled()) return;
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Reminder to place a podium");
+                UI::SameLine();
+            }
+            if (m_podiumCount < 1)
+            {
+                UI::Text("\\$f00");
+                UI::SameLine();
+                UI::Text("Podium Check: No podiums");
+            }
+            else if (m_podiumCount > 1)
+            {
+                UI::Text("\\$f00");
+                UI::SameLine();
+                UI::Text("Podium Check: Too many (" + tostring(m_podiumCount) + ")");
+            }
+            else
+            {
+                UI::Text("\\$0f0");
+                UI::SameLine();
+                UI::Text("Podium Check: Valid");
+            }
         }
 
         private int GetPodiumCount()
