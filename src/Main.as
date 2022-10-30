@@ -8,7 +8,8 @@ bool Setting_DebugLoggingEnabled = false;
 
 array<EditorHelpers::EditorFunction@> functions =
 {
-      EditorHelpers::Quicksave()
+      EditorHelpers::EventSignals()
+    , EditorHelpers::Quicksave()
     , EditorHelpers::BlockHelpers()
     , EditorHelpers::BlockCursor()
     , EditorHelpers::PlacementGrid()
@@ -24,6 +25,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::MoodChanger()
     , EditorHelpers::CameraModes()
     , EditorHelpers::LocatorCheck()
+    , EditorHelpers::PodiumReminder()
 };
 
 namespace Compatibility
