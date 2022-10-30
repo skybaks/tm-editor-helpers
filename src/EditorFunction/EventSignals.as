@@ -18,6 +18,7 @@ namespace EditorHelpers
         bool Signal_MapFileUpdated = false;
         bool Signal_BlockItemPlaced = false;
         bool Signal_BlockItemRemoved = false;
+        bool Signal_EnteredEditor = false;
     }
 
     // Notifies when the map uid changes or the map file changes size
@@ -29,6 +30,9 @@ namespace EditorHelpers
     // Notifies when a block or item is removed
     bool Signal_BlockItemRemoved() { return EditorHelpers::SignalsInternal::Signal_BlockItemRemoved; }
 
+    // Notifies that you have just entered the editor
+    bool Signal_EnteredEditor() { return EditorHelpers::SignalsInternal::Signal_EnteredEditor; }
+
     // The EventSignals editor function has no function effect for users but
     // rather provides notifications for certain events occurring so that code
     // doesnt need to be duplicated in multiple editor functions.
@@ -38,6 +42,7 @@ namespace EditorHelpers
         private uint m_prevClassicBlockCount = 0;
         private uint m_prevGhostBlockCount = 0;
         private uint m_prevAnchoredObjectCount = 0;
+        private bool m_prevEditorIsNull = true;
 
         string Name() override { return "Event Signals"; }
         bool Enabled() override { return true; }
@@ -63,6 +68,7 @@ namespace EditorHelpers
 
             UpdateSignal_MapFileUpdated();
             UpdateSignal_BlockItemPlacedRemoved();
+            UpdateSignal_EnteredEditor();
 
             Debug_LeaveMethod();
         }
@@ -139,6 +145,24 @@ namespace EditorHelpers
                 m_prevGhostBlockCount = 0;
                 m_prevAnchoredObjectCount = 0;
             }
+
+            Debug_LeaveMethod();
+        }
+
+        private void UpdateSignal_EnteredEditor()
+        {
+            Debug_EnterMethod("UpdateSignal_EnteredEditor");
+
+            EditorHelpers::SignalsInternal::Signal_EnteredEditor = false;
+
+            bool editorIsNull = Editor is null;
+            if (m_prevEditorIsNull && !editorIsNull)
+            {
+                EditorHelpers::SignalsInternal::Signal_EnteredEditor = true;
+
+                Debug("Activate Signal: Signal_EnteredEditor");
+            }
+            m_prevEditorIsNull = editorIsNull;
 
             Debug_LeaveMethod();
         }
