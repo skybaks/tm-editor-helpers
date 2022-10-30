@@ -221,7 +221,6 @@ namespace EditorHelpers
 
             if (!Enabled() || Editor is null)
             {
-                Debug("!Enabled:" + tostring(!Enabled()) + " Editor is null:" + tostring(Editor is null));
                 Debug_LeaveMethod();
                 return;
             }

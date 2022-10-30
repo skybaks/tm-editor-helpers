@@ -1,6 +1,18 @@
 
 namespace EditorHelpers
 {
+    namespace Compatibility
+    {
+        bool ItemContainsPodiumInfo(CGameItemModel@ itemModel)
+        {
+            bool containsPodiumInfo = false;
+#if TMNEXT
+            containsPodiumInfo = itemModel !is null && itemModel.PodiumInfo !is null;
+#endif
+            return containsPodiumInfo;
+        }
+    }
+
     [Setting category="Functions" name="PodiumReminder: Enabled" hidden]
     bool Setting_PodiumReminder_Enabled = true;
 
@@ -67,12 +79,10 @@ namespace EditorHelpers
                     }
                 }
 
-                // Get Podiums in Items - Maybe needs compatibility?
                 for (uint i = 0; i < Editor.Challenge.AnchoredObjects.Length; ++i)
                 {
                     auto currentObject = Editor.Challenge.AnchoredObjects[i];
-                    if (currentObject.ItemModel !is null
-                        && currentObject.ItemModel.PodiumInfo !is null)
+                    if (Compatibility::ItemContainsPodiumInfo(currentObject.ItemModel))
                     {
                         podiumCount += 1;
                         Debug("Adding podium to count for ITEM index:" + tostring(i) + " name:" + tostring(currentObject.ItemModel.Name));
