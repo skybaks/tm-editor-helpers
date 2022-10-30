@@ -1,7 +1,7 @@
 
 namespace EditorHelpers
 {
-    EditorHelpers::CountdownTimer permissionReduceSpamTimer = CountdownTimer(1.0f);
+    EditorHelpers::CountdownTimer permissionReduceSpamTimer = CountdownTimer(10.0f);
 
     bool HasPermission()
     {

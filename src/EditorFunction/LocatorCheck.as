@@ -28,7 +28,6 @@ namespace EditorHelpers
         private bool m_initGameResources = true;
         private string[] m_gameResources = {};
         private XmlHeaderDependency[] m_deps = {};
-        private string m_lastUidPlusBytes = "";
 
         string Name() override { return "Locator Check"; }
         bool Enabled() override { return Setting_LocatorCheck_Enabled; }
@@ -53,7 +52,6 @@ namespace EditorHelpers
             {
                 if (m_initGameResources)
                 {
-                    m_lastUidPlusBytes = "";
                     auto appFidFile = cast<CSystemFidFile>(GetFidFromNod(GetApp()));
                     if (appFidFile !is null)
                     {
@@ -79,26 +77,15 @@ namespace EditorHelpers
         {
             if (!Enabled() || Editor is null) return;
 
-            auto challengeFidFile = cast<CSystemFidFile>(GetFidFromNod(Editor.Challenge));
-            if (challengeFidFile !is null)
+            if (Signal_MapFileUpdated())
             {
-                string uidPlusBytes = Editor.Challenge.EdChallengeId + tostring(challengeFidFile.ByteSize);
-                if (m_lastUidPlusBytes != uidPlusBytes)
+                string xmlHeaderString = ReadGbxXmlHeader();
+                m_deps = {};
+                ParseHeaderXml(xmlHeaderString);
+                for (uint i = 0; i < m_deps.Length; i++)
                 {
-                    string xmlHeaderString = ReadGbxXmlHeader();
-                    m_deps = {};
-                    ParseHeaderXml(xmlHeaderString);
-                    for (uint i = 0; i < m_deps.Length; i++)
-                    {
-                        m_deps[i].IsGameResource = m_gameResources.Find(m_deps[i].File) >= 0;
-                    }
+                    m_deps[i].IsGameResource = m_gameResources.Find(m_deps[i].File) >= 0;
                 }
-
-                m_lastUidPlusBytes = uidPlusBytes;
-            }
-            else
-            {
-                m_lastUidPlusBytes = "";
             }
         }
 

@@ -8,7 +8,8 @@ bool Setting_DebugLoggingEnabled = false;
 
 array<EditorHelpers::EditorFunction@> functions =
 {
-      EditorHelpers::Quicksave()
+      EditorHelpers::EventSignals()
+    , EditorHelpers::Quicksave()
     , EditorHelpers::BlockHelpers()
     , EditorHelpers::BlockCursor()
     , EditorHelpers::PlacementGrid()
@@ -24,6 +25,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::MoodChanger()
     , EditorHelpers::CameraModes()
     , EditorHelpers::LocatorCheck()
+    , EditorHelpers::PodiumReminder()
 };
 
 namespace Compatibility
@@ -92,17 +94,6 @@ void RenderInterface()
         }
     }
     UI::End();
-}
-
-void Render()
-{
-    if (!EditorHelpers::HasPermission()) return;
-    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
-
-    for (uint index = 0; index < functions.Length; index++)
-    {
-        functions[index].RenderDrawing();
-    }
 }
 
 [SettingsTab name="Settings"]

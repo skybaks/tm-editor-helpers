@@ -11,15 +11,6 @@ namespace EditorHelpers
             return editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item;
 #endif
         }
-
-        uint GetGhostBlocksCount(CGameCtnEditorFree@ editor)
-        {
-            uint count = 0;
-#if TMNEXT
-            count = editor.PluginMapType.GhostBlocks.Length;
-#endif
-            return count;
-        }
     }
 
     enum RotationRandomizerMode
@@ -44,10 +35,6 @@ namespace EditorHelpers
         private float stepY = 15.0;
         private float stepX = 10.0;
         private float stepZ = 10.0;
-
-        private uint prevClassicBlockCount = 0;
-        private uint prevGhostBlockCount = 0;
-        private uint prevAnchoredObjectCount = 0;
 
         string Name() override { return "Rotation Randomizer"; }
         bool Enabled() override { return Setting_RotationRandomizer_Enabled; }
@@ -206,9 +193,7 @@ namespace EditorHelpers
         {
             if (!Enabled() || Editor is null) return;
 
-            if (prevClassicBlockCount < Editor.PluginMapType.ClassicBlocks.Length
-                || prevGhostBlockCount < Compatibility::GetGhostBlocksCount(Editor)
-                || prevAnchoredObjectCount < Editor.Challenge.AnchoredObjects.Length)
+            if (Signal_BlockItemPlaced())
             {
                 if (selectedMode == RotationRandomizerMode::RANDOM)
                 {
@@ -299,10 +284,6 @@ namespace EditorHelpers
                     }
                 }
             }
-
-            prevClassicBlockCount = Editor.PluginMapType.ClassicBlocks.Length;
-            prevGhostBlockCount = Compatibility::GetGhostBlocksCount(Editor);
-            prevAnchoredObjectCount = Editor.Challenge.AnchoredObjects.Length;
         }
 
         private float ClosestValidYawAngle(float inputYaw)
