@@ -49,7 +49,7 @@ namespace EditorHelpers
                 return;
             }
 
-            if (Signal_MapFileUpdated())
+            if (Signal_BlockItemPlaced() || Signal_BlockItemRemoved())
             {
                 m_podiumCount = GetPodiumCount();
                 Debug("Podiums:" + tostring(m_podiumCount));
