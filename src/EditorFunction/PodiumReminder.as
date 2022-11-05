@@ -65,7 +65,7 @@ namespace EditorHelpers
                 return;
             }
 
-            if (Signal_BlockItemPlaced() || Signal_BlockItemRemoved())
+            if (Signal_MapFileUpdated())
             {
                 m_podiumCount = GetPodiumCount();
                 Debug("Podiums:" + tostring(m_podiumCount));
@@ -142,6 +142,19 @@ namespace EditorHelpers
 
             if (Editor.Challenge !is null)
             {
+                // Using preprocessor to skip looking for podiums in certain
+                // games where we know they will not be
+#if TMNEXT
+                for (uint i = 0; i < Editor.Challenge.AnchoredObjects.Length; ++i)
+                {
+                    auto currentObject = Editor.Challenge.AnchoredObjects[i];
+                    if (Compatibility::ItemContainsPodiumInfo(currentObject.ItemModel))
+                    {
+                        podiumCount += 1;
+                        Debug("Adding podium to count for ITEM index:" + tostring(i) + " name:" + tostring(currentObject.ItemModel.Name));
+                    }
+                }
+#else
                 for (uint i = 0; i < Editor.Challenge.Blocks.Length; ++i)
                 {
                     auto currentBlock = Editor.Challenge.Blocks[i];
@@ -152,16 +165,7 @@ namespace EditorHelpers
                         Debug("Adding podium to count for BLOCK index:" + tostring(i) + " name:" + tostring(currentBlock.BlockModel.Name));
                     }
                 }
-
-                for (uint i = 0; i < Editor.Challenge.AnchoredObjects.Length; ++i)
-                {
-                    auto currentObject = Editor.Challenge.AnchoredObjects[i];
-                    if (Compatibility::ItemContainsPodiumInfo(currentObject.ItemModel))
-                    {
-                        podiumCount += 1;
-                        Debug("Adding podium to count for ITEM index:" + tostring(i) + " name:" + tostring(currentObject.ItemModel.Name));
-                    }
-                }
+#endif
             }
 
             Debug_LeaveMethod();

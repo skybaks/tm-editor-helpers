@@ -1,3 +1,7 @@
+# 5.9
+* Performance fix for Podium Reminder on maps with a large amount of blocks or items
+
+
 # 5.8
 * Update the behavior of item pivot position override. Previously, the item pivot position would be reset each time you select a new item. Now if the pivot position override is applied the pivot position will remain in place when switching between items. If the pivot position override is not applied then the display window will be updated with the item's current pivot position.
 * Add new function - Podium Reminder - Displays a notification when saving if the map does not contain exactly one podium.
