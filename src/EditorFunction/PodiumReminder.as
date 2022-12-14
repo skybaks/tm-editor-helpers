@@ -7,7 +7,7 @@ namespace EditorHelpers
         {
             bool containsPodiumInfo = false;
 #if TMNEXT
-            containsPodiumInfo = itemModel !is null && itemModel.PodiumInfo !is null;
+            containsPodiumInfo = itemModel !is null && itemModel.Name == "Podium";
 #endif
             return containsPodiumInfo;
         }
