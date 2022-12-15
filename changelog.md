@@ -1,3 +1,7 @@
+# 5.10
+* nbeerten - Fix for 12/2022 TM update. There was an API change in the class CGameItemModel.
+
+
 # 5.9
 * Performance fix for Podium Reminder on maps with a large amount of blocks or items
 
