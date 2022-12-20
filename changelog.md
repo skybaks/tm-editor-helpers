@@ -1,5 +1,7 @@
 # 5.11
 * Small change to detection of podiums in map for generating reminders.
+* Add new display of cursor position. This show the current X, Y, Z position of the block/item cursor.
+
 
 # 5.10
 * nbeerten - Fix for 12/2022 TM update. There was an API change in the class CGameItemModel.

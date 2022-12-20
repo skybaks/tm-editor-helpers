@@ -26,6 +26,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::CameraModes()
     , EditorHelpers::LocatorCheck()
     , EditorHelpers::PodiumReminder()
+    , EditorHelpers::CursorPosition()
 };
 
 namespace Compatibility
