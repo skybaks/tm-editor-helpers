@@ -1,6 +1,41 @@
 
 namespace EditorHelpers
 {
+    namespace Compatibility
+    {
+        void UpdateFreePosition(CGameCtnEditorFree@ editor, vec3&out pos)
+        {
+#if TMNEXT
+            if (editor.Cursor.UseFreePos)
+#else
+            if (false)
+#endif
+            {
+#if TMNEXT
+                pos.x = editor.Cursor.FreePosInMap.x;
+                pos.y = editor.Cursor.FreePosInMap.y;
+                pos.z = editor.Cursor.FreePosInMap.z;
+#endif
+            }
+            else
+            {
+                pos.x = float(editor.Cursor.Coord.x) * 32.0f;
+                pos.y = float(editor.Cursor.Coord.y - 8) * 8.0f;
+                pos.z = float(editor.Cursor.Coord.z) * 32.0f;
+            }
+        }
+
+        bool EnableCursorPositionFunction()
+        {
+#if TMNEXT
+#elif MP4
+            Setting_CursorPosition_Enabled = false;
+#endif
+            return Setting_CursorPosition_Enabled;
+        }
+
+    }
+
     [Setting category="Functions" name="CursorPosition: Enabled" hidden]
     bool Setting_CursorPosition_Enabled = true;
 
@@ -9,7 +44,7 @@ namespace EditorHelpers
         private vec3 m_position;
 
         string Name() override { return "Cursor Position"; }
-        bool Enabled() override { return Setting_CursorPosition_Enabled; }
+        bool Enabled() override { return Compatibility::EnableCursorPositionFunction(); }
 
         void RenderInterface_Settings() override
         {
@@ -34,16 +69,7 @@ namespace EditorHelpers
         void Update(float) override
         {
             if (!Enabled() || Editor is null) return;
-            if (Editor.Cursor.UseFreePos)
-            {
-                m_position = Editor.Cursor.FreePosInMap;
-            }
-            else
-            {
-                m_position.x = float(Editor.Cursor.Coord.x) * 32.0f;
-                m_position.y = float(Editor.Cursor.Coord.y - 8) * 8.0f;
-                m_position.z = float(Editor.Cursor.Coord.z) * 32.0f;
-            }
+            Compatibility::UpdateFreePosition(Editor, m_position);
         }
 
         void RenderInterface_Info() override
