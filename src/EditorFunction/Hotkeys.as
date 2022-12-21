@@ -3,80 +3,23 @@ namespace EditorHelpers
 {
     namespace Compatibility
     {
-        void OnKeyPress_AirBlockModeHotkey(CGameCtnEditorFree@ Editor, VirtualKey key)
+        void ToggleAirBlockMode(CGameCtnEditorFree@ Editor)
         {
 #if TMNEXT
-            if (Setting_Hotkeys_AirBlockHotKeyEnabled && key == Setting_Hotkeys_AirBlockHotKey
-                && (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block
-                    || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::GhostBlock
-                    || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeBlock))
+            if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block
+                || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::GhostBlock
+                || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeBlock)
             {
                 Editor.ButtonAirBlockModeOnClick();
             }
 #endif
         }
 
-        void OnKeyPress_ToggleColorsHotkey(CGameCtnEditorFree@ Editor, VirtualKey key, int previousColor)
+        void SetNextMapElemColor(CGameCtnEditorFree@ Editor, int color)
         {
 #if TMNEXT
-            if (Setting_Hotkeys_ToggleColorsHotKeyEnabled && key == Setting_Hotkeys_ToggleColorsHotKey)
-            {
-                Editor.PluginMapType.NextMapElemColor = CGameEditorPluginMap::EMapElemColor(previousColor);
-            }
+            Editor.PluginMapType.NextMapElemColor = CGameEditorPluginMap::EMapElemColor(color);
 #endif
-        }
-
-        void OnKeyPress_FlipCursor180(CGameCtnEditorFree@ Editor, VirtualKey key)
-        {
-            if (Setting_Hotkeys_FlipCursor180HotKeyEnabled
-                && Setting_Hotkeys_FlipCursor180HotKey == key
-                && Compatibility::FreeblockModePreciseRotationShouldBeActive(Editor))
-            {
-                if (Editor.Cursor.Pitch < 0.0)
-                {
-                    Editor.Cursor.Pitch = 0.0;
-                }
-                else
-                {
-                    Editor.Cursor.Pitch = Math::ToRad(-180.0);
-                }
-            }
-        }
-
-        void OnKeyPress_CustomItemGhost(CGameCtnEditorFree@ Editor, VirtualKey key)
-        {
-            if (Setting_Hotkeys_CustomItemGhostHotKeyEnabled
-                && Setting_Hotkeys_CustomItemGhostHotKey == key)
-            {
-                HotkeyInterface::ToggleCustomItemApplyGhost();
-            }
-        }
-
-        void OnKeyPress_CustomItemAutoRotation(CGameCtnEditorFree@ Editor, VirtualKey key)
-        {
-            if (Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled
-                && Setting_Hotkeys_CustomItemAutoRotationHotKey == key)
-            {
-                HotkeyInterface::ToggleCustomItemApplyAutoRotation();
-            }
-        }
-
-        void OnKeyPress_CustomItemGrid(CGameCtnEditorFree@ Editor, VirtualKey key)
-        {
-            if (Setting_Hotkeys_CustomItemGridHotKeyEnabled
-                && Setting_Hotkeys_CustomItemGridHotKey == key)
-            {
-                HotkeyInterface::ToggleCustomItemApplyGrid();
-            }
-        }
-
-        void OnKeyPress_CustomItemPivot(CGameCtnEditorFree@ Editor, VirtualKey key)
-        {
-            if (Setting_Hotkeys_CustomItemPivotHotKeyEnabled
-                && Setting_Hotkeys_CustomItemPivotHotKey == key)
-            {
-                HotkeyInterface::ToggleCustomItemApplyPivot();
-            }
         }
 
         int GetCurrentMapElemColor(CGameCtnEditorFree@ Editor)
@@ -297,15 +240,100 @@ namespace EditorHelpers
             if (!down && m_keysDown.IsEmpty() && Editor.PluginMapType !is null && Editor.PluginMapType.IsEditorReadyForRequest)
             {
                 Debug("Passing keypress \"" + tostring(key) + "\" to hotkey processing methods");
-                Compatibility::OnKeyPress_AirBlockModeHotkey(Editor, key);
-                Compatibility::OnKeyPress_ToggleColorsHotkey(Editor, key, m_mapElemColorPrevPrev);
-                Compatibility::OnKeyPress_FlipCursor180(Editor, key);
-                Compatibility::OnKeyPress_CustomItemGhost(Editor, key);
-                Compatibility::OnKeyPress_CustomItemAutoRotation(Editor, key);
-                Compatibility::OnKeyPress_CustomItemGrid(Editor, key);
-                Compatibility::OnKeyPress_CustomItemPivot(Editor, key);
+                OnKeyPress_AirBlockModeHotkey(key);
+                OnKeyPress_ToggleColorsHotkey(key);
+                OnKeyPress_FlipCursor180(key);
+                OnKeyPress_CustomItemGhost(key);
+                OnKeyPress_CustomItemAutoRotation(key);
+                OnKeyPress_CustomItemGrid(key);
+                OnKeyPress_CustomItemPivot(key);
             }
 
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_AirBlockModeHotkey(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_AirBlockModeHotkey");
+            if (Setting_Hotkeys_AirBlockHotKeyEnabled && key == Setting_Hotkeys_AirBlockHotKey)
+            {
+                Debug("Activate AirBlockModeHotkey");
+                Compatibility::ToggleAirBlockMode(Editor);
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_ToggleColorsHotkey(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_ToggleColorsHotkey");
+            if (Setting_Hotkeys_ToggleColorsHotKeyEnabled && key == Setting_Hotkeys_ToggleColorsHotKey)
+            {
+                Debug("Activate ToggleColorsHotkey");
+                Compatibility::SetNextMapElemColor(Editor, m_mapElemColorPrevPrev);
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_FlipCursor180(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_FlipCursor180");
+            if (Setting_Hotkeys_FlipCursor180HotKeyEnabled && key == Setting_Hotkeys_FlipCursor180HotKey
+                && Compatibility::FreeblockModePreciseRotationShouldBeActive(Editor))
+            {
+                Debug("Activate FlipCursor180");
+                if (Editor.Cursor.Pitch < 0.0)
+                {
+                    Editor.Cursor.Pitch = 0.0;
+                }
+                else
+                {
+                    Editor.Cursor.Pitch = Math::ToRad(-180.0);
+                }
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_CustomItemGhost(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_CustomItemGhost");
+            if (Setting_Hotkeys_CustomItemGhostHotKeyEnabled && key == Setting_Hotkeys_CustomItemGhostHotKey)
+            {
+                Debug("Activate CustomItemGhost");
+                HotkeyInterface::ToggleCustomItemApplyGhost();
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_CustomItemAutoRotation(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_CustomItemAutoRotation");
+            if (Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled && key == Setting_Hotkeys_CustomItemAutoRotationHotKey)
+            {
+                Debug("Activate CustomItemAutoRotation");
+                HotkeyInterface::ToggleCustomItemApplyAutoRotation();
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_CustomItemGrid(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_CustomItemGrid");
+            if (Setting_Hotkeys_CustomItemGridHotKeyEnabled && key == Setting_Hotkeys_CustomItemGridHotKey)
+            {
+                Debug("Activate CustomItemGrid");
+                HotkeyInterface::ToggleCustomItemApplyGrid();
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_CustomItemPivot(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_CustomItemPivot");
+            if (Setting_Hotkeys_CustomItemPivotHotKeyEnabled && key == Setting_Hotkeys_CustomItemPivotHotKey)
+            {
+                Debug("Activate CustomItemPivot");
+                HotkeyInterface::ToggleCustomItemApplyPivot();
+            }
             Debug_LeaveMethod();
         }
 
