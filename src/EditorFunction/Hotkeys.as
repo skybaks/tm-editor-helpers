@@ -43,6 +43,15 @@ namespace EditorHelpers
             }
         }
 
+        void OnKeyPress_CustomItemGrid(CGameCtnEditorFree@ Editor, VirtualKey key)
+        {
+            if (Setting_Hotkeys_CustomItemGridHotKeyEnabled
+                && Setting_Hotkeys_CustomItemGridHotKey == key)
+            {
+                Interface::ToggleCustomItemApplyGrid();
+            }
+        }
+
         int GetCurrentMapElemColor(CGameCtnEditorFree@ Editor)
         {
             int elemColor = 0;
@@ -81,6 +90,11 @@ namespace EditorHelpers
     [Setting category="Functions" name="Hotkeys: FlipCursor180 HotKey" hidden]
     VirtualKey Setting_Hotkeys_FlipCursor180HotKey = VirtualKey::OemPeriod;
 
+    [Setting category="Functions" name="Hotkeys: CustomItemGrid HotKey Enabled" hidden]
+    bool Setting_Hotkeys_CustomItemGridHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: CustomItemGrid HotKey" hidden]
+    VirtualKey Setting_Hotkeys_CustomItemGridHotKey = VirtualKey::I;
+
     class Hotkeys : EditorHelpers::EditorFunction
     {
         private VirtualKey[] m_keysDown = {};
@@ -108,65 +122,10 @@ namespace EditorHelpers
                 UI::TableSetupColumn("");
                 UI::TableHeadersRow();
 
-                UI::TableNextRow();
-                UI::TableNextColumn();
-                UI::Text("Toggle AirBlock Mode");
-                UI::TableNextColumn();
-                UI::Text(tostring(Setting_Hotkeys_AirBlockHotKey));
-                UI::TableNextColumn();
-                Setting_Hotkeys_AirBlockHotKeyEnabled = UI::Checkbox("Enabled##AirBlockHotkey", Setting_Hotkeys_AirBlockHotKeyEnabled);
-                UI::TableNextColumn();
-                if (m_rebindKeyName == "AirBlockHotkey")
-                {
-                    if (UI::Button("Cancel##AirBlockHotkey"))
-                    {
-                        m_rebindKeyName = "";
-                    }
-                }
-                else if (UI::Button("Rebind##AirBlockHotkey"))
-                {
-                    m_rebindKeyName = "AirBlockHotkey";
-                }
-
-                UI::TableNextRow();
-                UI::TableNextColumn();
-                UI::Text("Quickswitch To Last Color");
-                UI::TableNextColumn();
-                UI::Text(tostring(Setting_Hotkeys_ToggleColorsHotKey));
-                UI::TableNextColumn();
-                Setting_Hotkeys_ToggleColorsHotKeyEnabled = UI::Checkbox("Enabled##ToggleColors", Setting_Hotkeys_ToggleColorsHotKeyEnabled);
-                UI::TableNextColumn();
-                if (m_rebindKeyName == "ToggleColors")
-                {
-                    if (UI::Button("Cancel##ToggleColors"))
-                    {
-                        m_rebindKeyName = "";
-                    }
-                }
-                else if (UI::Button("Rebind##ToggleColors"))
-                {
-                    m_rebindKeyName = "ToggleColors";
-                }
-
-                UI::TableNextRow();
-                UI::TableNextColumn();
-                UI::Text("Flip Block 180 deg");
-                UI::TableNextColumn();
-                UI::Text(tostring(Setting_Hotkeys_FlipCursor180HotKey));
-                UI::TableNextColumn();
-                Setting_Hotkeys_FlipCursor180HotKeyEnabled = UI::Checkbox("Enabled##FlipCursor180", Setting_Hotkeys_FlipCursor180HotKeyEnabled);
-                UI::TableNextColumn();
-                if (m_rebindKeyName == "FlipCursor180")
-                {
-                    if (UI::Button("Cancel##FlipCursor180"))
-                    {
-                        m_rebindKeyName = "";
-                    }
-                }
-                else if (UI::Button("Rebind##FlipCursor180"))
-                {
-                    m_rebindKeyName = "FlipCursor180";
-                }
+                HotkeySettingsTableRow("Toggle AirBlock Mode", "AirBlockHotkey", Setting_Hotkeys_AirBlockHotKey, Setting_Hotkeys_AirBlockHotKeyEnabled, Setting_Hotkeys_AirBlockHotKeyEnabled);
+                HotkeySettingsTableRow("Quickswitch To Last Color", "ToggleColors", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
+                HotkeySettingsTableRow("Flip Block 180 deg", "FlipCursor180", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
+                HotkeySettingsTableRow("Toggle Apply Custom Item Grid", "CustomItemGrid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
 
                 UI::EndTable();
             }
@@ -198,18 +157,10 @@ namespace EditorHelpers
             {
                 UI::BeginTooltip();
                 string activeHotkeysHelper = "";
-                if (Setting_Hotkeys_AirBlockHotKeyEnabled)
-                {
-                    activeHotkeysHelper += "[ " + tostring(Setting_Hotkeys_AirBlockHotKey) + " ]\tToggle Airblock Mode\n";
-                }
-                if (Setting_Hotkeys_ToggleColorsHotKeyEnabled)
-                {
-                    activeHotkeysHelper += "[ " + tostring(Setting_Hotkeys_ToggleColorsHotKey) + " ]\tQuickswitch Last Element Color\n";
-                }
-                if (Setting_Hotkeys_FlipCursor180HotKeyEnabled)
-                {
-                    activeHotkeysHelper += "[ " + tostring(Setting_Hotkeys_FlipCursor180HotKey) + " ]\tFlip Block/Item 180 degrees\n";
-                }
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Airblock Mode", Setting_Hotkeys_AirBlockHotKey, Setting_Hotkeys_AirBlockHotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Quickswitch Last Element Color", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Flip Block/Item 180 degrees", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Grid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
                 UI::Text(activeHotkeysHelper);
                 UI::EndTooltip();
             }
@@ -267,6 +218,10 @@ namespace EditorHelpers
                 {
                     Setting_Hotkeys_FlipCursor180HotKey = key;
                 }
+                else if (m_rebindKeyName == "CustomItemGrid")
+                {
+                    Setting_Hotkeys_CustomItemGridHotKey = key;
+                }
 
                 m_rebindKeyName = "";
                 Debug_LeaveMethod();
@@ -285,9 +240,43 @@ namespace EditorHelpers
                 Compatibility::OnKeyPress_AirBlockModeHotkey(Editor, key);
                 Compatibility::OnKeyPress_ToggleColorsHotkey(Editor, key, m_mapElemColorPrevPrev);
                 Compatibility::OnKeyPress_FlipCursor180(Editor, key);
+                Compatibility::OnKeyPress_CustomItemGrid(Editor, key);
             }
 
             Debug_LeaveMethod();
+        }
+
+        private void HotkeySettingsTableRow(const string&in title, const string&in rebindName, const VirtualKey&in currentKey, bool&in enabledIn, bool&out enabledOut)
+        {
+            UI::TableNextRow();
+            UI::TableNextColumn();
+            UI::Text(title);
+            UI::TableNextColumn();
+            UI::Text(tostring(currentKey));
+            UI::TableNextColumn();
+            enabledOut = UI::Checkbox("Enabled##" + rebindName, enabledIn);
+            UI::TableNextColumn();
+            if (m_rebindKeyName == rebindName)
+            {
+                if (UI::Button("Cancel##" + rebindName))
+                {
+                    m_rebindKeyName = "";
+                }
+            }
+            else if (UI::Button("Rebind##" + rebindName))
+            {
+                m_rebindKeyName = rebindName;
+            }
+        }
+
+        private string HotkeyDisplayActiveRow(const string&in title, const VirtualKey&in key, const bool&in enabled)
+        {
+            string text = "";
+            if (enabled)
+            {
+                text = "[ " + tostring(key) + " ]\t" + title + "\n";
+            }
+            return text;
         }
     }
 }

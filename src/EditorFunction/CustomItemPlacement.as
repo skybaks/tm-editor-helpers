@@ -102,6 +102,17 @@ namespace EditorHelpers
         }
     }
 
+    namespace Interface
+    {
+        void ToggleCustomItemApplyGrid()
+        {
+            if (Setting_CustomItemPlacement_Enabled)
+            {
+                Setting_CustomItemPlacement_ApplyGrid = !Setting_CustomItemPlacement_ApplyGrid;
+            }
+        }
+    }
+
     class CustomItemPlacementSettings
     {
         bool Initialized = false;
