@@ -20,7 +20,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::Hotkeys()
     , EditorHelpers::RotationRandomizer()
 #if TMNEXT
-    , EditorHelpers::FreeblockModePreciseTranslation()
+    , EditorHelpers::FreeblockPlacement()
 #endif
     , EditorHelpers::MoodChanger()
     , EditorHelpers::CameraModes()
