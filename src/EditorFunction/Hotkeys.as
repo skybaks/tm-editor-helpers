@@ -43,12 +43,21 @@ namespace EditorHelpers
             }
         }
 
+        void OnKeyPress_CustomItemGhost(CGameCtnEditorFree@ Editor, VirtualKey key)
+        {
+            if (Setting_Hotkeys_CustomItemGhostHotKeyEnabled
+                && Setting_Hotkeys_CustomItemGhostHotKey == key)
+            {
+                HotkeyInterface::ToggleCustomItemApplyGhost();
+            }
+        }
+
         void OnKeyPress_CustomItemGrid(CGameCtnEditorFree@ Editor, VirtualKey key)
         {
             if (Setting_Hotkeys_CustomItemGridHotKeyEnabled
                 && Setting_Hotkeys_CustomItemGridHotKey == key)
             {
-                Interface::ToggleCustomItemApplyGrid();
+                HotkeyInterface::ToggleCustomItemApplyGrid();
             }
         }
 
@@ -90,6 +99,11 @@ namespace EditorHelpers
     [Setting category="Functions" name="Hotkeys: FlipCursor180 HotKey" hidden]
     VirtualKey Setting_Hotkeys_FlipCursor180HotKey = VirtualKey::OemPeriod;
 
+    [Setting category="Functions" name="Hotkeys: CustomItemGhost HotKey Enabled" hidden]
+    bool Setting_Hotkeys_CustomItemGhostHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: CustomItemGhost HotKey" hidden]
+    VirtualKey Setting_Hotkeys_CustomItemGhostHotKey = VirtualKey::G;
+
     [Setting category="Functions" name="Hotkeys: CustomItemGrid HotKey Enabled" hidden]
     bool Setting_Hotkeys_CustomItemGridHotKeyEnabled = false;
     [Setting category="Functions" name="Hotkeys: CustomItemGrid HotKey" hidden]
@@ -113,8 +127,8 @@ namespace EditorHelpers
             UI::SameLine();
             Setting_Hotkeys_Enabled = UI::Checkbox("Enabled", Setting_Hotkeys_Enabled);
             UI::BeginDisabled(!Setting_Hotkeys_Enabled);
-            UI::TextWrapped("Adds some custom hotkeys to the editor to manage things that are not already hotkeys the game.");
-            if (UI::BeginTable("SettingsHotkeysTable", 4 /*columns*/))
+            UI::TextWrapped("Adds some custom hotkeys to the editor to manage things that are not already hotkeys in the game. It is recommended to map plugin functions to hotkeys not already used by the game.");
+            if (UI::BeginTable("SettingsHotkeysTable", 4 /*columns*/, UI::TableFlags::SizingFixedFit))
             {
                 UI::TableSetupColumn("Action");
                 UI::TableSetupColumn("Key");
@@ -125,6 +139,7 @@ namespace EditorHelpers
                 HotkeySettingsTableRow("Toggle AirBlock Mode", "AirBlockHotkey", Setting_Hotkeys_AirBlockHotKey, Setting_Hotkeys_AirBlockHotKeyEnabled, Setting_Hotkeys_AirBlockHotKeyEnabled);
                 HotkeySettingsTableRow("Quickswitch To Last Color", "ToggleColors", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
                 HotkeySettingsTableRow("Flip Block 180 deg", "FlipCursor180", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
+                HotkeySettingsTableRow("Toggle Apply Custom Item Ghost Mode", "CustomItemGhost", Setting_Hotkeys_CustomItemGhostHotKey, Setting_Hotkeys_CustomItemGhostHotKeyEnabled, Setting_Hotkeys_CustomItemGhostHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Grid", "CustomItemGrid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
 
                 UI::EndTable();
@@ -160,6 +175,7 @@ namespace EditorHelpers
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Airblock Mode", Setting_Hotkeys_AirBlockHotKey, Setting_Hotkeys_AirBlockHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Quickswitch Last Element Color", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Flip Block/Item 180 degrees", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Ghost Mode", Setting_Hotkeys_CustomItemGhostHotKey, Setting_Hotkeys_CustomItemGhostHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Grid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
                 UI::Text(activeHotkeysHelper);
                 UI::EndTooltip();
@@ -218,6 +234,10 @@ namespace EditorHelpers
                 {
                     Setting_Hotkeys_FlipCursor180HotKey = key;
                 }
+                else if (m_rebindKeyName == "CustomItemGhost")
+                {
+                    Setting_Hotkeys_CustomItemGhostHotKey = key;
+                }
                 else if (m_rebindKeyName == "CustomItemGrid")
                 {
                     Setting_Hotkeys_CustomItemGridHotKey = key;
@@ -240,6 +260,7 @@ namespace EditorHelpers
                 Compatibility::OnKeyPress_AirBlockModeHotkey(Editor, key);
                 Compatibility::OnKeyPress_ToggleColorsHotkey(Editor, key, m_mapElemColorPrevPrev);
                 Compatibility::OnKeyPress_FlipCursor180(Editor, key);
+                Compatibility::OnKeyPress_CustomItemGhost(Editor, key);
                 Compatibility::OnKeyPress_CustomItemGrid(Editor, key);
             }
 
