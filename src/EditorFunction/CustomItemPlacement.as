@@ -112,11 +112,27 @@ namespace EditorHelpers
             }
         }
 
+        void ToggleCustomItemApplyAutoRotation()
+        {
+            if (Setting_CustomItemPlacement_Enabled)
+            {
+                Setting_CustomItemPlacement_ApplyAutoRotation = !Setting_CustomItemPlacement_ApplyAutoRotation;
+            }
+        }
+
         void ToggleCustomItemApplyGrid()
         {
             if (Setting_CustomItemPlacement_Enabled)
             {
                 Setting_CustomItemPlacement_ApplyGrid = !Setting_CustomItemPlacement_ApplyGrid;
+            }
+        }
+
+        void ToggleCustomItemApplyPivot()
+        {
+            if (Setting_CustomItemPlacement_Enabled)
+            {
+                Setting_CustomItemPlacement_ApplyPivot = !Setting_CustomItemPlacement_ApplyPivot;
             }
         }
     }

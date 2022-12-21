@@ -52,12 +52,30 @@ namespace EditorHelpers
             }
         }
 
+        void OnKeyPress_CustomItemAutoRotation(CGameCtnEditorFree@ Editor, VirtualKey key)
+        {
+            if (Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled
+                && Setting_Hotkeys_CustomItemAutoRotationHotKey == key)
+            {
+                HotkeyInterface::ToggleCustomItemApplyAutoRotation();
+            }
+        }
+
         void OnKeyPress_CustomItemGrid(CGameCtnEditorFree@ Editor, VirtualKey key)
         {
             if (Setting_Hotkeys_CustomItemGridHotKeyEnabled
                 && Setting_Hotkeys_CustomItemGridHotKey == key)
             {
                 HotkeyInterface::ToggleCustomItemApplyGrid();
+            }
+        }
+
+        void OnKeyPress_CustomItemPivot(CGameCtnEditorFree@ Editor, VirtualKey key)
+        {
+            if (Setting_Hotkeys_CustomItemPivotHotKeyEnabled
+                && Setting_Hotkeys_CustomItemPivotHotKey == key)
+            {
+                HotkeyInterface::ToggleCustomItemApplyPivot();
             }
         }
 
@@ -104,10 +122,20 @@ namespace EditorHelpers
     [Setting category="Functions" name="Hotkeys: CustomItemGhost HotKey" hidden]
     VirtualKey Setting_Hotkeys_CustomItemGhostHotKey = VirtualKey::G;
 
+    [Setting category="Functions" name="Hotkeys: CustomItemAutoRotation HotKey Enabled" hidden]
+    bool Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: CustomItemAutoRotation HotKey" hidden]
+    VirtualKey Setting_Hotkeys_CustomItemAutoRotationHotKey = VirtualKey::Y;
+
     [Setting category="Functions" name="Hotkeys: CustomItemGrid HotKey Enabled" hidden]
     bool Setting_Hotkeys_CustomItemGridHotKeyEnabled = false;
     [Setting category="Functions" name="Hotkeys: CustomItemGrid HotKey" hidden]
     VirtualKey Setting_Hotkeys_CustomItemGridHotKey = VirtualKey::I;
+
+    [Setting category="Functions" name="Hotkeys: CustomItemPivot HotKey Enabled" hidden]
+    bool Setting_Hotkeys_CustomItemPivotHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: CustomItemPivot HotKey" hidden]
+    VirtualKey Setting_Hotkeys_CustomItemPivotHotKey = VirtualKey::U;
 
     class Hotkeys : EditorHelpers::EditorFunction
     {
@@ -140,7 +168,9 @@ namespace EditorHelpers
                 HotkeySettingsTableRow("Quickswitch To Last Color", "ToggleColors", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
                 HotkeySettingsTableRow("Flip Block 180 deg", "FlipCursor180", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Ghost Mode", "CustomItemGhost", Setting_Hotkeys_CustomItemGhostHotKey, Setting_Hotkeys_CustomItemGhostHotKeyEnabled, Setting_Hotkeys_CustomItemGhostHotKeyEnabled);
+                HotkeySettingsTableRow("Toggle Apply Custom Item AutoRotation", "CustomItemAutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Grid", "CustomItemGrid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
+                HotkeySettingsTableRow("Toggle Apply Custom Item Pivot", "CustomItemPivot", Setting_Hotkeys_CustomItemPivotHotKey, Setting_Hotkeys_CustomItemPivotHotKeyEnabled, Setting_Hotkeys_CustomItemPivotHotKeyEnabled);
 
                 UI::EndTable();
             }
@@ -176,7 +206,9 @@ namespace EditorHelpers
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Quickswitch Last Element Color", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Flip Block/Item 180 degrees", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Ghost Mode", Setting_Hotkeys_CustomItemGhostHotKey, Setting_Hotkeys_CustomItemGhostHotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item AutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Grid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Pivot", Setting_Hotkeys_CustomItemPivotHotKey, Setting_Hotkeys_CustomItemPivotHotKeyEnabled);
                 UI::Text(activeHotkeysHelper);
                 UI::EndTooltip();
             }
@@ -238,9 +270,17 @@ namespace EditorHelpers
                 {
                     Setting_Hotkeys_CustomItemGhostHotKey = key;
                 }
+                else if (m_rebindKeyName == "CustomItemAutoRotation")
+                {
+                    Setting_Hotkeys_CustomItemAutoRotationHotKey = key;
+                }
                 else if (m_rebindKeyName == "CustomItemGrid")
                 {
                     Setting_Hotkeys_CustomItemGridHotKey = key;
+                }
+                else if (m_rebindKeyName == "CustomItemPivot")
+                {
+                    Setting_Hotkeys_CustomItemPivotHotKey = key;
                 }
 
                 m_rebindKeyName = "";
@@ -261,7 +301,9 @@ namespace EditorHelpers
                 Compatibility::OnKeyPress_ToggleColorsHotkey(Editor, key, m_mapElemColorPrevPrev);
                 Compatibility::OnKeyPress_FlipCursor180(Editor, key);
                 Compatibility::OnKeyPress_CustomItemGhost(Editor, key);
+                Compatibility::OnKeyPress_CustomItemAutoRotation(Editor, key);
                 Compatibility::OnKeyPress_CustomItemGrid(Editor, key);
+                Compatibility::OnKeyPress_CustomItemPivot(Editor, key);
             }
 
             Debug_LeaveMethod();
