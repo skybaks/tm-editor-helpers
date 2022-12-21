@@ -2,6 +2,7 @@
 * Small change to detection of podiums in map for generating reminders.
 * Add new display of cursor position. This show the current X, Y, Z position of the block/item cursor.
 * Rework the "Freeblock Mode Precise Translation" to have a similar interface to setting custom item placment grid. It now allows you to specify horizontal and vertical step for placement instead of a translation offset.
+* Add new hotkeys to control the custom item placement settings. Toggle for Ghost Mode, Autorotation, Apply Custom Grid, and Apply Custom Pivot.
 
 
 # 5.10
