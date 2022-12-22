@@ -44,6 +44,8 @@ namespace EditorHelpers
 
     [Setting category="Functions" name="Hotkeys: Hotkeys Function Enabled" hidden]
     bool Setting_Hotkeys_Enabled = true;
+    [Setting category="Functions" name="Hotkeys: Show Activation Notification" hidden]
+    bool Setting_Hotkeys_ShowActivationNotification = false;
 
     [Setting category="Functions" name="Hotkeys: AirBlockHotKey Enabled" hidden]
     bool Setting_Hotkeys_AirBlockHotKeyEnabled = true;
@@ -141,6 +143,7 @@ namespace EditorHelpers
             Setting_Hotkeys_Enabled = UI::Checkbox("Enabled", Setting_Hotkeys_Enabled);
             UI::BeginDisabled(!Setting_Hotkeys_Enabled);
             UI::TextWrapped("Adds some custom hotkeys to the editor to manage things that are not already hotkeys in the game. It is recommended (but not required) to map these to hotkeys not already used by the game.");
+            Setting_Hotkeys_ShowActivationNotification = UI::Checkbox("Display a notification when hotkeys are activated", Setting_Hotkeys_ShowActivationNotification);
             if (UI::BeginTable("SettingsHotkeysTable", 4 /*columns*/, UI::TableFlags::SizingFixedFit))
             {
                 UI::TableSetupColumn("Action");
@@ -342,6 +345,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_AirBlockHotKeyEnabled && key == Setting_Hotkeys_AirBlockHotKey)
             {
                 Debug("Activate AirBlockModeHotkey");
+                ShowHotkeyNotification("Toggle Airblock Mode", key);
                 Compatibility::ToggleAirBlockMode(Editor);
             }
             Debug_LeaveMethod();
@@ -353,6 +357,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_ToggleColorsHotKeyEnabled && key == Setting_Hotkeys_ToggleColorsHotKey)
             {
                 Debug("Activate ToggleColorsHotkey");
+                ShowHotkeyNotification("Quickswitch Last Element Color", key);
                 Compatibility::SetNextMapElemColor(Editor, m_mapElemColorPrevPrev);
             }
             Debug_LeaveMethod();
@@ -365,6 +370,7 @@ namespace EditorHelpers
                 && Compatibility::FreeblockModePreciseRotationShouldBeActive(Editor))
             {
                 Debug("Activate FlipCursor180");
+                ShowHotkeyNotification("Flip Block/Item 180 degrees", key);
                 if (Editor.Cursor.Pitch < 0.0)
                 {
                     Editor.Cursor.Pitch = 0.0;
@@ -383,6 +389,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled && key == Setting_Hotkeys_BlockCursorToggleHideHotKey)
             {
                 Debug("Activate BlockCursorToggleHide");
+                ShowHotkeyNotification("Toggle Hide Block Cursor", key);
                 HotkeyInterface::ToggleHideBlockCursor();
             }
             Debug_LeaveMethod();
@@ -394,6 +401,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_BlockHelpersToggleHotKeyEnabled && key == Setting_Hotkeys_BlockHelpersToggleHotKey)
             {
                 Debug("Activate BlockHelpersToggle");
+                ShowHotkeyNotification("Toggle Block Helpers", key);
                 HotkeyInterface::ToggleShowBlockHelpers();
             }
             Debug_LeaveMethod();
@@ -405,6 +413,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_CustomItemGhostHotKeyEnabled && key == Setting_Hotkeys_CustomItemGhostHotKey)
             {
                 Debug("Activate CustomItemGhost");
+                ShowHotkeyNotification("Toggle Apply Custom Item Ghost Mode", key);
                 HotkeyInterface::ToggleCustomItemApplyGhost();
             }
             Debug_LeaveMethod();
@@ -416,6 +425,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled && key == Setting_Hotkeys_CustomItemAutoRotationHotKey)
             {
                 Debug("Activate CustomItemAutoRotation");
+                ShowHotkeyNotification("Toggle Apply Custom Item AutoRotation", key);
                 HotkeyInterface::ToggleCustomItemApplyAutoRotation();
             }
             Debug_LeaveMethod();
@@ -427,6 +437,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_CustomItemGridHotKeyEnabled && key == Setting_Hotkeys_CustomItemGridHotKey)
             {
                 Debug("Activate CustomItemGrid");
+                ShowHotkeyNotification("Toggle Apply Custom Item Grid", key);
                 HotkeyInterface::ToggleCustomItemApplyGrid();
             }
             Debug_LeaveMethod();
@@ -438,6 +449,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_CustomItemPivotHotKeyEnabled && key == Setting_Hotkeys_CustomItemPivotHotKey)
             {
                 Debug("Activate CustomItemPivot");
+                ShowHotkeyNotification("Toggle Apply Custom Item Pivot", key);
                 HotkeyInterface::ToggleCustomItemApplyPivot();
             }
             Debug_LeaveMethod();
@@ -449,6 +461,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled && key == Setting_Hotkeys_FreeblockPlacementApplyGridHotKey)
             {
                 Debug("Activate FreeblockPlacementApplyGrid");
+                ShowHotkeyNotification("Toggle Apply Custom Freeblock Grid", key);
                 HotkeyInterface::ToggleFreeblockApplyCustomGrid();
             }
             Debug_LeaveMethod();
@@ -460,6 +473,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled && key == Setting_Hotkeys_VisualPlacementGridOnHotKey)
             {
                 Debug("Activate VisualPlacementGridOn");
+                ShowHotkeyNotification("Toggle Show Editor Placement Grid", key);
                 HotkeyInterface::TogglePlacementGridOn();
             }
             Debug_LeaveMethod();
@@ -471,6 +485,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled && key == Setting_Hotkeys_VisualPlacementGridTransparentHotKey)
             {
                 Debug("Activate VisualPlacementGridTransparent");
+                ShowHotkeyNotification("Toggle Editor Placement Grid Transparency", key);
                 HotkeyInterface::TogglePlacementGridTransparent();
             }
             Debug_LeaveMethod();
@@ -482,6 +497,7 @@ namespace EditorHelpers
             if (Setting_Hotkeys_ActivateQuicksaveHotKeyEnabled && key == Setting_Hotkeys_ActivateQuicksaveHotKey)
             {
                 Debug("Activate ActivateQuicksave");
+                ShowHotkeyNotification("Quicksave", key);
                 HotkeyInterface::ActivateQuicksave();
             }
             Debug_LeaveMethod();
@@ -518,6 +534,18 @@ namespace EditorHelpers
                 text = "[ " + tostring(key) + " ]\t" + title + "\n";
             }
             return text;
+        }
+
+        private void ShowHotkeyNotification(const string&in name, const VirtualKey&in key)
+        {
+            if (Setting_Hotkeys_ShowActivationNotification)
+            {
+                UI::ShowNotification(
+                    "Editor Helpers: " + Name(),
+                    "Hotkey pressed: [ " + tostring(key) + " ] " + name,
+                    750
+                );
+            }
         }
     }
 }
