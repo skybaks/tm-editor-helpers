@@ -60,6 +60,15 @@ namespace EditorHelpers
     [Setting category="Functions" name="Hotkeys: FlipCursor180 HotKey" hidden]
     VirtualKey Setting_Hotkeys_FlipCursor180HotKey = VirtualKey::OemPeriod;
 
+    // Plugin: BlockCursor
+
+    [Setting category="Functions" name="Hotkeys: BlockCursorToggleHide HotKey Enabled" hidden]
+    bool Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: CustomItemGhost HotKey" hidden]
+    VirtualKey Setting_Hotkeys_BlockCursorToggleHideHotKey = VirtualKey::O;
+
+    // Plugin: CustomItemPlacement
+
     [Setting category="Functions" name="Hotkeys: CustomItemGhost HotKey Enabled" hidden]
     bool Setting_Hotkeys_CustomItemGhostHotKeyEnabled = false;
     [Setting category="Functions" name="Hotkeys: CustomItemGhost HotKey" hidden]
@@ -98,7 +107,7 @@ namespace EditorHelpers
             UI::SameLine();
             Setting_Hotkeys_Enabled = UI::Checkbox("Enabled", Setting_Hotkeys_Enabled);
             UI::BeginDisabled(!Setting_Hotkeys_Enabled);
-            UI::TextWrapped("Adds some custom hotkeys to the editor to manage things that are not already hotkeys in the game. It is recommended to map plugin functions to hotkeys not already used by the game.");
+            UI::TextWrapped("Adds some custom hotkeys to the editor to manage things that are not already hotkeys in the game. It is recommended (but not required) to map these to hotkeys not already used by the game.");
             if (UI::BeginTable("SettingsHotkeysTable", 4 /*columns*/, UI::TableFlags::SizingFixedFit))
             {
                 UI::TableSetupColumn("Action");
@@ -110,6 +119,7 @@ namespace EditorHelpers
                 HotkeySettingsTableRow("Toggle AirBlock Mode", "AirBlockHotkey", Setting_Hotkeys_AirBlockHotKey, Setting_Hotkeys_AirBlockHotKeyEnabled, Setting_Hotkeys_AirBlockHotKeyEnabled);
                 HotkeySettingsTableRow("Quickswitch To Last Color", "ToggleColors", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
                 HotkeySettingsTableRow("Flip Block 180 deg", "FlipCursor180", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
+                HotkeySettingsTableRow("Toggle Hide Block Cursor", "BlockCursorToggleHide", Setting_Hotkeys_BlockCursorToggleHideHotKey, Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled, Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Ghost Mode", "CustomItemGhost", Setting_Hotkeys_CustomItemGhostHotKey, Setting_Hotkeys_CustomItemGhostHotKeyEnabled, Setting_Hotkeys_CustomItemGhostHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item AutoRotation", "CustomItemAutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Grid", "CustomItemGrid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
@@ -148,6 +158,7 @@ namespace EditorHelpers
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Airblock Mode", Setting_Hotkeys_AirBlockHotKey, Setting_Hotkeys_AirBlockHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Quickswitch Last Element Color", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Flip Block/Item 180 degrees", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Hide Block Cursor", Setting_Hotkeys_BlockCursorToggleHideHotKey, Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Ghost Mode", Setting_Hotkeys_CustomItemGhostHotKey, Setting_Hotkeys_CustomItemGhostHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item AutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Grid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
@@ -209,6 +220,10 @@ namespace EditorHelpers
                 {
                     Setting_Hotkeys_FlipCursor180HotKey = key;
                 }
+                else if (m_rebindKeyName == "BlockCursorToggleHide")
+                {
+                    Setting_Hotkeys_BlockCursorToggleHideHotKey = key;
+                }
                 else if (m_rebindKeyName == "CustomItemGhost")
                 {
                     Setting_Hotkeys_CustomItemGhostHotKey = key;
@@ -243,6 +258,7 @@ namespace EditorHelpers
                 OnKeyPress_AirBlockModeHotkey(key);
                 OnKeyPress_ToggleColorsHotkey(key);
                 OnKeyPress_FlipCursor180(key);
+                OnKeyPress_BlockCursorToggleHide(key);
                 OnKeyPress_CustomItemGhost(key);
                 OnKeyPress_CustomItemAutoRotation(key);
                 OnKeyPress_CustomItemGrid(key);
@@ -289,6 +305,17 @@ namespace EditorHelpers
                 {
                     Editor.Cursor.Pitch = Math::ToRad(-180.0);
                 }
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_BlockCursorToggleHide(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_BlockCursorToggleHide");
+            if (Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled && key == Setting_Hotkeys_BlockCursorToggleHideHotKey)
+            {
+                Debug("Activate BlockCursorToggleHide");
+                HotkeyInterface::ToggleHideBlockCursor();
             }
             Debug_LeaveMethod();
         }
