@@ -103,6 +103,18 @@ namespace EditorHelpers
     [Setting category="Functions" name="Hotkeys: FreeblockPlacementApplyGrid HotKey" hidden]
     VirtualKey Setting_Hotkeys_FreeblockPlacementApplyGridHotKey = VirtualKey::K;
 
+    // Plugin: PlacementGrid
+
+    [Setting category="Functions" name="Hotkeys: VisualPlacementGridOn HotKey Enabled" hidden]
+    bool Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: VisualPlacementGridOn HotKey" hidden]
+    VirtualKey Setting_Hotkeys_VisualPlacementGridOnHotKey = VirtualKey::J;
+
+    [Setting category="Functions" name="Hotkeys: VisualPlacementGridTransparent HotKey Enabled" hidden]
+    bool Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: VisualPlacementGridOn HotKey" hidden]
+    VirtualKey Setting_Hotkeys_VisualPlacementGridTransparentHotKey = VirtualKey::N;
+
     class Hotkeys : EditorHelpers::EditorFunction
     {
         private VirtualKey[] m_keysDown = {};
@@ -140,6 +152,8 @@ namespace EditorHelpers
                 HotkeySettingsTableRow("Toggle Apply Custom Item Grid", "CustomItemGrid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Pivot", "CustomItemPivot", Setting_Hotkeys_CustomItemPivotHotKey, Setting_Hotkeys_CustomItemPivotHotKeyEnabled, Setting_Hotkeys_CustomItemPivotHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Freeblock Grid", "FreeblockPlacementApplyGrid", Setting_Hotkeys_FreeblockPlacementApplyGridHotKey, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled);
+                HotkeySettingsTableRow("Toggle Show Editor Placement Grid", "VisualPlacementGridOn", Setting_Hotkeys_VisualPlacementGridOnHotKey, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled);
+                HotkeySettingsTableRow("Toggle Editor Placement Grid Transparency", "VisualPlacementGridTransparent", Setting_Hotkeys_VisualPlacementGridTransparentHotKey, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled);
 
                 UI::EndTable();
             }
@@ -181,6 +195,8 @@ namespace EditorHelpers
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Grid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Pivot", Setting_Hotkeys_CustomItemPivotHotKey, Setting_Hotkeys_CustomItemPivotHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Freeblock Grid", Setting_Hotkeys_FreeblockPlacementApplyGridHotKey, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Show Editor Placement Grid", Setting_Hotkeys_VisualPlacementGridOnHotKey, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Editor Placement Grid Transparency", Setting_Hotkeys_VisualPlacementGridTransparentHotKey, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled);
                 UI::Text(activeHotkeysHelper);
                 UI::EndTooltip();
             }
@@ -266,6 +282,14 @@ namespace EditorHelpers
                 {
                     Setting_Hotkeys_FreeblockPlacementApplyGridHotKey = key;
                 }
+                else if (m_rebindKeyName == "VisualPlacementGridOn")
+                {
+                    Setting_Hotkeys_VisualPlacementGridOnHotKey = key;
+                }
+                else if (m_rebindKeyName == "VisualPlacementGridTransparent")
+                {
+                    Setting_Hotkeys_VisualPlacementGridTransparentHotKey = key;
+                }
 
                 m_rebindKeyName = "";
                 Debug_LeaveMethod();
@@ -291,6 +315,8 @@ namespace EditorHelpers
                 OnKeyPress_CustomItemGrid(key);
                 OnKeyPress_CustomItemPivot(key);
                 OnKeyPress_FreeblockPlacementApplyGrid(key);
+                OnKeyPress_VisualPlacementGridOn(key);
+                OnKeyPress_VisualPlacementGridTransparent(key);
             }
 
             Debug_LeaveMethod();
@@ -410,6 +436,28 @@ namespace EditorHelpers
             {
                 Debug("Activate FreeblockPlacementApplyGrid");
                 HotkeyInterface::ToggleFreeblockApplyCustomGrid();
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_VisualPlacementGridOn(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_VisualPlacementGridOn");
+            if (Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled && key == Setting_Hotkeys_VisualPlacementGridOnHotKey)
+            {
+                Debug("Activate VisualPlacementGridOn");
+                HotkeyInterface::TogglePlacementGridOn();
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_VisualPlacementGridTransparent(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_VisualPlacementGridTransparent");
+            if (Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled && key == Setting_Hotkeys_VisualPlacementGridTransparentHotKey)
+            {
+                Debug("Activate VisualPlacementGridTransparent");
+                HotkeyInterface::TogglePlacementGridTransparent();
             }
             Debug_LeaveMethod();
         }

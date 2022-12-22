@@ -7,6 +7,7 @@
   * For Block Cursor Highlight: Toggle to show/hide block cursor
   * For Block Helpers: Toggle to show/hide clip helpers
   * For Custom Freeblock Placement: Toggle for Apply Custom Grid
+  * For Visual Placement Grid: Toggle for show/hide grid and toggle for apply grid transparency
 
 
 # 5.10

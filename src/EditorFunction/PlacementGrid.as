@@ -1,6 +1,25 @@
 
 namespace EditorHelpers
 {
+    namespace HotkeyInterface
+    {
+        void TogglePlacementGridOn()
+        {
+            if (Setting_PlacementGrid_Enabled)
+            {
+                Setting_PlacementGrid_PlacementGridOn = !Setting_PlacementGrid_PlacementGridOn;
+            }
+        }
+
+        void TogglePlacementGridTransparent()
+        {
+            if (Setting_PlacementGrid_Enabled)
+            {
+                Setting_PlacementGrid_PlacementGridTransparent = !Setting_PlacementGrid_PlacementGridTransparent;
+            }
+        }
+    }
+
     [Setting category="Functions" name="PlacementGrid: Enabled" hidden]
     bool Setting_PlacementGrid_Enabled = true;
     [Setting category="Functions" name="PlacementGrid: Placement Grid On" hidden]
