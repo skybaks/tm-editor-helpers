@@ -96,6 +96,13 @@ namespace EditorHelpers
     [Setting category="Functions" name="Hotkeys: CustomItemPivot HotKey" hidden]
     VirtualKey Setting_Hotkeys_CustomItemPivotHotKey = VirtualKey::U;
 
+    // Plugin: FreeblockPlacement
+
+    [Setting category="Functions" name="Hotkeys: FreeblockPlacementApplyGrid HotKey Enabled" hidden]
+    bool Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: FreeblockPlacementApplyGrid HotKey" hidden]
+    VirtualKey Setting_Hotkeys_FreeblockPlacementApplyGridHotKey = VirtualKey::K;
+
     class Hotkeys : EditorHelpers::EditorFunction
     {
         private VirtualKey[] m_keysDown = {};
@@ -132,6 +139,7 @@ namespace EditorHelpers
                 HotkeySettingsTableRow("Toggle Apply Custom Item AutoRotation", "CustomItemAutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Grid", "CustomItemGrid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Pivot", "CustomItemPivot", Setting_Hotkeys_CustomItemPivotHotKey, Setting_Hotkeys_CustomItemPivotHotKeyEnabled, Setting_Hotkeys_CustomItemPivotHotKeyEnabled);
+                HotkeySettingsTableRow("Toggle Apply Custom Freeblock Grid", "FreeblockPlacementApplyGrid", Setting_Hotkeys_FreeblockPlacementApplyGridHotKey, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled);
 
                 UI::EndTable();
             }
@@ -172,6 +180,7 @@ namespace EditorHelpers
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item AutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Grid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Pivot", Setting_Hotkeys_CustomItemPivotHotKey, Setting_Hotkeys_CustomItemPivotHotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Freeblock Grid", Setting_Hotkeys_FreeblockPlacementApplyGridHotKey, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled);
                 UI::Text(activeHotkeysHelper);
                 UI::EndTooltip();
             }
@@ -253,6 +262,10 @@ namespace EditorHelpers
                 {
                     Setting_Hotkeys_CustomItemPivotHotKey = key;
                 }
+                else if (m_rebindKeyName == "FreeblockPlacementApplyGrid")
+                {
+                    Setting_Hotkeys_FreeblockPlacementApplyGridHotKey = key;
+                }
 
                 m_rebindKeyName = "";
                 Debug_LeaveMethod();
@@ -277,6 +290,7 @@ namespace EditorHelpers
                 OnKeyPress_CustomItemAutoRotation(key);
                 OnKeyPress_CustomItemGrid(key);
                 OnKeyPress_CustomItemPivot(key);
+                OnKeyPress_FreeblockPlacementApplyGrid(key);
             }
 
             Debug_LeaveMethod();
@@ -385,6 +399,17 @@ namespace EditorHelpers
             {
                 Debug("Activate CustomItemPivot");
                 HotkeyInterface::ToggleCustomItemApplyPivot();
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_FreeblockPlacementApplyGrid(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_FreeblockPlacementApplyGrid");
+            if (Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled && key == Setting_Hotkeys_FreeblockPlacementApplyGridHotKey)
+            {
+                Debug("Activate FreeblockPlacementApplyGrid");
+                HotkeyInterface::ToggleFreeblockApplyCustomGrid();
             }
             Debug_LeaveMethod();
         }

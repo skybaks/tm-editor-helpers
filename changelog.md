@@ -6,6 +6,7 @@
   * For Custom Item Placement settings: Toggle for Ghost Mode, Autorotation, Apply Custom Grid, and Apply Custom Pivot.
   * For Block Cursor Highlight: Toggle to show/hide block cursor
   * For Block Helpers: Toggle to show/hide clip helpers
+  * For Custom Freeblock Placement: Toggle for Apply Custom Grid
 
 
 # 5.10

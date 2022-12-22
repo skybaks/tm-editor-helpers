@@ -11,6 +11,17 @@ namespace EditorHelpers
         }
     }
 
+    namespace HotkeyInterface
+    {
+        void ToggleFreeblockApplyCustomGrid()
+        {
+            if (Settings_FreeblockPlacement_Enabled)
+            {
+                Settings_FreeblockPlacement_ApplyGrid = !Settings_FreeblockPlacement_ApplyGrid;
+            }
+        }
+    }
+
     [Setting category="Functions" name="FreeblockPlacement: Enabled" hidden]
     bool Settings_FreeblockPlacement_Enabled = true;
     [Setting category="Functions" hidden]
