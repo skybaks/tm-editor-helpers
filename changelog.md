@@ -5,6 +5,7 @@
 * Added tons of new optional hotkeys which can control plugin functions if you prefer to use that instead of the GUI:
   * For Custom Item Placement settings: Toggle for Ghost Mode, Autorotation, Apply Custom Grid, and Apply Custom Pivot.
   * For Block Cursor Highlight: Toggle to show/hide block cursor
+  * For Block Helpers: Toggle to show/hide clip helpers
 
 
 # 5.10

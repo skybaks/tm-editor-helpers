@@ -67,6 +67,13 @@ namespace EditorHelpers
     [Setting category="Functions" name="Hotkeys: CustomItemGhost HotKey" hidden]
     VirtualKey Setting_Hotkeys_BlockCursorToggleHideHotKey = VirtualKey::O;
 
+    // Plugin: BlockHelpers
+
+    [Setting category="Functions" name="Hotkeys: BlockHelpersToggle HotKey Enabled" hidden]
+    bool Setting_Hotkeys_BlockHelpersToggleHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: CustomItemGhost HotKey" hidden]
+    VirtualKey Setting_Hotkeys_BlockHelpersToggleHotKey = VirtualKey::L;
+
     // Plugin: CustomItemPlacement
 
     [Setting category="Functions" name="Hotkeys: CustomItemGhost HotKey Enabled" hidden]
@@ -120,6 +127,7 @@ namespace EditorHelpers
                 HotkeySettingsTableRow("Quickswitch To Last Color", "ToggleColors", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
                 HotkeySettingsTableRow("Flip Block 180 deg", "FlipCursor180", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Hide Block Cursor", "BlockCursorToggleHide", Setting_Hotkeys_BlockCursorToggleHideHotKey, Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled, Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled);
+                HotkeySettingsTableRow("Toggle Block Helpers", "BlockHelpersToggle", Setting_Hotkeys_BlockHelpersToggleHotKey, Setting_Hotkeys_BlockHelpersToggleHotKeyEnabled, Setting_Hotkeys_BlockHelpersToggleHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Ghost Mode", "CustomItemGhost", Setting_Hotkeys_CustomItemGhostHotKey, Setting_Hotkeys_CustomItemGhostHotKeyEnabled, Setting_Hotkeys_CustomItemGhostHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item AutoRotation", "CustomItemAutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Grid", "CustomItemGrid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
@@ -159,6 +167,7 @@ namespace EditorHelpers
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Quickswitch Last Element Color", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Flip Block/Item 180 degrees", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Hide Block Cursor", Setting_Hotkeys_BlockCursorToggleHideHotKey, Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Block Helpers", Setting_Hotkeys_BlockHelpersToggleHotKey, Setting_Hotkeys_BlockHelpersToggleHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Ghost Mode", Setting_Hotkeys_CustomItemGhostHotKey, Setting_Hotkeys_CustomItemGhostHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item AutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Grid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
@@ -224,6 +233,10 @@ namespace EditorHelpers
                 {
                     Setting_Hotkeys_BlockCursorToggleHideHotKey = key;
                 }
+                else if (m_rebindKeyName == "BlockHelpersToggle")
+                {
+                    Setting_Hotkeys_BlockHelpersToggleHotKey = key;
+                }
                 else if (m_rebindKeyName == "CustomItemGhost")
                 {
                     Setting_Hotkeys_CustomItemGhostHotKey = key;
@@ -259,6 +272,7 @@ namespace EditorHelpers
                 OnKeyPress_ToggleColorsHotkey(key);
                 OnKeyPress_FlipCursor180(key);
                 OnKeyPress_BlockCursorToggleHide(key);
+                OnKeyPress_BlockHelpersToggle(key);
                 OnKeyPress_CustomItemGhost(key);
                 OnKeyPress_CustomItemAutoRotation(key);
                 OnKeyPress_CustomItemGrid(key);
@@ -316,6 +330,17 @@ namespace EditorHelpers
             {
                 Debug("Activate BlockCursorToggleHide");
                 HotkeyInterface::ToggleHideBlockCursor();
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_BlockHelpersToggle(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_BlockHelpersToggle");
+            if (Setting_Hotkeys_BlockHelpersToggleHotKeyEnabled && key == Setting_Hotkeys_BlockHelpersToggleHotKey)
+            {
+                Debug("Activate BlockHelpersToggle");
+                HotkeyInterface::ToggleShowBlockHelpers();
             }
             Debug_LeaveMethod();
         }
