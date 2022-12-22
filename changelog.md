@@ -9,6 +9,7 @@
   * For Custom Freeblock Placement: Toggle for Apply Custom Grid
   * For Visual Placement Grid: Toggle for show/hide grid and toggle for apply grid transparency
   * For Quicksave: Hotkey to save the map
+* Add setting for activated hotkeys to generate a short notification
 
 
 # 5.10
