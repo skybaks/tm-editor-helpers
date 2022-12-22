@@ -9,6 +9,7 @@ namespace EditorHelpers
 
         string Name() { return ""; }
         bool Enabled(){ return false; }
+        bool HasSettingsEntry() { return true; }
         void Init(){}
         void RenderInterface_Action(){}
         void RenderInterface_Display(){}

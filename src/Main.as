@@ -111,9 +111,12 @@ void RenderSettingsPage()
     UI::Separator();
     for (uint index = 0; index < functions.Length; index++)
     {
-        functions[index].RenderInterface_Settings();
-        UI::Dummy(vec2(10.0f, 10.0f));
-        UI::Separator();
+        if (functions[index].HasSettingsEntry())
+        {
+            functions[index].RenderInterface_Settings();
+            UI::Dummy(vec2(10.0f, 10.0f));
+            UI::Separator();
+        }
     }
 }
 
