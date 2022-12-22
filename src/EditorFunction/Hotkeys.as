@@ -115,6 +115,13 @@ namespace EditorHelpers
     [Setting category="Functions" name="Hotkeys: VisualPlacementGridOn HotKey" hidden]
     VirtualKey Setting_Hotkeys_VisualPlacementGridTransparentHotKey = VirtualKey::N;
 
+    // Plugin: Quicksave
+
+    [Setting category="Functions" name="Hotkeys: ActivateQuicksave HotKey Enabled" hidden]
+    bool Setting_Hotkeys_ActivateQuicksaveHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: ActivateQuicksave HotKey" hidden]
+    VirtualKey Setting_Hotkeys_ActivateQuicksaveHotKey = VirtualKey::D;
+
     class Hotkeys : EditorHelpers::EditorFunction
     {
         private VirtualKey[] m_keysDown = {};
@@ -154,6 +161,7 @@ namespace EditorHelpers
                 HotkeySettingsTableRow("Toggle Apply Custom Freeblock Grid", "FreeblockPlacementApplyGrid", Setting_Hotkeys_FreeblockPlacementApplyGridHotKey, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Show Editor Placement Grid", "VisualPlacementGridOn", Setting_Hotkeys_VisualPlacementGridOnHotKey, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Editor Placement Grid Transparency", "VisualPlacementGridTransparent", Setting_Hotkeys_VisualPlacementGridTransparentHotKey, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled);
+                HotkeySettingsTableRow("Quicksave", "ActivateQuicksave", Setting_Hotkeys_ActivateQuicksaveHotKey, Setting_Hotkeys_ActivateQuicksaveHotKeyEnabled, Setting_Hotkeys_ActivateQuicksaveHotKeyEnabled);
 
                 UI::EndTable();
             }
@@ -197,6 +205,7 @@ namespace EditorHelpers
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Freeblock Grid", Setting_Hotkeys_FreeblockPlacementApplyGridHotKey, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Show Editor Placement Grid", Setting_Hotkeys_VisualPlacementGridOnHotKey, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Editor Placement Grid Transparency", Setting_Hotkeys_VisualPlacementGridTransparentHotKey, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Quicksave", Setting_Hotkeys_ActivateQuicksaveHotKey, Setting_Hotkeys_ActivateQuicksaveHotKeyEnabled);
                 UI::Text(activeHotkeysHelper);
                 UI::EndTooltip();
             }
@@ -290,6 +299,10 @@ namespace EditorHelpers
                 {
                     Setting_Hotkeys_VisualPlacementGridTransparentHotKey = key;
                 }
+                else if (m_rebindKeyName == "ActivateQuicksave")
+                {
+                    Setting_Hotkeys_ActivateQuicksaveHotKey = key;
+                }
 
                 m_rebindKeyName = "";
                 Debug_LeaveMethod();
@@ -317,6 +330,7 @@ namespace EditorHelpers
                 OnKeyPress_FreeblockPlacementApplyGrid(key);
                 OnKeyPress_VisualPlacementGridOn(key);
                 OnKeyPress_VisualPlacementGridTransparent(key);
+                OnKeyPress_ActivateQuicksave(key);
             }
 
             Debug_LeaveMethod();
@@ -458,6 +472,17 @@ namespace EditorHelpers
             {
                 Debug("Activate VisualPlacementGridTransparent");
                 HotkeyInterface::TogglePlacementGridTransparent();
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_ActivateQuicksave(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_ActivateQuicksave");
+            if (Setting_Hotkeys_ActivateQuicksaveHotKeyEnabled && key == Setting_Hotkeys_ActivateQuicksaveHotKey)
+            {
+                Debug("Activate ActivateQuicksave");
+                HotkeyInterface::ActivateQuicksave();
             }
             Debug_LeaveMethod();
         }
