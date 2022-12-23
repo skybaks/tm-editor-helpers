@@ -102,6 +102,41 @@ namespace EditorHelpers
         }
     }
 
+    namespace HotkeyInterface
+    {
+        void ToggleCustomItemApplyGhost()
+        {
+            if (Setting_CustomItemPlacement_Enabled)
+            {
+                Setting_CustomItemPlacement_ApplyGhost = !Setting_CustomItemPlacement_ApplyGhost;
+            }
+        }
+
+        void ToggleCustomItemApplyAutoRotation()
+        {
+            if (Setting_CustomItemPlacement_Enabled)
+            {
+                Setting_CustomItemPlacement_ApplyAutoRotation = !Setting_CustomItemPlacement_ApplyAutoRotation;
+            }
+        }
+
+        void ToggleCustomItemApplyGrid()
+        {
+            if (Setting_CustomItemPlacement_Enabled)
+            {
+                Setting_CustomItemPlacement_ApplyGrid = !Setting_CustomItemPlacement_ApplyGrid;
+            }
+        }
+
+        void ToggleCustomItemApplyPivot()
+        {
+            if (Setting_CustomItemPlacement_Enabled)
+            {
+                Setting_CustomItemPlacement_ApplyPivot = !Setting_CustomItemPlacement_ApplyPivot;
+            }
+        }
+    }
+
     class CustomItemPlacementSettings
     {
         bool Initialized = false;

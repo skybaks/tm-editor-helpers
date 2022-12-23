@@ -1,6 +1,19 @@
 
 namespace EditorHelpers
 {
+    namespace HotkeyInterface
+    {
+        bool g_Quicksave_Activate = false;
+
+        void ActivateQuicksave()
+        {
+            if (Setting_Quicksave_Enabled)
+            {
+                g_Quicksave_Activate = true;
+            }
+        }
+    }
+
     [Setting category="Functions" name="Quicksave: Enabled" hidden]
     bool Setting_Quicksave_Enabled = true;
 
@@ -42,8 +55,10 @@ namespace EditorHelpers
                 UI::SameLine();
             }
             UI::BeginDisabled(!timerQuicksave.Complete());
-            if (UI::Button("Save Map"))
+            if (UI::Button("Save Map")
+                || (HotkeyInterface::g_Quicksave_Activate && timerQuicksave.Complete()))
             {
+
                 if (currentFileName != "")
                 {
                     string[] mapPath = currentFileName.Split("\\");
@@ -64,6 +79,8 @@ namespace EditorHelpers
             UI::EndDisabled();
             UI::SameLine();
             UI::Text(currentFileName);
+
+            HotkeyInterface::g_Quicksave_Activate = false;
         }
 
         void Update(float dt) override

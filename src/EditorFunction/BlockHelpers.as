@@ -13,6 +13,17 @@ namespace EditorHelpers
         }
     }
 
+    namespace HotkeyInterface
+    {
+        void ToggleShowBlockHelpers()
+        {
+            if (Setting_BlockHelpers_Enabled)
+            {
+                Setting_BlockHelpers_BlockHelpersOff = !Setting_BlockHelpers_BlockHelpersOff;
+            }
+        }
+    }
+
     [Setting category="Functions" name="BlockHelpers: Enabled" hidden]
     bool Setting_BlockHelpers_Enabled = true;
     [Setting category="Functions" name="BlockHelpers: Block Helpers Off" hidden]

@@ -1,6 +1,17 @@
 
 namespace EditorHelpers
 {
+    namespace HotkeyInterface
+    {
+        void ToggleHideBlockCursor()
+        {
+            if (Setting_BlockCursor_Enabled)
+            {
+                Setting_BlockCursor_HideBlockCursor = !Setting_BlockCursor_HideBlockCursor;
+            }
+        }
+    }
+
     [Setting category="Functions" name="BlockCursor: Enabled" hidden]
     bool Setting_BlockCursor_Enabled = true;
     [Setting category="Functions" name="BlockCursor: Hide Block Cursor" hidden]

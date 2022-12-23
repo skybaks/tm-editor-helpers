@@ -46,6 +46,7 @@ namespace EditorHelpers
 
         string Name() override { return "Event Signals"; }
         bool Enabled() override { return true; }
+        bool HasSettingsEntry() override { return false; }
 
         void Init() override
         {
