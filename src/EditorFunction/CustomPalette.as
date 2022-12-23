@@ -84,29 +84,7 @@ namespace EditorHelpers
                 }
                 m_filterStringPrev = m_filterString;
 
-                auto tableFlags = UI::TableFlags(int(UI::TableFlags::SizingFixedFit) | int(UI::TableFlags::ScrollY));
-                if (UI::BeginTable("CustomPaletteTable", 2 /*cols*/, tableFlags))
-                {
-                    UI::ListClipper clipper(m_articlesFiltered.Length);
-                    while (clipper.Step())
-                    {
-                        int filterOffset = 0;
-                        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
-                        {
-                            UI::TableNextRow();
-
-                            UI::TableNextColumn();
-                            if (UI::Button("Select##" + tostring(i)))
-                            {
-                                SetCurrentArticle(m_articlesFiltered[i]);
-                            }
-
-                            UI::TableNextColumn();
-                            UI::Text(m_articlesFiltered[i].DisplayName);
-                        }
-                    }
-                    UI::EndTable();
-                }
+                DisplayInventoryArticlesTable("Search", m_articlesFiltered);
                 UI::EndTabItem();
             }
 
@@ -243,8 +221,8 @@ namespace EditorHelpers
 
         private void DisplayInventoryArticlesTable(const string&in id, const EditorInventoryArticle@[]&in articles)
         {
-            auto tableFlags = UI::TableFlags(int(UI::TableFlags::SizingFixedFit) | int(UI::TableFlags::ScrollY));
-            if (UI::BeginTable("CustomPaletteTable" + id, 2 /*cols*/, tableFlags))
+            auto tableFlags = UI::TableFlags(/*int(UI::TableFlags::SizingFixedFit) |*/ int(UI::TableFlags::ScrollY));
+            if (UI::BeginTable("CustomPaletteTable" + id, 1 /*cols*/, tableFlags))
             {
                 UI::ListClipper clipper(articles.Length);
                 while (clipper.Step())
@@ -255,13 +233,10 @@ namespace EditorHelpers
                         UI::TableNextRow();
 
                         UI::TableNextColumn();
-                        if (UI::Button("Select##" + tostring(i)))
+                        if (UI::Selectable(articles[i].DisplayName + "##" + tostring(i), false))
                         {
                             SetCurrentArticle(articles[i]);
                         }
-
-                        UI::TableNextColumn();
-                        UI::Text(articles[i].DisplayName);
                     }
                 }
                 UI::EndTable();
