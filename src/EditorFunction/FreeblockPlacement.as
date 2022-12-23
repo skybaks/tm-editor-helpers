@@ -1,5 +1,4 @@
 
-#if TMNEXT
 
 namespace EditorHelpers
 {
@@ -7,7 +6,34 @@ namespace EditorHelpers
     {
         bool FreeblockPlacementShouldBeActive(CGameCtnEditorFree@ editor)
         {
+#if TMNEXT
             return editor.Cursor.UseFreePos || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item;
+#else
+            return false;
+#endif
+        }
+
+        void GetFreemodePos(CGameCtnEditorFree@ editor, const vec3&out pos)
+        {
+#if TMNEXT
+            pos = editor.Cursor.FreePosInMap;
+#endif
+        }
+
+        void SetFreemodePos(CGameCtnEditorFree@ editor, const vec3&in pos)
+        {
+#if TMNEXT
+            editor.Cursor.FreePosInMap = pos;
+#endif
+        }
+
+        bool EnableFreeblockPlacementFunction()
+        {
+#if TMNEXT
+#else
+            Settings_FreeblockPlacement_Enabled = false;
+#endif
+            return Settings_FreeblockPlacement_Enabled;
         }
     }
 
@@ -31,9 +57,10 @@ namespace EditorHelpers
     {
         private float m_HStep;
         private float m_VStep;
+        private vec3 m_pos;
 
         string Name() override { return "Freeblock Placement"; }
-        bool Enabled() override { return Settings_FreeblockPlacement_Enabled; }
+        bool Enabled() override { return Compatibility::EnableFreeblockPlacementFunction(); }
 
         void RenderInterface_Settings() override
         {
@@ -80,18 +107,18 @@ namespace EditorHelpers
             if (!Enabled() || Editor is null) return;
             if (Compatibility::FreeblockPlacementShouldBeActive(Editor) && Settings_FreeblockPlacement_ApplyGrid)
             {
+                Compatibility::GetFreemodePos(Editor, m_pos);
                 if(m_HStep > 0.0f)
                 {
-                    Editor.Cursor.FreePosInMap.x = Math::Round(Editor.Cursor.FreePosInMap.x / m_HStep) * m_HStep;
-                    Editor.Cursor.FreePosInMap.z = Math::Round(Editor.Cursor.FreePosInMap.z / m_HStep) * m_HStep;
+                    m_pos.x = Math::Round(m_pos.x / m_HStep) * m_HStep;
+                    m_pos.z = Math::Round(m_pos.z / m_HStep) * m_HStep;
                 }
                 if (m_VStep > 0.0f)
                 {
-                    Editor.Cursor.FreePosInMap.y = Math::Round(Editor.Cursor.FreePosInMap.y / m_VStep) * m_VStep;
+                    m_pos.y = Math::Round(m_pos.y / m_VStep) * m_VStep;
                 }
+                Compatibility::SetFreemodePos(Editor, m_pos);
             }
         }
     }
 }
-
-#endif

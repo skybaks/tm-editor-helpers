@@ -19,9 +19,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::FreeblockModePreciseRotation()
     , EditorHelpers::Hotkeys()
     , EditorHelpers::RotationRandomizer()
-#if TMNEXT
     , EditorHelpers::FreeblockPlacement()
-#endif
     , EditorHelpers::MoodChanger()
     , EditorHelpers::CameraModes()
     , EditorHelpers::LocatorCheck()
