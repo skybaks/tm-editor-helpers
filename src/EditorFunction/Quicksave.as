@@ -20,6 +20,7 @@ namespace EditorHelpers
     class Quicksave : EditorHelpers::EditorFunction
     {
         private EditorHelpers::CountdownTimer timerQuicksave;
+        private bool m_triggerSave;
 
         string Name() override { return "Quicksave"; }
         bool Enabled() override { return Setting_Quicksave_Enabled; }
@@ -42,23 +43,42 @@ namespace EditorHelpers
             {
                 timerQuicksave.MaxTime = 2.0f;
             }
+
+            if (!Enabled() || Editor is null)
+            {
+                m_triggerSave = false;
+                HotkeyInterface::g_Quicksave_Activate = false;
+            }
         }
 
         void RenderInterface_Action() override
         {
-            if (!Enabled()) return;
+            if (!Enabled() || Editor is null) return;
 
-            string currentFileName = Editor.PluginMapType.MapFileName;
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Save map in one click");
                 UI::SameLine();
             }
             UI::BeginDisabled(!timerQuicksave.Complete());
-            if (UI::Button("Save Map")
-                || (HotkeyInterface::g_Quicksave_Activate && timerQuicksave.Complete()))
+            if (UI::Button("Save Map"))
             {
+                m_triggerSave = true;
+            }
+            UI::EndDisabled();
+            UI::SameLine();
+            UI::Text(Editor.PluginMapType.MapFileName);
+        }
 
+        void Update(float dt) override
+        {
+            if (!Enabled() || Editor is null) return;
+            float dtSeconds = dt / 1000.0f;
+            timerQuicksave.Update(dtSeconds);
+
+            if ((m_triggerSave || HotkeyInterface::g_Quicksave_Activate) && timerQuicksave.Complete())
+            {
+                string currentFileName = Editor.PluginMapType.MapFileName;
                 if (currentFileName != "")
                 {
                     string[] mapPath = currentFileName.Split("\\");
@@ -76,18 +96,9 @@ namespace EditorHelpers
                 }
                 timerQuicksave.StartNew();
             }
-            UI::EndDisabled();
-            UI::SameLine();
-            UI::Text(currentFileName);
 
+            m_triggerSave = false;
             HotkeyInterface::g_Quicksave_Activate = false;
-        }
-
-        void Update(float dt) override
-        {
-            if (!Enabled() || Editor is null) return;
-            float dtSeconds = dt / 1000.0f;
-            timerQuicksave.Update(dtSeconds);
         }
     }
 }
