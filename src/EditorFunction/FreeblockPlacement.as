@@ -13,7 +13,7 @@ namespace EditorHelpers
 #endif
         }
 
-        void GetFreemodePos(CGameCtnEditorFree@ editor, const vec3&out pos)
+        void GetFreemodePos(CGameCtnEditorFree@ editor, vec3&out pos)
         {
 #if TMNEXT
             pos = editor.Cursor.FreePosInMap;
