@@ -6,6 +6,8 @@ bool settingToolTipsEnabled = true;
 [Setting category="General" name="Debug Logging Enabled" hidden]
 bool Setting_DebugLoggingEnabled = false;
 
+const string g_windowName = Icons::PuzzlePiece + " Editor Helpers";
+
 array<EditorHelpers::EditorFunction@> functions =
 {
       EditorHelpers::EventSignals()
@@ -22,6 +24,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::FreeblockPlacement()
     , EditorHelpers::MoodChanger()
     , EditorHelpers::CameraModes()
+    , EditorHelpers::CustomPalette()
     , EditorHelpers::LocatorCheck()
     , EditorHelpers::PodiumReminder()
     , EditorHelpers::CursorPosition()
@@ -58,8 +61,9 @@ void RenderInterface()
 {
     if (!EditorHelpers::HasPermission()) return;
     if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
+
     UI::SetNextWindowSize(300, 600, UI::Cond::FirstUseEver);
-    UI::Begin(Icons::PuzzlePiece + " Editor Helpers", settingWindowVisible);
+    UI::Begin(g_windowName, settingWindowVisible);
 
     if (UI::CollapsingHeader("Action"))
     {
@@ -93,6 +97,11 @@ void RenderInterface()
         }
     }
     UI::End();
+
+    for (uint index = 0; index < functions.Length; index++)
+    {
+        functions[index].RenderInterface_ChildWindow();
+    }
 }
 
 [SettingsTab name="Settings"]
