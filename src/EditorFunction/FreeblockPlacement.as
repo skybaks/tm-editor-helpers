@@ -31,9 +31,9 @@ namespace EditorHelpers
         {
 #if TMNEXT
 #else
-            Settings_FreeblockPlacement_Enabled = false;
+            Setting_FreeblockPlacement_Enabled = false;
 #endif
-            return Settings_FreeblockPlacement_Enabled;
+            return Setting_FreeblockPlacement_Enabled;
         }
     }
 
@@ -41,24 +41,24 @@ namespace EditorHelpers
     {
         void ToggleFreeblockApplyCustomGrid()
         {
-            if (Settings_FreeblockPlacement_Enabled)
+            if (Setting_FreeblockPlacement_Enabled)
             {
-                Settings_FreeblockPlacement_ApplyGrid = !Settings_FreeblockPlacement_ApplyGrid;
+                Setting_FreeblockPlacement_ApplyGrid = !Setting_FreeblockPlacement_ApplyGrid;
             }
         }
     }
 
     [Setting category="Functions" name="FreeblockPlacement: Enabled" hidden]
-    bool Settings_FreeblockPlacement_Enabled = true;
+    bool Setting_FreeblockPlacement_Enabled = true;
     [Setting category="Functions" name="FreeblockPlacement: Persist Grid" hidden]
-    bool Settings_FreeblockPlacement_PersistGrid = false;
+    bool Setting_FreeblockPlacement_PersistGrid = false;
     [Setting category="Functions" name="FreeblockPlacement: Persist Translate" hidden]
-    bool Settings_FreeblockPlacement_PersistTranslate = false;
+    bool Setting_FreeblockPlacement_PersistTranslate = false;
 
     [Setting category="Functions" hidden]
-    bool Settings_FreeblockPlacement_ApplyGrid = false;
+    bool Setting_FreeblockPlacement_ApplyGrid = false;
     [Setting category="Functions" hidden]
-    bool Settings_FreeblockPlacement_ApplyTranslate = false;
+    bool Setting_FreeblockPlacement_ApplyTranslate = false;
 
     class FreeblockPlacement : EditorHelpers::EditorFunction
     {
@@ -78,11 +78,11 @@ namespace EditorHelpers
             UI::PushID(Name() + "SettingsPage");
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
-            Settings_FreeblockPlacement_Enabled = UI::Checkbox("Enabled", Settings_FreeblockPlacement_Enabled);
-            UI::BeginDisabled(!Settings_FreeblockPlacement_Enabled);
+            Setting_FreeblockPlacement_Enabled = UI::Checkbox("Enabled", Setting_FreeblockPlacement_Enabled);
+            UI::BeginDisabled(!Setting_FreeblockPlacement_Enabled);
             UI::TextWrapped("Allows you to force blocks or macroblocks to a specific grid when placing free mode.");
-            Settings_FreeblockPlacement_PersistGrid = UI::Checkbox("Persist Force Freeblock Grid selection between editor sessions", Settings_FreeblockPlacement_PersistGrid);
-            Settings_FreeblockPlacement_PersistTranslate = UI::Checkbox("Persist Force Freeblock Translate selection between editor sessions", Settings_FreeblockPlacement_PersistTranslate);
+            Setting_FreeblockPlacement_PersistGrid = UI::Checkbox("Persist Force Freeblock Grid selection between editor sessions", Setting_FreeblockPlacement_PersistGrid);
+            Setting_FreeblockPlacement_PersistTranslate = UI::Checkbox("Persist Force Freeblock Translate selection between editor sessions", Setting_FreeblockPlacement_PersistTranslate);
             UI::EndDisabled();
             UI::PopID();
         }
@@ -91,16 +91,16 @@ namespace EditorHelpers
         {
             if (Editor is null || !Enabled() || FirstPass)
             {
-                if (!Settings_FreeblockPlacement_PersistGrid)
+                if (!Setting_FreeblockPlacement_PersistGrid)
                 {
-                    Settings_FreeblockPlacement_ApplyGrid = false;
+                    Setting_FreeblockPlacement_ApplyGrid = false;
                     m_HStep = 32.0f;
                     m_VStep = 8.0f;
                 }
 
-                if (!Settings_FreeblockPlacement_PersistTranslate)
+                if (!Setting_FreeblockPlacement_PersistTranslate)
                 {
-                    Settings_FreeblockPlacement_ApplyTranslate = false;
+                    Setting_FreeblockPlacement_ApplyTranslate = false;
                     m_XTranslate = 0.0f;
                     m_YTranslate = 0.0f;
                     m_ZTranslate = 0.0f;
@@ -120,7 +120,7 @@ namespace EditorHelpers
                 EditorHelpers::HelpMarker("Sets the placement grid of blocks in free mode");
                 UI::SameLine();
             }
-            Settings_FreeblockPlacement_ApplyGrid = UI::Checkbox("Apply Grid to Freeblocks", Settings_FreeblockPlacement_ApplyGrid);
+            Setting_FreeblockPlacement_ApplyGrid = UI::Checkbox("Apply Grid to Freeblocks", Setting_FreeblockPlacement_ApplyGrid);
             m_HStep = Math::Max(UI::InputFloat("Horizontal Grid", m_HStep), 0.0f);
             m_VStep = Math::Max(UI::InputFloat("Vertical Grid", m_VStep), 0.0f);
 
@@ -129,7 +129,7 @@ namespace EditorHelpers
                 EditorHelpers::HelpMarker("Apply a placement offset to blocks in free mode");
                 UI::SameLine();
             }
-            Settings_FreeblockPlacement_ApplyTranslate = UI::Checkbox("Apply Translation to Freeblocks", Settings_FreeblockPlacement_ApplyTranslate);
+            Setting_FreeblockPlacement_ApplyTranslate = UI::Checkbox("Apply Translation to Freeblocks", Setting_FreeblockPlacement_ApplyTranslate);
             m_XTranslate = UI::InputFloat("X Translation", m_XTranslate);
             m_YTranslate = UI::InputFloat("Y Translation", m_YTranslate);
             m_ZTranslate = UI::InputFloat("Z Translation", m_ZTranslate);
@@ -143,7 +143,7 @@ namespace EditorHelpers
             if (Compatibility::FreeblockPlacementShouldBeActive(Editor))
             {
                 Compatibility::GetFreemodePos(Editor, m_pos);
-                if (Settings_FreeblockPlacement_ApplyGrid)
+                if (Setting_FreeblockPlacement_ApplyGrid)
                 {
                     if(m_HStep > 0.0f)
                     {
@@ -156,7 +156,7 @@ namespace EditorHelpers
                     }
                 }
 
-                if (Settings_FreeblockPlacement_ApplyTranslate && Math::Distance2(m_pos, m_posPrev) > 0.0001f)
+                if (Setting_FreeblockPlacement_ApplyTranslate && Math::Distance2(m_pos, m_posPrev) > 0.0001f)
                 {
                     m_pos.x += m_XTranslate;
                     m_pos.y += m_YTranslate;
