@@ -22,6 +22,19 @@ namespace EditorHelpers
         CGameEditorPluginMap::EPlaceMode PlaceMode;
     }
 
+    namespace HotkeyInterface
+    {
+        bool g_CustomPalette_QuickswitchPreviousTrigger = false;
+
+        void QuickswitchPreviousArticle()
+        {
+            if (Setting_CustomPalette_Enabled)
+            {
+                g_CustomPalette_QuickswitchPreviousTrigger = true;
+            }
+        }
+    }
+
     [Setting category="Functions" name="CustomPalette: Enabled" hidden]
     bool Setting_CustomPalette_Enabled = true;
     [Setting category="Functions" name="CustomPalette: Window Visible" hidden]
@@ -63,6 +76,7 @@ namespace EditorHelpers
                 m_filterString = "";
                 m_filterStringPrev = "";
                 @m_selectedArticlePrev = null;
+                HotkeyInterface::g_CustomPalette_QuickswitchPreviousTrigger = false;
             }
         }
 
@@ -133,6 +147,12 @@ namespace EditorHelpers
                 AddNewArticleToHistory(selectedArticle);
             }
             @m_selectedArticlePrev = selectedArticle;
+
+            if (HotkeyInterface::g_CustomPalette_QuickswitchPreviousTrigger && m_articlesHistory.Length > 1)
+            {
+                SetCurrentArticle(m_articlesHistory[1]);
+            }
+            HotkeyInterface::g_CustomPalette_QuickswitchPreviousTrigger = false;
 
             Debug_LeaveMethod();
         }

@@ -98,6 +98,13 @@ namespace EditorHelpers
     [Setting category="Functions" name="Hotkeys: CustomItemPivot HotKey" hidden]
     VirtualKey Setting_Hotkeys_CustomItemPivotHotKey = VirtualKey::U;
 
+    // Plugin: CustomPalette
+
+    [Setting category="Functions" name="Hotkeys: CustomPaletteQuickswitchPrevious HotKey Enabled" hidden]
+    bool Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: CustomPaletteQuickswitchPrevious HotKey" hidden]
+    VirtualKey Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKey = VirtualKey::B;
+
     // Plugin: FreeblockPlacement
 
     [Setting category="Functions" name="Hotkeys: FreeblockPlacementApplyGrid HotKey Enabled" hidden]
@@ -161,6 +168,7 @@ namespace EditorHelpers
                 HotkeySettingsTableRow("Toggle Apply Custom Item AutoRotation", "CustomItemAutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Grid", "CustomItemGrid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Pivot", "CustomItemPivot", Setting_Hotkeys_CustomItemPivotHotKey, Setting_Hotkeys_CustomItemPivotHotKeyEnabled, Setting_Hotkeys_CustomItemPivotHotKeyEnabled);
+                HotkeySettingsTableRow("Quickswitch To Previous Block/Item/Macroblock", "CustomPaletteQuickswitchPrevious", Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKey, Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled, Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Freeblock Grid", "FreeblockPlacementApplyGrid", Setting_Hotkeys_FreeblockPlacementApplyGridHotKey, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Show Editor Placement Grid", "VisualPlacementGridOn", Setting_Hotkeys_VisualPlacementGridOnHotKey, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Editor Placement Grid Transparency", "VisualPlacementGridTransparent", Setting_Hotkeys_VisualPlacementGridTransparentHotKey, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled);
@@ -205,6 +213,7 @@ namespace EditorHelpers
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item AutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Grid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Pivot", Setting_Hotkeys_CustomItemPivotHotKey, Setting_Hotkeys_CustomItemPivotHotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Quickswitch To Previous Block/Item/Macroblock", Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKey, Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Freeblock Grid", Setting_Hotkeys_FreeblockPlacementApplyGridHotKey, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Show Editor Placement Grid", Setting_Hotkeys_VisualPlacementGridOnHotKey, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Editor Placement Grid Transparency", Setting_Hotkeys_VisualPlacementGridTransparentHotKey, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled);
@@ -290,6 +299,10 @@ namespace EditorHelpers
                 {
                     Setting_Hotkeys_CustomItemPivotHotKey = key;
                 }
+                else if (m_rebindKeyName == "CustomPaletteQuickswitchPrevious")
+                {
+                    Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKey = key;
+                }
                 else if (m_rebindKeyName == "FreeblockPlacementApplyGrid")
                 {
                     Setting_Hotkeys_FreeblockPlacementApplyGridHotKey = key;
@@ -330,6 +343,7 @@ namespace EditorHelpers
                 OnKeyPress_CustomItemAutoRotation(key);
                 OnKeyPress_CustomItemGrid(key);
                 OnKeyPress_CustomItemPivot(key);
+                OnKeyPress_CustomPaletteQuickswitchPrevious(key);
                 OnKeyPress_FreeblockPlacementApplyGrid(key);
                 OnKeyPress_VisualPlacementGridOn(key);
                 OnKeyPress_VisualPlacementGridTransparent(key);
@@ -451,6 +465,18 @@ namespace EditorHelpers
                 Debug("Activate CustomItemPivot");
                 ShowHotkeyNotification("Toggle Apply Custom Item Pivot", key);
                 HotkeyInterface::ToggleCustomItemApplyPivot();
+            }
+            Debug_LeaveMethod();
+        }
+
+        private void OnKeyPress_CustomPaletteQuickswitchPrevious(const VirtualKey&in key)
+        {
+            Debug_EnterMethod("OnKeyPress_CustomPaletteQuickswitchPrevious");
+            if (Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled && key == Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKey)
+            {
+                Debug("Activate CustomPaletteQuickswitchPrevious");
+                ShowHotkeyNotification("Quickswitch To Previous Block/Item/Macroblock", key);
+                HotkeyInterface::QuickswitchPreviousArticle();
             }
             Debug_LeaveMethod();
         }
