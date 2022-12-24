@@ -137,7 +137,7 @@ namespace EditorHelpers
             Debug_LeaveMethod();
         }
 
-        private void RecursiveAddInventoryArticle(CGameCtnArticleNode@ current, CGameEditorPluginMap::EPlaceMode placeMode)
+        private void RecursiveAddInventoryArticle(CGameCtnArticleNode@ current, const string&in name, CGameEditorPluginMap::EPlaceMode placeMode)
         {
             Debug_EnterMethod("RecursiveAddInventoryArticle");
 
@@ -147,17 +147,29 @@ namespace EditorHelpers
                 for (uint i = 0; i < currentDir.ChildNodes.Length; ++i)
                 {
                     auto newDir = currentDir.ChildNodes[i];
-                    RecursiveAddInventoryArticle(newDir, placeMode);
-                }
-            }
-            else
-            {
-                CGameCtnArticleNodeArticle@ currentArt = cast<CGameCtnArticleNodeArticle>(current);
-                if (currentArt !is null)
-                {
-                    string articleName = tostring(currentArt.Article.PageName) + tostring(currentArt.Article.NameOrDisplayName);
-                    Debug("Add " + articleName);
-                    m_articles.InsertLast(EditorInventoryArticle(articleName, currentArt, placeMode));
+                    if (newDir.IsDirectory)
+                    {
+                        RecursiveAddInventoryArticle(newDir, name + "/" + newDir.NodeName, placeMode);
+                    }
+                    else
+                    {
+                        CGameCtnArticleNodeArticle@ currentArt = cast<CGameCtnArticleNodeArticle>(newDir);
+                        if (currentArt !is null)
+                        {
+                            string articleName = name + "/" + currentArt.NodeName;
+                            if (currentArt.NodeName.Contains("\\"))
+                            {
+                                auto splitPath = tostring(currentArt.NodeName).Split("\\");
+                                if (splitPath.Length > 0)
+                                {
+                                    articleName = name + "/" + splitPath[splitPath.Length-1];
+                                    Debug("Split node name results in: " + tostring(articleName));
+                                }
+                            }
+                            Debug("Add " + articleName);
+                            m_articles.InsertLast(EditorInventoryArticle(articleName, currentArt, placeMode));
+                        }
+                    }
                 }
             }
 
@@ -170,14 +182,23 @@ namespace EditorHelpers
 
             if (m_articles.Length > 0)
             {
+                Debug("Clearing cached articles");
                 m_articles.RemoveRange(0, m_articles.Length);
             }
+            if (m_articlesHistory.Length > 0)
+            {
+                Debug("Clearing recent articles");
+                m_articlesHistory.RemoveRange(0, m_articlesHistory.Length);
+            }
 
-            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[0], CGameEditorPluginMap::EPlaceMode::Block);
-            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[3], CGameEditorPluginMap::EPlaceMode::Item);
-            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[4], CGameEditorPluginMap::EPlaceMode::Macroblock);
+            Debug("Loading inventory blocks");
+            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[0], "Block", CGameEditorPluginMap::EPlaceMode::Block);
+            Debug("Loading inventory items");
+            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[3], "Item", CGameEditorPluginMap::EPlaceMode::Item);
+            Debug("Loading inventory macroblocks");
+            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[4], "Macroblock", CGameEditorPluginMap::EPlaceMode::Macroblock);
 
-            Debug("Inventory Length: " + tostring(m_articles.Length));
+            Debug("Inventory total length: " + tostring(m_articles.Length));
 
             UpdateFilteredList();
 
