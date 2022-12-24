@@ -207,11 +207,21 @@ namespace EditorHelpers
 
         private void SetCurrentArticle(const EditorInventoryArticle@ newArticle)
         {
+            Debug_EnterMethod("SetCurrentArticle");
+            if (newArticle is null)
+            {
+                Debug("New  EditorInventoryArticle is null");
+                Debug_LeaveMethod();
+                return;
+            }
+
             if (Editor.PluginMapType.PlaceMode != newArticle.PlaceMode)
             {
                 Editor.PluginMapType.PlaceMode = newArticle.PlaceMode;
             }
             Editor.PluginMapType.Inventory.SelectArticle(newArticle.Article);
+
+            Debug_LeaveMethod();
         }
 
         private void UpdateFilteredList()
