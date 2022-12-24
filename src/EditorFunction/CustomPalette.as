@@ -41,6 +41,21 @@ namespace EditorHelpers
         string Name() override { return "Custom Palette"; }
         bool Enabled() override { return Setting_CustomPalette_Enabled; }
 
+        void RenderInterface_Settings() override
+        {
+            UI::PushID(Name() + "SettingsPage");
+            UI::Markdown("**" + Name() + "**");
+            UI::SameLine();
+            Setting_CustomPalette_Enabled = UI::Checkbox("Enabled", Setting_CustomPalette_Enabled);
+            UI::BeginDisabled(!Setting_CustomPalette_Enabled);
+            UI::TextWrapped("This function opens an additional display window that contains a searchable list of all blocks, items, and macroblocks in the editor. It also shows all recent blocks, items, and macroblocks used.");
+
+            Setting_CustomPalette_WindowVisible = UI::Checkbox("Show Additional Window", Setting_CustomPalette_WindowVisible);
+            Setting_CustomPalette_ArticleHistoryMax = Math::Clamp(UI::InputInt("Max number of recent blocks/items/macroblocks", Setting_CustomPalette_ArticleHistoryMax), 5, 100);
+            UI::EndDisabled();
+            UI::PopID();
+        }
+
         void Init() override
         {
             if (!Enabled() || Editor is null)
@@ -88,7 +103,7 @@ namespace EditorHelpers
                 UI::EndTabItem();
             }
 
-            if (UI::BeginTabItem("History"))
+            if (UI::BeginTabItem("Recent"))
             {
                 DisplayInventoryArticlesTable("History", m_articlesHistory);
                 UI::EndTabItem();
