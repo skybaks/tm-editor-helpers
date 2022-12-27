@@ -67,6 +67,7 @@ namespace EditorHelpers
         private bool m_forcePaletteIndex;
         private string m_paletteNewName;
         private bool m_deleteConfirm;
+        private bool m_paletteRandomize;
 
         string Name() override { return "Custom Palette"; }
         bool Enabled() override { return Setting_CustomPalette_Enabled; }
@@ -96,6 +97,7 @@ namespace EditorHelpers
                 HotkeyInterface::g_CustomPalette_QuickswitchPreviousTrigger = false;
                 m_forcePaletteIndex = false;
                 m_deleteConfirm = false;
+                m_paletteRandomize = false;
             }
         }
 
@@ -216,7 +218,12 @@ namespace EditorHelpers
 
                 if (UI::TreeNode("Build"))
                 {
-                    UI::Text("tbd");
+                    if (settingToolTipsEnabled)
+                    {
+                        EditorHelpers::HelpMarker("Chooses random from palette on block/item/macroblock placement");
+                        UI::SameLine();
+                    }
+                    m_paletteRandomize = UI::Checkbox("Randomizer", m_paletteRandomize);
 
                     UI::TreePop();
                 }
@@ -255,6 +262,15 @@ namespace EditorHelpers
             if (Signal_EnteredEditor())
             {
                 IndexInventory();
+            }
+
+            if (Signal_BlockItemPlaced() && m_paletteRandomize
+                && Setting_CustomPalette_WindowVisible
+                && m_selectedPaletteIndex >= 0 && m_selectedPaletteIndex < m_palettes.Length
+                && m_palettes[m_selectedPaletteIndex].Articles.Length > 0)
+            {
+                int newIndex = Math::Rand(0, m_palettes[m_selectedPaletteIndex].Articles.Length);
+                SetCurrentArticle(m_palettes[m_selectedPaletteIndex].Articles[newIndex]);
             }
 
             CGameCtnArticleNodeArticle@ selectedArticle = cast<CGameCtnArticleNodeArticle>(Editor.PluginMapType.Inventory.CurrentSelectedNode);
