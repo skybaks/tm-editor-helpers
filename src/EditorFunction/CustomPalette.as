@@ -34,6 +34,13 @@ namespace EditorHelpers
         EditorInventoryArticle@[] Articles;
     }
 
+    enum PaletteRandomizerMode
+    {
+        NONE,
+        RANDOM,
+        CYCLE
+    }
+
     namespace HotkeyInterface
     {
         bool g_CustomPalette_QuickswitchPreviousTrigger = false;
@@ -67,7 +74,7 @@ namespace EditorHelpers
         private bool m_forcePaletteIndex;
         private string m_paletteNewName;
         private bool m_deleteConfirm;
-        private bool m_paletteRandomize;
+        private PaletteRandomizerMode m_paletteRandomize;
 
         string Name() override { return "Custom Palette"; }
         bool Enabled() override { return Setting_CustomPalette_Enabled; }
@@ -97,7 +104,7 @@ namespace EditorHelpers
                 HotkeyInterface::g_CustomPalette_QuickswitchPreviousTrigger = false;
                 m_forcePaletteIndex = false;
                 m_deleteConfirm = false;
-                m_paletteRandomize = false;
+                m_paletteRandomize = PaletteRandomizerMode::NONE;
             }
         }
 
@@ -148,6 +155,11 @@ namespace EditorHelpers
             {
                 if (UI::TreeNode("Edit"))
                 {
+                    if (settingToolTipsEnabled)
+                    {
+                        EditorHelpers::HelpMarker("Create a new custom palette");
+                        UI::SameLine();
+                    }
                     if (UI::Button(" New Palette"))
                     {
                         m_palettes.InsertLast(EditorInventoryPalette());
@@ -156,6 +168,11 @@ namespace EditorHelpers
                     }
                     UI::BeginDisabled(m_deleteConfirm);
                     UI::SameLine();
+                    if (settingToolTipsEnabled)
+                    {
+                        EditorHelpers::HelpMarker("Delete the active custom palette");
+                        UI::SameLine();
+                    }
                     if (UI::Button(" Delete Selected Palette"))
                     {
                         m_deleteConfirm = true;
@@ -185,6 +202,11 @@ namespace EditorHelpers
                         }
                     }
 
+                    if (settingToolTipsEnabled)
+                    {
+                        EditorHelpers::HelpMarker("Rename the active custom palette. Use \"Set Name\" to apply changes");
+                        UI::SameLine();
+                    }
                     m_paletteNewName = UI::InputText("##NewPaletteName", m_paletteNewName);
                     UI::SameLine();
                     if (UI::Button("Set Name")
@@ -197,6 +219,11 @@ namespace EditorHelpers
                         SavePalettes();
                     }
 
+                    if (settingToolTipsEnabled)
+                    {
+                        EditorHelpers::HelpMarker("Add or remove elements from the active custom palette");
+                        UI::SameLine();
+                    }
                     UI::Text("Current Block/Item/Macroblock: ");
                     UI::SameLine();
                     if (UI::Button(" Add") && m_articlesHistory.Length > 0)
@@ -220,10 +247,25 @@ namespace EditorHelpers
                 {
                     if (settingToolTipsEnabled)
                     {
-                        EditorHelpers::HelpMarker("Chooses random from palette on block/item/macroblock placement");
+                        EditorHelpers::HelpMarker("Chooses random from palette on block/item/macroblock placement.\n\n\"Random\" picks a random selection from the palette\n\"Cycle\" cycles through the palette in order\n\"None\" is the randomizer turned off");
                         UI::SameLine();
                     }
-                    m_paletteRandomize = UI::Checkbox("Randomizer", m_paletteRandomize);
+                    UI::Text("Randomizer:");
+                    UI::SameLine();
+                    if (UI::RadioButton("None", m_paletteRandomize == PaletteRandomizerMode::NONE))
+                    {
+                        m_paletteRandomize = PaletteRandomizerMode::NONE;
+                    }
+                    UI::SameLine();
+                    if (UI::RadioButton("Random", m_paletteRandomize == PaletteRandomizerMode::RANDOM))
+                    {
+                        m_paletteRandomize = PaletteRandomizerMode::RANDOM;
+                    }
+                    UI::SameLine();
+                    if (UI::RadioButton("Cycle", m_paletteRandomize == PaletteRandomizerMode::CYCLE))
+                    {
+                        m_paletteRandomize = PaletteRandomizerMode::CYCLE;
+                    }
 
                     UI::TreePop();
                 }
@@ -264,13 +306,37 @@ namespace EditorHelpers
                 IndexInventory();
             }
 
-            if (Signal_BlockItemPlaced() && m_paletteRandomize
+            if (Signal_BlockItemPlaced() && m_paletteRandomize != PaletteRandomizerMode::NONE
                 && Setting_CustomPalette_WindowVisible
                 && m_selectedPaletteIndex >= 0 && m_selectedPaletteIndex < m_palettes.Length
                 && m_palettes[m_selectedPaletteIndex].Articles.Length > 0)
             {
-                int newIndex = Math::Rand(0, m_palettes[m_selectedPaletteIndex].Articles.Length);
-                SetCurrentArticle(m_palettes[m_selectedPaletteIndex].Articles[newIndex]);
+                if (m_paletteRandomize == PaletteRandomizerMode::RANDOM)
+                {
+                    int newIndex = Math::Rand(0, m_palettes[m_selectedPaletteIndex].Articles.Length);
+                    SetCurrentArticle(m_palettes[m_selectedPaletteIndex].Articles[newIndex]);
+                }
+                else if (m_paletteRandomize == PaletteRandomizerMode::CYCLE)
+                {
+                    int newIndex = 0;
+                    if (m_articlesHistory.Length > 0)
+                    {
+                        for (uint searchIndex = 0; searchIndex < m_palettes[m_selectedPaletteIndex].Articles.Length; ++searchIndex)
+                        {
+                            if (m_palettes[m_selectedPaletteIndex].Articles[searchIndex].Article is m_articlesHistory[0].Article)
+                            {
+                                newIndex = searchIndex + 1;
+                                break;
+                            }
+                        }
+
+                        if (newIndex >= int(m_palettes[m_selectedPaletteIndex].Articles.Length))
+                        {
+                            newIndex = 0;
+                        }
+                    }
+                    SetCurrentArticle(m_palettes[m_selectedPaletteIndex].Articles[newIndex]);
+                }
             }
 
             CGameCtnArticleNodeArticle@ selectedArticle = cast<CGameCtnArticleNodeArticle>(Editor.PluginMapType.Inventory.CurrentSelectedNode);
