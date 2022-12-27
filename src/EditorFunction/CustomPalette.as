@@ -22,6 +22,18 @@ namespace EditorHelpers
         CGameEditorPluginMap::EPlaceMode PlaceMode;
     }
 
+    class EditorInventoryPalette
+    {
+        EditorInventoryPalette()
+        {
+            Name = "Palette";
+            Articles = {};
+        }
+
+        string Name;
+        EditorInventoryArticle@[] Articles;
+    }
+
     namespace HotkeyInterface
     {
         bool g_CustomPalette_QuickswitchPreviousTrigger = false;
@@ -50,6 +62,11 @@ namespace EditorHelpers
         private string m_filterString;
         private string m_filterStringPrev;
         private CGameCtnArticleNodeArticle@ m_selectedArticlePrev;
+        private EditorInventoryPalette@[] m_palettes;
+        private uint m_selectedPaletteIndex;
+        private bool m_forcePaletteIndex;
+        private string m_paletteNewName;
+        private bool m_deleteConfirm;
 
         string Name() override { return "Custom Palette"; }
         bool Enabled() override { return Setting_CustomPalette_Enabled; }
@@ -77,6 +94,8 @@ namespace EditorHelpers
                 m_filterStringPrev = "";
                 @m_selectedArticlePrev = null;
                 HotkeyInterface::g_CustomPalette_QuickswitchPreviousTrigger = false;
+                m_forcePaletteIndex = false;
+                m_deleteConfirm = false;
             }
         }
 
@@ -120,6 +139,103 @@ namespace EditorHelpers
             if (UI::BeginTabItem("Recent"))
             {
                 DisplayInventoryArticlesTable("History", m_articlesHistory);
+                UI::EndTabItem();
+            }
+
+            if (UI::BeginTabItem("Custom"))
+            {
+                if (UI::TreeNode("Edit"))
+                {
+                    if (UI::Button(" New Palette"))
+                    {
+                        m_palettes.InsertLast(EditorInventoryPalette());
+                        m_forcePaletteIndex = true;
+                        m_selectedPaletteIndex = m_palettes.Length - 1;
+                    }
+                    UI::BeginDisabled(m_deleteConfirm);
+                    UI::SameLine();
+                    if (UI::Button(" Delete Selected Palette"))
+                    {
+                        m_deleteConfirm = true;
+                    }
+                    UI::EndDisabled();
+                    if (m_deleteConfirm)
+                    {
+                        UI::SameLine();
+                        UI::Text("Are you sure?");
+                        UI::SameLine();
+                        if (UI::Button("Yes"))
+                        {
+                            if (m_selectedPaletteIndex >= 0 && m_selectedPaletteIndex < m_palettes.Length)
+                            {
+                                m_palettes.RemoveAt(m_selectedPaletteIndex);
+                                m_forcePaletteIndex = true;
+                                m_selectedPaletteIndex = m_selectedPaletteIndex != 0 ? m_selectedPaletteIndex - 1 : 0;
+                            }
+                            m_deleteConfirm = false;
+
+                            SavePalettes();
+                        }
+                        UI::SameLine();
+                        if (UI::Button("Cancel"))
+                        {
+                            m_deleteConfirm = false;
+                        }
+                    }
+
+                    m_paletteNewName = UI::InputText("##NewPaletteName", m_paletteNewName);
+                    UI::SameLine();
+                    if (UI::Button("Set Name")
+                        && m_selectedPaletteIndex >= 0 && m_selectedPaletteIndex < m_palettes.Length)
+                    {
+                        m_palettes[m_selectedPaletteIndex].Name = m_paletteNewName;
+                        m_paletteNewName = "";
+                        m_forcePaletteIndex = true;
+
+                        SavePalettes();
+                    }
+
+                    UI::Text("Current Block/Item/Macroblock: ");
+                    UI::SameLine();
+                    if (UI::Button(" Add") && m_articlesHistory.Length > 0)
+                    {
+                        AddNewArticleToPalette(m_articlesHistory[0].Article, m_selectedPaletteIndex);
+
+                        SavePalettes();
+                    }
+                    UI::SameLine();
+                    if (UI::Button(" Remove") && m_articlesHistory.Length > 0)
+                    {
+                        RemoveArticleFromPalette(m_articlesHistory[0].Article, m_selectedPaletteIndex);
+
+                        SavePalettes();
+                    }
+
+                    UI::TreePop();
+                }
+
+                if (UI::TreeNode("Build"))
+                {
+                    UI::Text("tbd");
+
+                    UI::TreePop();
+                }
+
+                UI::BeginTabBar("CustomPaletteTabBarCustomPalettes");
+                for (uint paletteIndex = 0; paletteIndex < m_palettes.Length; ++paletteIndex)
+                {
+                    UI::TabItemFlags flags = m_forcePaletteIndex && paletteIndex == m_selectedPaletteIndex ? UI::TabItemFlags::SetSelected : UI::TabItemFlags::None;
+                    if (UI::BeginTabItem(m_palettes[paletteIndex].Name + "##" + tostring(paletteIndex), flags))
+                    {
+                        m_selectedPaletteIndex = paletteIndex;
+
+                        DisplayInventoryArticlesTable("Palette##" + tostring(paletteIndex), m_palettes[paletteIndex].Articles);
+                        UI::EndTabItem();
+                    }
+                }
+                m_forcePaletteIndex = false;
+                UI::EndTabBar();
+
                 UI::EndTabItem();
             }
             UI::EndTabBar();
@@ -210,6 +326,11 @@ namespace EditorHelpers
                 Debug("Clearing recent articles");
                 m_articlesHistory.RemoveRange(0, m_articlesHistory.Length);
             }
+            if (m_palettes.Length > 0)
+            {
+                Debug("Clearing palettes");
+                m_palettes.RemoveRange(0, m_palettes.Length);
+            }
 
             Debug("Loading inventory blocks");
             RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[0], "Block", CGameEditorPluginMap::EPlaceMode::Block);
@@ -221,6 +342,7 @@ namespace EditorHelpers
             Debug("Inventory total length: " + tostring(m_articles.Length));
 
             UpdateFilteredList();
+            LoadPalettes();
 
             Debug_LeaveMethod();
         }
@@ -242,6 +364,30 @@ namespace EditorHelpers
             Editor.PluginMapType.Inventory.SelectArticle(newArticle.Article);
 
             Debug_LeaveMethod();
+        }
+
+        private EditorInventoryArticle@ FindArticleByName(const string&in articleName)
+        {
+            for (uint i = 0; i < m_articles.Length; ++i)
+            {
+                if (m_articles[i].DisplayName == articleName)
+                {
+                    return m_articles[i];
+                }
+            }
+            return null;
+        }
+
+        private EditorInventoryArticle@ FindArticleByRef(const CGameCtnArticleNodeArticle@ article)
+        {
+            for (uint i = 0; i < m_articles.Length; ++i)
+            {
+                if (m_articles[i].Article is article)
+                {
+                    return m_articles[i];
+                }
+            }
+            return null;
         }
 
         private void UpdateFilteredList()
@@ -275,21 +421,55 @@ namespace EditorHelpers
                 m_articlesHistory.RemoveAt(m_articlesHistory.Length-1);
             }
 
-            for (uint i = 0; i < m_articles.Length; ++i)
+            auto article = FindArticleByRef(newArticle);
+            if (article !is null)
             {
-                if (m_articles[i].Article is newArticle)
+                m_articlesHistory.InsertAt(0, article);
+            }
+        }
+
+        private void AddNewArticleToPalette(const CGameCtnArticleNodeArticle@ newArticle, const uint&in index)
+        {
+            if (index >= 0 && index < m_palettes.Length)
+            {
+                for (uint searchIndex = 0; searchIndex < m_palettes[index].Articles.Length; ++searchIndex)
                 {
-                    m_articlesHistory.InsertAt(0, m_articles[i]);
-                    break;
+                    if (m_palettes[index].Articles[searchIndex].Article is newArticle)
+                    {
+                        return;
+                    }
+                }
+
+                auto article = FindArticleByRef(newArticle);
+                if (article !is null)
+                {
+                    m_palettes[index].Articles.InsertLast(article);
+                }
+            }
+        }
+
+        private void RemoveArticleFromPalette(const CGameCtnArticleNodeArticle@ newArticle, const uint&in index)
+        {
+            if (index >= 0 && index < m_palettes.Length)
+            {
+                for (uint searchIndex = 0; searchIndex < m_palettes[index].Articles.Length; ++searchIndex)
+                {
+                    if (m_palettes[index].Articles[searchIndex].Article is newArticle)
+                    {
+                        m_palettes[index].Articles.RemoveAt(searchIndex);
+                        break;
+                    }
                 }
             }
         }
 
         private void DisplayInventoryArticlesTable(const string&in id, const EditorInventoryArticle@[]&in articles)
         {
-            auto tableFlags = UI::TableFlags(/*int(UI::TableFlags::SizingFixedFit) |*/ int(UI::TableFlags::ScrollY));
+            auto tableFlags = UI::TableFlags(int(UI::TableFlags::ScrollY));
             if (UI::BeginTable("CustomPaletteTable" + id, 1 /*cols*/, tableFlags))
             {
+                CGameCtnArticleNodeArticle@ selectedArticle = cast<CGameCtnArticleNodeArticle>(Editor.PluginMapType.Inventory.CurrentSelectedNode);
+
                 UI::ListClipper clipper(articles.Length);
                 while (clipper.Step())
                 {
@@ -299,7 +479,7 @@ namespace EditorHelpers
                         UI::TableNextRow();
 
                         UI::TableNextColumn();
-                        if (UI::Selectable(articles[i].DisplayName + "##" + tostring(i), false))
+                        if (UI::Selectable(articles[i].DisplayName + "##" + tostring(i), articles[i].Article is selectedArticle))
                         {
                             SetCurrentArticle(articles[i]);
                         }
@@ -307,6 +487,66 @@ namespace EditorHelpers
                 }
                 UI::EndTable();
             }
+        }
+
+        private void LoadPalettes()
+        {
+            Debug_EnterMethod("LoadPalettes");
+
+            if (m_palettes.Length > 0)
+            {
+                Debug("Clearing palettes");
+                m_palettes.RemoveRange(0, m_palettes.Length);
+            }
+
+            auto json = Json::FromFile(IO::FromStorageFolder("EditorFunction_CustomPalette.json"));
+
+            auto palettes = json.Get("palettes", Json::Array());
+            for (uint paletteIndex = 0; paletteIndex < palettes.Length; ++paletteIndex)
+            {
+                auto newPalette = EditorInventoryPalette();
+                newPalette.Name = palettes[paletteIndex].Get("name", Json::Value("Palette"));
+
+                auto articles = palettes[paletteIndex].Get("articles", Json::Array());
+                for (uint articleIndex = 0; articleIndex < articles.Length; ++articleIndex)
+                {
+                    string articleName = articles[articleIndex];
+                    auto articleRef = FindArticleByName(articleName);
+                    if (articleRef !is null)
+                    {
+                        Debug("Found article with name: " + tostring(articleName));
+                        newPalette.Articles.InsertLast(articleRef);
+                    }
+                }
+
+                m_palettes.InsertLast(newPalette);
+            }
+
+            Debug_LeaveMethod();
+        }
+
+        private void SavePalettes()
+        {
+            auto json = Json::Object();
+
+            auto palettes = Json::Array();
+            for (uint paletteIndex = 0; paletteIndex < m_palettes.Length; ++paletteIndex)
+            {
+                auto palette = Json::Object();
+                palette["name"] = m_palettes[paletteIndex].Name;
+
+                auto articles = Json::Array();
+                for (uint articleIndex = 0; articleIndex < m_palettes[paletteIndex].Articles.Length; ++articleIndex)
+                {
+                    articles.Add(Json::Value(m_palettes[paletteIndex].Articles[articleIndex].DisplayName));
+                }
+                palette["articles"] = articles;
+
+                palettes.Add(palette);
+            }
+
+            json["palettes"] = palettes;
+            Json::ToFile(IO::FromStorageFolder("EditorFunction_CustomPalette.json"), json);
         }
     }
 }
