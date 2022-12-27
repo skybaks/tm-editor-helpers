@@ -3,6 +3,11 @@ namespace EditorHelpers
 {
     namespace HotkeyInterface
     {
+        bool Enabled_PlacementGrid()
+        {
+            return Setting_PlacementGrid_Enabled;
+        }
+
         void TogglePlacementGridOn()
         {
             if (Setting_PlacementGrid_Enabled)

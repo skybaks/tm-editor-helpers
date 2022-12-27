@@ -3,6 +3,11 @@ namespace EditorHelpers
 {
     namespace HotkeyInterface
     {
+        bool Enabled_BlockCursor()
+        {
+            return Setting_BlockCursor_Enabled;
+        }
+
         void ToggleHideBlockCursor()
         {
             if (Setting_BlockCursor_Enabled)

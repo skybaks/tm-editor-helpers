@@ -162,17 +162,38 @@ namespace EditorHelpers
                 HotkeySettingsTableRow("Toggle AirBlock Mode", "AirBlockHotkey", Setting_Hotkeys_AirBlockHotKey, Setting_Hotkeys_AirBlockHotKeyEnabled, Setting_Hotkeys_AirBlockHotKeyEnabled);
                 HotkeySettingsTableRow("Quickswitch To Last Color", "ToggleColors", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
                 HotkeySettingsTableRow("Flip Block 180 deg", "FlipCursor180", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
+
+                UI::BeginDisabled(!HotkeyInterface::Enabled_BlockCursor());
                 HotkeySettingsTableRow("Toggle Hide Block Cursor", "BlockCursorToggleHide", Setting_Hotkeys_BlockCursorToggleHideHotKey, Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled, Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled);
+                UI::EndDisabled();
+
+                UI::BeginDisabled(!HotkeyInterface::Enabled_BlockHelpers());
                 HotkeySettingsTableRow("Toggle Block Helpers", "BlockHelpersToggle", Setting_Hotkeys_BlockHelpersToggleHotKey, Setting_Hotkeys_BlockHelpersToggleHotKeyEnabled, Setting_Hotkeys_BlockHelpersToggleHotKeyEnabled);
+                UI::EndDisabled();
+
+                UI::BeginDisabled(!HotkeyInterface::Enabled_CustomItemPlacement());
                 HotkeySettingsTableRow("Toggle Apply Custom Item Ghost Mode", "CustomItemGhost", Setting_Hotkeys_CustomItemGhostHotKey, Setting_Hotkeys_CustomItemGhostHotKeyEnabled, Setting_Hotkeys_CustomItemGhostHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item AutoRotation", "CustomItemAutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Grid", "CustomItemGrid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Apply Custom Item Pivot", "CustomItemPivot", Setting_Hotkeys_CustomItemPivotHotKey, Setting_Hotkeys_CustomItemPivotHotKeyEnabled, Setting_Hotkeys_CustomItemPivotHotKeyEnabled);
+                UI::EndDisabled();
+
+                UI::BeginDisabled(!HotkeyInterface::Enabled_CustomPalette());
                 HotkeySettingsTableRow("Quickswitch To Previous Block/Item/Macroblock", "CustomPaletteQuickswitchPrevious", Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKey, Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled, Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled);
+                UI::EndDisabled();
+
+                UI::BeginDisabled(!HotkeyInterface::Enabled_FreeblockPlacement());
                 HotkeySettingsTableRow("Toggle Apply Custom Freeblock Grid", "FreeblockPlacementApplyGrid", Setting_Hotkeys_FreeblockPlacementApplyGridHotKey, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled);
+                UI::EndDisabled();
+
+                UI::BeginDisabled(!HotkeyInterface::Enabled_PlacementGrid());
                 HotkeySettingsTableRow("Toggle Show Editor Placement Grid", "VisualPlacementGridOn", Setting_Hotkeys_VisualPlacementGridOnHotKey, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled);
                 HotkeySettingsTableRow("Toggle Editor Placement Grid Transparency", "VisualPlacementGridTransparent", Setting_Hotkeys_VisualPlacementGridTransparentHotKey, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled);
+                UI::EndDisabled();
+
+                UI::BeginDisabled(!HotkeyInterface::Enabled_Quicksave());
                 HotkeySettingsTableRow("Quicksave", "ActivateQuicksave", Setting_Hotkeys_ActivateQuicksaveHotKey, Setting_Hotkeys_ActivateQuicksaveHotKeyEnabled, Setting_Hotkeys_ActivateQuicksaveHotKeyEnabled);
+                UI::EndDisabled();
 
                 UI::EndTable();
             }

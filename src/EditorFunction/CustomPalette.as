@@ -57,6 +57,11 @@ namespace EditorHelpers
     {
         bool g_CustomPalette_QuickswitchPreviousTrigger = false;
 
+        bool Enabled_CustomPalette()
+        {
+            return Setting_CustomPalette_Enabled;
+        }
+
         void QuickswitchPreviousArticle()
         {
             if (Setting_CustomPalette_Enabled)
