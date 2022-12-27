@@ -41,6 +41,18 @@ namespace EditorHelpers
         CYCLE
     }
 
+    namespace Compatibility
+    {
+        bool EnableCustomPaletteFunction()
+        {
+#if TMNEXT
+#else
+            Setting_CustomPalette_Enabled = false;
+#endif
+            return Setting_CustomPalette_Enabled;
+        }
+    }
+
     namespace HotkeyInterface
     {
         bool g_CustomPalette_QuickswitchPreviousTrigger = false;
@@ -77,7 +89,7 @@ namespace EditorHelpers
         private PaletteRandomizerMode m_paletteRandomize;
 
         string Name() override { return "Custom Palette"; }
-        bool Enabled() override { return Setting_CustomPalette_Enabled; }
+        bool Enabled() override { return Compatibility::EnableCustomPaletteFunction(); }
 
         void RenderInterface_Settings() override
         {
