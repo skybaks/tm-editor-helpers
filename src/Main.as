@@ -51,52 +51,63 @@ namespace Compatibility
 void RenderMenu()
 {
     if (!EditorHelpers::HasPermission()) return;
-    if (UI::MenuItem("\\$2f9" + Icons::PuzzlePiece + "\\$fff Editor Helpers", selected: settingWindowVisible, enabled: GetApp().Editor !is null))
+    if (UI::BeginMenu("\\$2f9" + Icons::PuzzlePiece + "\\$fff Editor Helpers", enabled: !Compatibility::EditorIsNull()))
     {
-        settingWindowVisible = !settingWindowVisible;
+        if (UI::MenuItem(Icons::PuzzlePiece + " Main Window", selected: settingWindowVisible))
+        {
+            settingWindowVisible = !settingWindowVisible;
+        }
+
+        for (uint index = 0; index < functions.Length; index++)
+        {
+            functions[index].RenderInterface_MenuItem();
+        }
+        UI::EndMenu();
     }
 }
 
 void RenderInterface()
 {
     if (!EditorHelpers::HasPermission()) return;
-    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
+    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting()) return;
 
-    UI::SetNextWindowSize(300, 600, UI::Cond::FirstUseEver);
-    UI::Begin(g_windowName, settingWindowVisible);
-
-    if (UI::CollapsingHeader("Action"))
+    if (settingWindowVisible)
     {
-        for (uint index = 0; index < functions.Length; index++)
+        UI::SetNextWindowSize(300, 600, UI::Cond::FirstUseEver);
+        UI::Begin(g_windowName, settingWindowVisible);
+        if (UI::CollapsingHeader("Action"))
         {
-            functions[index].RenderInterface_Action();
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                functions[index].RenderInterface_Action();
+            }
         }
-    }
 
-    if (UI::CollapsingHeader("Display"))
-    {
-        for (uint index = 0; index < functions.Length; index++)
+        if (UI::CollapsingHeader("Display"))
         {
-            functions[index].RenderInterface_Display();
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                functions[index].RenderInterface_Display();
+            }
         }
-    }
 
-    if (UI::CollapsingHeader("Build"))
-    {
-        for (uint index = 0; index < functions.Length; index++)
+        if (UI::CollapsingHeader("Build"))
         {
-            functions[index].RenderInterface_Build();
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                functions[index].RenderInterface_Build();
+            }
         }
-    }
 
-    if (UI::CollapsingHeader("Info"))
-    {
-        for (uint index = 0; index < functions.Length; index++)
+        if (UI::CollapsingHeader("Info"))
         {
-            functions[index].RenderInterface_Info();
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                functions[index].RenderInterface_Info();
+            }
         }
+        UI::End();
     }
-    UI::End();
 
     for (uint index = 0; index < functions.Length; index++)
     {

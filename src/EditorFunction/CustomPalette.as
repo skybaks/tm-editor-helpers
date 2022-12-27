@@ -153,6 +153,11 @@ namespace EditorHelpers
 
             if (UI::BeginTabItem("Custom"))
             {
+                if (settingToolTipsEnabled)
+                {
+                    EditorHelpers::HelpMarker("Create, Edit, or Delete custom palettes");
+                    UI::SameLine();
+                }
                 if (UI::TreeNode("Edit"))
                 {
                     if (settingToolTipsEnabled)
@@ -243,6 +248,11 @@ namespace EditorHelpers
                     UI::TreePop();
                 }
 
+                if (settingToolTipsEnabled)
+                {
+                    EditorHelpers::HelpMarker("Tools to use with existing custom palettes");
+                    UI::SameLine();
+                }
                 if (UI::TreeNode("Build"))
                 {
                     if (settingToolTipsEnabled)
@@ -290,6 +300,19 @@ namespace EditorHelpers
             UI::EndTabBar();
 
             UI::End();
+        }
+
+        void RenderInterface_MenuItem() override
+        {
+            if (!Enabled())
+            {
+                return;
+            }
+
+            if (UI::MenuItem(Icons::PuzzlePiece + " " + Name(), selected: Setting_CustomPalette_WindowVisible))
+            {
+                Setting_CustomPalette_WindowVisible = !Setting_CustomPalette_WindowVisible;
+            }
         }
 
         void Update(float) override
