@@ -6,6 +6,8 @@ bool settingToolTipsEnabled = true;
 [Setting category="General" name="Debug Logging Enabled" hidden]
 bool Setting_DebugLoggingEnabled = false;
 
+const string g_windowName = Icons::PuzzlePiece + " Editor Helpers";
+
 array<EditorHelpers::EditorFunction@> functions =
 {
       EditorHelpers::EventSignals()
@@ -22,6 +24,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::FreeblockPlacement()
     , EditorHelpers::MoodChanger()
     , EditorHelpers::CameraModes()
+    , EditorHelpers::CustomPalette()
     , EditorHelpers::LocatorCheck()
     , EditorHelpers::PodiumReminder()
     , EditorHelpers::CursorPosition()
@@ -48,51 +51,68 @@ namespace Compatibility
 void RenderMenu()
 {
     if (!EditorHelpers::HasPermission()) return;
-    if (UI::MenuItem("\\$2f9" + Icons::PuzzlePiece + "\\$fff Editor Helpers", selected: settingWindowVisible, enabled: GetApp().Editor !is null))
+    if (UI::BeginMenu("\\$2f9" + Icons::PuzzlePiece + "\\$fff Editor Helpers", enabled: !Compatibility::EditorIsNull()))
     {
-        settingWindowVisible = !settingWindowVisible;
+        if (UI::MenuItem(Icons::PuzzlePiece + " Main Window", selected: settingWindowVisible))
+        {
+            settingWindowVisible = !settingWindowVisible;
+        }
+
+        for (uint index = 0; index < functions.Length; index++)
+        {
+            functions[index].RenderInterface_MenuItem();
+        }
+        UI::EndMenu();
     }
 }
 
 void RenderInterface()
 {
     if (!EditorHelpers::HasPermission()) return;
-    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting() || !settingWindowVisible) return;
-    UI::SetNextWindowSize(300, 600, UI::Cond::FirstUseEver);
-    UI::Begin(Icons::PuzzlePiece + " Editor Helpers", settingWindowVisible);
+    if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting()) return;
 
-    if (UI::CollapsingHeader("Action"))
+    if (settingWindowVisible)
     {
-        for (uint index = 0; index < functions.Length; index++)
+        UI::SetNextWindowSize(300, 600, UI::Cond::FirstUseEver);
+        UI::Begin(g_windowName, settingWindowVisible);
+        if (UI::CollapsingHeader("Action"))
         {
-            functions[index].RenderInterface_Action();
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                functions[index].RenderInterface_Action();
+            }
         }
+
+        if (UI::CollapsingHeader("Display"))
+        {
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                functions[index].RenderInterface_Display();
+            }
+        }
+
+        if (UI::CollapsingHeader("Build"))
+        {
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                functions[index].RenderInterface_Build();
+            }
+        }
+
+        if (UI::CollapsingHeader("Info"))
+        {
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                functions[index].RenderInterface_Info();
+            }
+        }
+        UI::End();
     }
 
-    if (UI::CollapsingHeader("Display"))
+    for (uint index = 0; index < functions.Length; index++)
     {
-        for (uint index = 0; index < functions.Length; index++)
-        {
-            functions[index].RenderInterface_Display();
-        }
+        functions[index].RenderInterface_ChildWindow();
     }
-
-    if (UI::CollapsingHeader("Build"))
-    {
-        for (uint index = 0; index < functions.Length; index++)
-        {
-            functions[index].RenderInterface_Build();
-        }
-    }
-
-    if (UI::CollapsingHeader("Info"))
-    {
-        for (uint index = 0; index < functions.Length; index++)
-        {
-            functions[index].RenderInterface_Info();
-        }
-    }
-    UI::End();
 }
 
 [SettingsTab name="Settings"]

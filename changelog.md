@@ -9,7 +9,13 @@
   * For Custom Freeblock Placement: Toggle for Apply Custom Grid
   * For Visual Placement Grid: Toggle for show/hide grid and toggle for apply grid transparency
   * For Quicksave: Hotkey to save the map
+  * For Custom Palette: Hotkey to quickswitch to last block/item/macroblock
 * Add setting for activated hotkeys to generate a short notification
+* Added new custom block/item palette function
+  * Contains a searchable list of all blocks, items, and macroblocks in your editor
+  * Keeps a history of blocks, items, and macroblocks that you use so that you can quickly switch back and forth.
+  * Allows for you to build and customize your own palettes; a collection of blocks, items, or macroblocks
+  * Randomizer function allow for you to randomize the current block, item, or macroblock from inside the current palette each time a block, item or macroblock is placed.
 
 
 # 5.10
