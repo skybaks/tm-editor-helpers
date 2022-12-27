@@ -39,6 +39,11 @@ namespace EditorHelpers
 
     namespace HotkeyInterface
     {
+        bool Enabled_FreeblockPlacement()
+        {
+            return Setting_FreeblockPlacement_Enabled;
+        }
+
         void ToggleFreeblockApplyCustomGrid()
         {
             if (Setting_FreeblockPlacement_Enabled)

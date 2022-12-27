@@ -104,6 +104,11 @@ namespace EditorHelpers
 
     namespace HotkeyInterface
     {
+        bool Enabled_CustomItemPlacement()
+        {
+            return Setting_CustomItemPlacement_Enabled;
+        }
+
         void ToggleCustomItemApplyGhost()
         {
             if (Setting_CustomItemPlacement_Enabled)

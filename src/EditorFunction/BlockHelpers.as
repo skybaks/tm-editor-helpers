@@ -15,6 +15,11 @@ namespace EditorHelpers
 
     namespace HotkeyInterface
     {
+        bool Enabled_BlockHelpers()
+        {
+            return Setting_BlockHelpers_Enabled;
+        }
+
         void ToggleShowBlockHelpers()
         {
             if (Setting_BlockHelpers_Enabled)

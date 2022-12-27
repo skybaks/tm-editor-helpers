@@ -5,6 +5,11 @@ namespace EditorHelpers
     {
         bool g_Quicksave_Activate = false;
 
+        bool Enabled_Quicksave()
+        {
+            return Setting_Quicksave_Enabled;
+        }
+
         void ActivateQuicksave()
         {
             if (Setting_Quicksave_Enabled)
