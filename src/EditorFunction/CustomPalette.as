@@ -395,6 +395,22 @@ namespace EditorHelpers
             Debug_LeaveMethod();
         }
 
+        private bool VerifyInventoryItem(CGameCtnArticleNode@ rootNode, const string&in check)
+        {
+            Debug_EnterMethod("VerifyInventoryItem");
+            bool success = false;
+
+            CGameCtnArticleNodeDirectory@ rootNodeDir = cast<CGameCtnArticleNodeDirectory>(rootNode);
+            if (rootNodeDir !is null && rootNodeDir.ChildNodes.Length > 0)
+            {
+                success = rootNodeDir.ChildNodes[0].NodeName == check;
+                Debug("Compared: rootNodeDir.ChildNodes[0].NodeName=" + rootNodeDir.ChildNodes[0].NodeName + "  ==  check=" + check);
+            }
+
+            Debug_LeaveMethod();
+            return success;
+        }
+
         private void RecursiveAddInventoryArticle(CGameCtnArticleNode@ current, const string&in name, CGameEditorPluginMap::EPlaceMode placeMode)
         {
             Debug_EnterMethod("RecursiveAddInventoryArticle");
@@ -452,6 +468,25 @@ namespace EditorHelpers
             {
                 Debug("Clearing palettes");
                 m_palettes.RemoveRange(0, m_palettes.Length);
+            }
+
+            if (!VerifyInventoryItem(Editor.PluginMapType.Inventory.RootNodes[0], "RoadTech"))
+            {
+                Debug("Error verifying blocks integrity. aborting index");
+                Debug_LeaveMethod();
+                return;
+            }
+            if (!VerifyInventoryItem(Editor.PluginMapType.Inventory.RootNodes[3], "Official"))
+            {
+                Debug("Error verifying items integrity. aborting index");
+                Debug_LeaveMethod();
+                return;
+            }
+            if (!VerifyInventoryItem(Editor.PluginMapType.Inventory.RootNodes[4], "Official"))
+            {
+                Debug("Error verifying macroblocks integrity. aborting index");
+                Debug_LeaveMethod();
+                return;
             }
 
             Debug("Loading inventory blocks");
