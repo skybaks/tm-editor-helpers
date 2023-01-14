@@ -1,3 +1,7 @@
+# 5.12
+* Added presets for the time of day to the Mood Changer. This has the game defaults but also includes some other interesting times.
+
+
 # 5.11
 * Small change to detection of podiums in map for generating reminders.
 * Add new display of cursor position. This show the current X, Y, Z position of the block/item cursor.
