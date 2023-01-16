@@ -18,13 +18,16 @@ namespace EditorHelpers
         MoodChangerPreset@[] g_moodChangerPresetsStadiumNext = {
             MoodChangerPreset("Sunrise - Before First Light", "06:03:59"),
             MoodChangerPreset("Sunrise - First Light", "06:04:00"),
-            MoodChangerPreset("Sunrise - No Moon", "06:30:00"),
+            MoodChangerPreset("Sunrise - Last Spotlights On", "06:30:00"),
+            MoodChangerPreset("Sunrise - First Spotlights Off", "06:30:01"),
             MoodChangerPreset("Sunrise - Default", "07:37:12"),
 
             MoodChangerPreset("Day - Default", "12:06:00"),
 
             MoodChangerPreset("Sunset - Faint Moon", "17:50:00"),
             MoodChangerPreset("Sunset - Moon", "18:20:00"),
+            MoodChangerPreset("Sunset - Last Spotlights Off", "18:30:00"),
+            MoodChangerPreset("Sunset - First Spotlights On", "18:30:01"),
             MoodChangerPreset("Sunset - Default", "19:22:48"),
             MoodChangerPreset("Sunset - Last Light", "20:57:17"),
             MoodChangerPreset("Sunset - After Last Light", "20:57:18"),
@@ -121,8 +124,10 @@ namespace EditorHelpers
                     return g_moodChangerPresetsStadium2;
                 }
             }
-#endif
             return null;
+#else
+            return null;
+#endif
         }
 
     }
