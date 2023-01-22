@@ -11,6 +11,15 @@ namespace EditorHelpers
 #endif
             return containsPodiumInfo;
         }
+
+        bool PodiumCountInvalid(const int count)
+        {
+#if TMNEXT
+            return count < 1;
+#else
+            return count != 1;
+#endif
+        }
     }
 
     [Setting category="Functions" name="PodiumReminder: Enabled" hidden]
@@ -81,7 +90,7 @@ namespace EditorHelpers
             if (Signal_MapFileUpdated()
                 && timerEnterEditorDelay.Complete()
                 && Setting_PodiumReminder_NotificationEnabled
-                && m_podiumCount != 1)
+                && Compatibility::PodiumCountInvalid(m_podiumCount))
             {
                 string title = "Editor Helpers: " + Name();
                 int displayTime = int(Setting_PodiumReminder_NotificationLength * 1000.0f);
@@ -115,17 +124,20 @@ namespace EditorHelpers
                 EditorHelpers::HelpMarker("Reminder to place a podium");
                 UI::SameLine();
             }
-            if (m_podiumCount < 1)
+            if (Compatibility::PodiumCountInvalid(m_podiumCount))
             {
-                UI::Text("\\$f00");
-                UI::SameLine();
-                UI::Text("Podium Check: No podiums");
-            }
-            else if (m_podiumCount > 1)
-            {
-                UI::Text("\\$f00");
-                UI::SameLine();
-                UI::Text("Podium Check: Too many (" + tostring(m_podiumCount) + ")");
+                if (m_podiumCount < 1)
+                {
+                    UI::Text("\\$f00");
+                    UI::SameLine();
+                    UI::Text("Podium Check: No podiums");
+                }
+                else if (m_podiumCount > 1)
+                {
+                    UI::Text("\\$f00");
+                    UI::SameLine();
+                    UI::Text("Podium Check: Too many (" + tostring(m_podiumCount) + ")");
+                }
             }
             else
             {
