@@ -1,3 +1,7 @@
+# 5.13
+* Update Default Block Modes function to allow enabling for specific modes only and add a quick-use interface to the "Build" display category
+
+
 # 5.12
 * Added presets for the time of day to the Mood Changer. This has the game defaults but also includes some other interesting times.
 * Fix podium reminder for TM 2020. Apparently placing more than one podium is perfectly valid.

@@ -99,13 +99,19 @@ namespace EditorHelpers
     }
 
     [Setting category="Functions" name="DefaultBlockMode: Enabled" hidden]
-    bool Setting_DefaultBlockMode_Enabled = false;
+    bool Setting_DefaultBlockMode_Enabled = true;
     [Setting category="Functions" name="DefaultBlockMode: Default Block Mode" hidden]
     string Setting_DefaultBlockMode_BlockMode = "Normal";
     [Setting category="Functions" name="DefaultBlockMode: Default Item Mode" hidden]
     string Setting_DefaultBlockMode_ItemMode = "Normal";
     [Setting category="Functions" name="DefaultBlockMode: Default Macroblock Mode" hidden]
     string Setting_DefaultBlockMode_MacroblockMode = "Normal";
+    [Setting category="Functions" name="DefaultBlockMode: Block Mode Active" hidden]
+    bool Setting_DefaultBlockMode_ActiveBlock = false;
+    [Setting category="Functions" name="DefaultBlockMode: Item Mode Active" hidden]
+    bool Setting_DefaultBlockMode_ActiveItem = false;
+    [Setting category="Functions" name="DefaultBlockMode: Macroblock Mode Active" hidden]
+    bool Setting_DefaultBlockMode_ActiveMacroblock = false;
 
     class DefaultBlockMode : EditorHelpers::EditorFunction
     {
@@ -123,50 +129,21 @@ namespace EditorHelpers
             UI::BeginDisabled(!Setting_DefaultBlockMode_Enabled);
             UI::TextWrapped("This allows you to choose a default mode for block, item, and macroblock modes. That means that when you switch to block, item, or macroblock mode your default will be picked.");
 
-            UI::Text("Default Block Mode:");
-            UI::SameLine();
-            for (uint i = 0; i < Compatibility::SelectableBlockModes.Length; i++)
-            {
-                if (UI::RadioButton(Compatibility::SelectableBlockModes[i] + "##Block", Compatibility::SelectableBlockModes[i] == Setting_DefaultBlockMode_BlockMode))
-                {
-                    Setting_DefaultBlockMode_BlockMode = Compatibility::SelectableBlockModes[i];
-                }
-                if (i < (Compatibility::SelectableBlockModes.Length - 1))
-                {
-                    UI::SameLine();
-                }
-            }
-
-            UI::Text("Default Item Mode:");
-            UI::SameLine();
-            for (uint i = 0; i < Compatibility::SelectableItemModes.Length; i++)
-            {
-                if (UI::RadioButton(Compatibility::SelectableItemModes[i] + "##Item", Compatibility::SelectableItemModes[i] == Setting_DefaultBlockMode_ItemMode))
-                {
-                    Setting_DefaultBlockMode_ItemMode = Compatibility::SelectableItemModes[i];
-                }
-                if (i < (Compatibility::SelectableItemModes.Length - 1))
-                {
-                    UI::SameLine();
-                }
-            }
-
-            UI::Text("Default Macroblock Mode:");
-            UI::SameLine();
-            for (uint i = 0; i < Compatibility::SelectableMacroblockModes.Length; i++)
-            {
-                if (UI::RadioButton(Compatibility::SelectableMacroblockModes[i] + "##Macroblock", Compatibility::SelectableMacroblockModes[i] == Setting_DefaultBlockMode_MacroblockMode))
-                {
-                    Setting_DefaultBlockMode_MacroblockMode = Compatibility::SelectableMacroblockModes[i];
-                }
-                if (i < (Compatibility::SelectableMacroblockModes.Length - 1))
-                {
-                    UI::SameLine();
-                }
-            }
+            DisplayModeOptions();
 
             UI::EndDisabled();
             UI::PopID();
+        }
+
+        void RenderInterface_Build() override
+        {
+            if (!Enabled() || Editor is null)
+            {
+                return;
+            }
+
+            UI::TextDisabled("\tMode Defaults");
+            DisplayModeOptions(true);
         }
 
         void Init() override 
@@ -198,8 +175,8 @@ namespace EditorHelpers
 
             if (lastPlaceModeCategory != currentPlaceModeCategory)
             {
-
-                if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block)
+                if (Setting_DefaultBlockMode_ActiveBlock
+                    && Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block)
                 {
                     if (tostring(Setting_DefaultBlockMode_BlockMode) == "Normal")
                     {
@@ -214,7 +191,8 @@ namespace EditorHelpers
                         Compatibility::SetModeBlockFree(Editor);
                     }
                 }
-                else if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item)
+                else if (Setting_DefaultBlockMode_ActiveItem
+                    && Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item)
                 {
                     if (tostring(Setting_DefaultBlockMode_ItemMode) == "Normal")
                     {
@@ -229,7 +207,8 @@ namespace EditorHelpers
                         Compatibility::SetModeItemFree(Editor);
                     }
                 }
-                else if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Macroblock)
+                else if (Setting_DefaultBlockMode_ActiveMacroblock
+                    && Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Macroblock)
                 {
                     if (tostring(Setting_DefaultBlockMode_MacroblockMode) == "Normal")
                     {
@@ -242,6 +221,68 @@ namespace EditorHelpers
                 }
             }
             lastPlaceModeCategory = currentPlaceModeCategory;
+        }
+
+        private string DisplayRadioSelection(const string&in idName, const string[]@ options, const string&in selection)
+        {
+            string newSelection = selection;
+            for (uint i = 0; i < options.Length; i++)
+            {
+                if (UI::RadioButton(options[i] + "##" + idName, options[i] == selection))
+                {
+                    newSelection = options[i];
+                }
+                if (i < (options.Length - 1))
+                {
+                    UI::SameLine();
+                }
+            }
+            return newSelection;
+        }
+
+        private void DisplayModeOptions(bool includeToolTips = false)
+        {
+            vec2 spacingOrig = UI::GetStyleVarVec2(UI::StyleVar::ItemSpacing);
+            vec2 spacingNew = vec2(1.0, spacingOrig.y);
+
+            if (includeToolTips && settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Enable and set the default block mode to use");
+                UI::SameLine();
+            }
+            Setting_DefaultBlockMode_ActiveBlock = UI::Checkbox("Block:", Setting_DefaultBlockMode_ActiveBlock);
+            UI::PushStyleVar(UI::StyleVar::ItemSpacing, spacingNew);
+            UI::SameLine();
+            UI::BeginDisabled(!Setting_DefaultBlockMode_ActiveBlock);
+            Setting_DefaultBlockMode_BlockMode = DisplayRadioSelection("Block", Compatibility::SelectableBlockModes, Setting_DefaultBlockMode_BlockMode);
+            UI::EndDisabled();
+            UI::PopStyleVar();
+
+            if (includeToolTips && settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Enable and set the default item mode to use");
+                UI::SameLine();
+            }
+            Setting_DefaultBlockMode_ActiveItem = UI::Checkbox("Item:", Setting_DefaultBlockMode_ActiveItem);
+            UI::PushStyleVar(UI::StyleVar::ItemSpacing, spacingNew);
+            UI::SameLine();
+            UI::BeginDisabled(!Setting_DefaultBlockMode_ActiveItem);
+            Setting_DefaultBlockMode_ItemMode = DisplayRadioSelection("Item", Compatibility::SelectableItemModes, Setting_DefaultBlockMode_ItemMode);
+            UI::EndDisabled();
+            UI::PopStyleVar();
+
+            if (includeToolTips && settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Enable and set the default macroblock mode to use");
+                UI::SameLine();
+            }
+            Setting_DefaultBlockMode_ActiveMacroblock = UI::Checkbox("Macroblock:", Setting_DefaultBlockMode_ActiveMacroblock);
+            UI::PushStyleVar(UI::StyleVar::ItemSpacing, spacingNew);
+            UI::SameLine();
+            UI::BeginDisabled(!Setting_DefaultBlockMode_ActiveMacroblock);
+            Setting_DefaultBlockMode_MacroblockMode = DisplayRadioSelection("Macroblock", Compatibility::SelectableMacroblockModes, Setting_DefaultBlockMode_MacroblockMode);
+            UI::EndDisabled();
+            UI::PopStyleVar();
         }
     }
 }
