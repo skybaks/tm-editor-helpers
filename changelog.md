@@ -1,5 +1,5 @@
 # 5.13
-* Update Default Block Modes function to allow enabling for specific modes only
+* Update Default Block Modes function to allow enabling for specific modes only and add a quick-use interface to the "Build" display category
 
 
 # 5.12
