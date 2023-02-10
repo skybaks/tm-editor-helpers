@@ -444,13 +444,19 @@ namespace EditorHelpers
             {
                 for (uint i = 0; i < currentDir.ChildNodes.Length; ++i)
                 {
+                    CGameCtnArticleNode@ newDir = currentDir.ChildNodes[i];
                     CGameCtnArticleNode@ newSisterDir = null;
                     if (sisterDir !is null && i < sisterDir.ChildNodes.Length)
                     {
                         @newSisterDir = sisterDir.ChildNodes[i];
+
+                        if (tostring(newSisterDir.NodeName) != tostring(newDir.NodeName))
+                        {
+                            Debug("newSisterDir has invalid node name");
+                            @newSisterDir = null;
+                        }
                     }
 
-                    CGameCtnArticleNode@ newDir = currentDir.ChildNodes[i];
                     if (newDir.IsDirectory)
                     {
                         RecursiveAddInventoryArticle(newDir, name + "/" + newDir.NodeName, placeMode, newSisterDir);
@@ -474,7 +480,7 @@ namespace EditorHelpers
 
                             if (currentSisterArt !is null && tostring(currentSisterArt.NodeName) != tostring(currentArt.NodeName))
                             {
-                                Debug("Sister article has invalid node name");
+                                Debug("currentSisterArt has invalid node name");
                                 @currentSisterArt = null;
                             }
 
