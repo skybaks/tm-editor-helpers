@@ -1,5 +1,6 @@
 # 5.13
 * Update Default Block Modes function to allow enabling for specific modes only and add a quick-use interface to the "Build" display category
+* Fix issue with custom palette not working properly with ghost and free block modes
 
 
 # 5.12

@@ -7,18 +7,21 @@ namespace EditorHelpers
         {
             DisplayName = "";
             @Article = null;
+            @ArticleAlt = null;
             PlaceMode = CGameEditorPluginMap::EPlaceMode::Unknown;
         }
 
-        EditorInventoryArticle(const string&in name, CGameCtnArticleNodeArticle@ article, CGameEditorPluginMap::EPlaceMode placeMode)
+        EditorInventoryArticle(const string&in name, CGameCtnArticleNodeArticle@ article, CGameCtnArticleNodeArticle@ articleAlt, CGameEditorPluginMap::EPlaceMode placeMode)
         {
             DisplayName = name;
             @Article = article;
+            @ArticleAlt = articleAlt;
             PlaceMode = placeMode;
         }
 
         string DisplayName;
         CGameCtnArticleNodeArticle@ Article;
+        CGameCtnArticleNodeArticle@ ArticleAlt;
         CGameEditorPluginMap::EPlaceMode PlaceMode;
     }
 
@@ -50,6 +53,25 @@ namespace EditorHelpers
             Setting_CustomPalette_Enabled = false;
 #endif
             return Setting_CustomPalette_Enabled;
+        }
+
+        bool IsBlockMode(CGameEditorPluginMap::EPlaceMode mode)
+        {
+            return mode == CGameEditorPluginMap::EPlaceMode::Block
+                || mode == CGameEditorPluginMap::EPlaceMode::GhostBlock
+#if TMNEXT
+                || mode == CGameEditorPluginMap::EPlaceMode::FreeBlock
+#endif
+                ;
+        }
+
+        bool IsMacroblockMode(CGameEditorPluginMap::EPlaceMode mode)
+        {
+            return mode == CGameEditorPluginMap::EPlaceMode::Macroblock
+#if TMNEXT
+                || mode == CGameEditorPluginMap::EPlaceMode::FreeMacroblock
+#endif
+                ;
         }
     }
 
@@ -382,6 +404,7 @@ namespace EditorHelpers
             CGameCtnArticleNodeArticle@ selectedArticle = cast<CGameCtnArticleNodeArticle>(Editor.PluginMapType.Inventory.CurrentSelectedNode);
             if (selectedArticle !is null && selectedArticle !is m_selectedArticlePrev)
             {
+                Debug("Selected article has changed");
                 AddNewArticleToHistory(selectedArticle);
             }
             @m_selectedArticlePrev = selectedArticle;
@@ -411,23 +434,37 @@ namespace EditorHelpers
             return success;
         }
 
-        private void RecursiveAddInventoryArticle(CGameCtnArticleNode@ current, const string&in name, CGameEditorPluginMap::EPlaceMode placeMode)
+        private void RecursiveAddInventoryArticle(CGameCtnArticleNode@ current, const string&in name, CGameEditorPluginMap::EPlaceMode placeMode, CGameCtnArticleNode@ sister)
         {
             Debug_EnterMethod("RecursiveAddInventoryArticle");
 
             CGameCtnArticleNodeDirectory@ currentDir = cast<CGameCtnArticleNodeDirectory>(current);
+            CGameCtnArticleNodeDirectory@ sisterDir = cast<CGameCtnArticleNodeDirectory>(sister);
             if (currentDir !is null)
             {
                 for (uint i = 0; i < currentDir.ChildNodes.Length; ++i)
                 {
-                    auto newDir = currentDir.ChildNodes[i];
+                    CGameCtnArticleNode@ newDir = currentDir.ChildNodes[i];
+                    CGameCtnArticleNode@ newSisterDir = null;
+                    if (sisterDir !is null && i < sisterDir.ChildNodes.Length)
+                    {
+                        @newSisterDir = sisterDir.ChildNodes[i];
+
+                        if (tostring(newSisterDir.NodeName) != tostring(newDir.NodeName))
+                        {
+                            Debug("newSisterDir has invalid node name");
+                            @newSisterDir = null;
+                        }
+                    }
+
                     if (newDir.IsDirectory)
                     {
-                        RecursiveAddInventoryArticle(newDir, name + "/" + newDir.NodeName, placeMode);
+                        RecursiveAddInventoryArticle(newDir, name + "/" + newDir.NodeName, placeMode, newSisterDir);
                     }
                     else
                     {
                         CGameCtnArticleNodeArticle@ currentArt = cast<CGameCtnArticleNodeArticle>(newDir);
+                        CGameCtnArticleNodeArticle@ currentSisterArt = cast<CGameCtnArticleNodeArticle>(newSisterDir);
                         if (currentArt !is null)
                         {
                             string articleName = name + "/" + currentArt.NodeName;
@@ -440,8 +477,15 @@ namespace EditorHelpers
                                     Debug("Split node name results in: " + tostring(articleName));
                                 }
                             }
+
+                            if (currentSisterArt !is null && tostring(currentSisterArt.NodeName) != tostring(currentArt.NodeName))
+                            {
+                                Debug("currentSisterArt has invalid node name");
+                                @currentSisterArt = null;
+                            }
+
                             Debug("Add " + articleName);
-                            m_articles.InsertLast(EditorInventoryArticle(articleName, currentArt, placeMode));
+                            m_articles.InsertLast(EditorInventoryArticle(articleName, currentArt, currentSisterArt, placeMode));
                         }
                     }
                 }
@@ -476,6 +520,12 @@ namespace EditorHelpers
                 Debug_LeaveMethod();
                 return;
             }
+            if (!VerifyInventoryItem(Editor.PluginMapType.Inventory.RootNodes[1], "RoadTech"))
+            {
+                Debug("Error verifying blocks integrity. aborting index");
+                Debug_LeaveMethod();
+                return;
+            }
             if (!VerifyInventoryItem(Editor.PluginMapType.Inventory.RootNodes[3], "Official"))
             {
                 Debug("Error verifying items integrity. aborting index");
@@ -490,11 +540,14 @@ namespace EditorHelpers
             }
 
             Debug("Loading inventory blocks");
-            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[0], "Block", CGameEditorPluginMap::EPlaceMode::Block);
+            // Index 0 is is used for normal block mode while Index 1 is used
+            // for ghost block mode and free block mode. They are the same
+            // blocks but the articles have different pointers.
+            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[0], "Block", CGameEditorPluginMap::EPlaceMode::Block, Editor.PluginMapType.Inventory.RootNodes[1]);
             Debug("Loading inventory items");
-            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[3], "Item", CGameEditorPluginMap::EPlaceMode::Item);
+            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[3], "Item", CGameEditorPluginMap::EPlaceMode::Item, null);
             Debug("Loading inventory macroblocks");
-            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[4], "Macroblock", CGameEditorPluginMap::EPlaceMode::Macroblock);
+            RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[4], "Macroblock", CGameEditorPluginMap::EPlaceMode::Macroblock, null);
 
             Debug("Inventory total length: " + tostring(m_articles.Length));
 
@@ -504,17 +557,28 @@ namespace EditorHelpers
             Debug_LeaveMethod();
         }
 
+        private bool PlaceModeIncompatible(CGameEditorPluginMap::EPlaceMode modeCurr, CGameEditorPluginMap::EPlaceMode modeNew)
+        {
+            bool incompatible = modeCurr != modeNew;
+            if ((Compatibility::IsBlockMode(modeCurr) && Compatibility::IsBlockMode(modeNew))
+                || (Compatibility::IsMacroblockMode(modeCurr) && Compatibility::IsMacroblockMode(modeNew)))
+            {
+                incompatible = false;
+            }
+            return incompatible;
+        }
+
         private void SetCurrentArticle(const EditorInventoryArticle@ newArticle)
         {
             Debug_EnterMethod("SetCurrentArticle");
             if (newArticle is null)
             {
-                Debug("New  EditorInventoryArticle is null");
+                Debug("New EditorInventoryArticle is null");
                 Debug_LeaveMethod();
                 return;
             }
 
-            if (Editor.PluginMapType.PlaceMode != newArticle.PlaceMode)
+            if (PlaceModeIncompatible(Editor.PluginMapType.PlaceMode, newArticle.PlaceMode))
             {
                 Editor.PluginMapType.PlaceMode = newArticle.PlaceMode;
             }
@@ -537,13 +601,22 @@ namespace EditorHelpers
 
         private EditorInventoryArticle@ FindArticleByRef(const CGameCtnArticleNodeArticle@ article)
         {
+            Debug_EnterMethod("FindArticleByRef");
+
             for (uint i = 0; i < m_articles.Length; ++i)
             {
-                if (m_articles[i].Article is article)
+                if (m_articles[i].Article is article || m_articles[i].ArticleAlt is article)
                 {
+                    Debug("Found the article");
+
+                    Debug_LeaveMethod();
                     return m_articles[i];
                 }
             }
+
+            Debug("Article not found");
+
+            Debug_LeaveMethod();
             return null;
         }
 
@@ -564,10 +637,13 @@ namespace EditorHelpers
 
         private void AddNewArticleToHistory(const CGameCtnArticleNodeArticle@ newArticle)
         {
+            Debug_EnterMethod("AddNewArticleToHistory");
+
             for (uint i = 0; i < m_articlesHistory.Length; ++i)
             {
                 if (m_articlesHistory[i].Article is newArticle)
                 {
+                    Debug("Article already present in history-- remove old instance");
                     m_articlesHistory.RemoveAt(i);
                     break;
                 }
@@ -575,6 +651,7 @@ namespace EditorHelpers
 
             while (m_articlesHistory.Length >= Setting_CustomPalette_ArticleHistoryMax)
             {
+                Debug("History too long-- remove one from end");
                 m_articlesHistory.RemoveAt(m_articlesHistory.Length-1);
             }
 
@@ -583,6 +660,8 @@ namespace EditorHelpers
             {
                 m_articlesHistory.InsertAt(0, article);
             }
+
+            Debug_LeaveMethod();
         }
 
         private void AddNewArticleToPalette(const CGameCtnArticleNodeArticle@ newArticle, const uint&in index)
