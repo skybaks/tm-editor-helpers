@@ -54,6 +54,25 @@ namespace EditorHelpers
 #endif
             return Setting_CustomPalette_Enabled;
         }
+
+        bool IsBlockMode(CGameEditorPluginMap::EPlaceMode mode)
+        {
+            return mode == CGameEditorPluginMap::EPlaceMode::Block
+                || mode == CGameEditorPluginMap::EPlaceMode::GhostBlock
+#if TMNEXT
+                || mode == CGameEditorPluginMap::EPlaceMode::FreeBlock
+#endif
+                ;
+        }
+
+        bool IsMacroblockMode(CGameEditorPluginMap::EPlaceMode mode)
+        {
+            return mode == CGameEditorPluginMap::EPlaceMode::Macroblock
+#if TMNEXT
+                || mode == CGameEditorPluginMap::EPlaceMode::FreeMacroblock
+#endif
+                ;
+        }
     }
 
     namespace HotkeyInterface
@@ -535,21 +554,8 @@ namespace EditorHelpers
         private bool PlaceModeIncompatible(CGameEditorPluginMap::EPlaceMode modeCurr, CGameEditorPluginMap::EPlaceMode modeNew)
         {
             bool incompatible = modeCurr != modeNew;
-            if (
-                (modeCurr == CGameEditorPluginMap::EPlaceMode::Block
-                    || modeCurr == CGameEditorPluginMap::EPlaceMode::GhostBlock
-                    || modeCurr == CGameEditorPluginMap::EPlaceMode::FreeBlock)
-                && (modeNew == CGameEditorPluginMap::EPlaceMode::Block
-                    || modeNew == CGameEditorPluginMap::EPlaceMode::GhostBlock
-                    || modeNew == CGameEditorPluginMap::EPlaceMode::FreeBlock))
-            {
-                incompatible = false;
-            }
-            else if (
-                (modeCurr == CGameEditorPluginMap::EPlaceMode::Macroblock
-                    || modeCurr == CGameEditorPluginMap::EPlaceMode::FreeMacroblock)
-                && (modeNew == CGameEditorPluginMap::EPlaceMode::Macroblock
-                    || modeNew == CGameEditorPluginMap::EPlaceMode::FreeMacroblock))
+            if ((Compatibility::IsBlockMode(modeCurr) && Compatibility::IsBlockMode(modeNew))
+                || (Compatibility::IsMacroblockMode(modeCurr) && Compatibility::IsMacroblockMode(modeNew)))
             {
                 incompatible = false;
             }
