@@ -5,6 +5,7 @@
 * Optimize initialization code in the locator check function. It's hard work should only be done once now instead of every time you enter the editor
 * Fix issue with locator check not correctly identifying game assets due to some unexpected naming oddities
 * Fix default block modes not fully detecting all the possible place modes
+* Fix default block modes to only display a mode if more than one setting is supported for the current game
 
 
 # 5.12
