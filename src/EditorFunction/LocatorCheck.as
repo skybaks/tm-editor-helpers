@@ -67,9 +67,8 @@ namespace EditorHelpers
             {
                 if (m_deps.Length != 0)
                 {
-                    m_deps = {};
+                    m_deps.RemoveRange(0, m_deps.Length);
                 }
-                m_initGameResources = true;
             }
         }
 
@@ -199,12 +198,26 @@ namespace EditorHelpers
                 auto fidsSubfile = cast<CSystemFidFile>(fidsFolder.Leaves[i]);
                 paths.InsertLast(prefix + fidsSubfile.FileName);
 
-                // Some weirdness with the arrows. Add these other file paths
-                if (fidsSubfile.FileName.Contains("+FreezeRGB"))
+                // There is something im not understanding about the game files
+                // that have a + in their file name. It appears that when you
+                // save one of these to a map the name that actually gets used
+                // can be any one of the variants in the logic below.
+                if (fidsSubfile.FileName.Contains("+"))
                 {
                     string tempFilename = fidsSubfile.FileName;
-                    tempFilename = tempFilename.Replace("+FreezeRGB", "");
-                    paths.InsertLast(prefix + tempFilename);
+                    string baseFilename = tempFilename.SubStr(0, tempFilename.IndexOf("+"));
+                    string plusAddon = tempFilename.SubStr(tempFilename.IndexOf("+"), tempFilename.IndexOf(".") - tempFilename.IndexOf("+"));
+                    string fileExtn = tempFilename.SubStr(tempFilename.IndexOf("."), tempFilename.Length - tempFilename.IndexOf("."));
+
+                    string[] plusOptions = { "", "+FreezeRGB", "+111Y", "+111A" };
+                    for (uint optionIndex = 0; optionIndex < plusOptions.Length; ++optionIndex)
+                    {
+                        if (plusAddon != plusOptions[optionIndex])
+                        {
+                            string newName = baseFilename + plusOptions[optionIndex] + fileExtn;
+                            paths.InsertLast(prefix + newName);
+                        }
+                    }
                 }
             }
         }

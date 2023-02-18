@@ -2,6 +2,8 @@
 * Update Default Block Modes function to allow enabling for specific modes only and add a quick-use interface to the "Build" display category
 * Fix issue with custom palette not working properly with ghost and free block modes
 * Fix backend hotkey management not getting properly cleaned up
+* Optimize initialization code in the locator check function. It's hard work should only be done once now instead of every time you enter the editor
+* Fix issue with locator check not correctly identifying game assets due to some unexpected naming oddities
 
 
 # 5.12
