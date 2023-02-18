@@ -1,7 +1,44 @@
 namespace EditorHelpers
 {
+    enum PlaceModeCategory
+    {
+        Block,
+        Item,
+        Macroblock,
+        Undefined
+    }
+
     namespace Compatibility
     {
+        PlaceModeCategory GetCurrentPlaceModeCategory(CGameCtnEditorFree@ editor)
+        {
+            PlaceModeCategory placeMode = PlaceModeCategory::Undefined;
+
+            if (editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block
+                || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::GhostBlock
+#if TMNEXT
+                || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeBlock
+#endif
+                )
+            {
+                placeMode = PlaceModeCategory::Block;
+            }
+            else if (editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item)
+            {
+                placeMode = PlaceModeCategory::Item;
+            }
+            else if (editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Macroblock
+#if TMNEXT
+                || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeMacroblock
+#endif
+                )
+            {
+                placeMode = PlaceModeCategory::Macroblock;
+            }
+
+            return placeMode;
+        }
+
         void SetModeBlockNormal(CGameCtnEditorFree@ editor)
         {
 #if TMNEXT
@@ -115,7 +152,7 @@ namespace EditorHelpers
 
     class DefaultBlockMode : EditorHelpers::EditorFunction
     {
-        private string lastPlaceModeCategory;
+        private PlaceModeCategory m_lastPlaceModeCategory;
 
         string Name() override { return "Default Block Mode"; }
         bool Enabled() override { return Setting_DefaultBlockMode_Enabled; }
@@ -150,30 +187,16 @@ namespace EditorHelpers
         {
             if (!Enabled() || Editor is null)
             {
-                lastPlaceModeCategory = "";
+                m_lastPlaceModeCategory = PlaceModeCategory::Undefined;
             }
         }
 
         void Update(float) override
         {
             if (!Enabled() || Editor is null) return;
-            string currentPlaceModeCategory = "Undefined";
-            if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block
-            || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::GhostBlock
-            || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Unknown)
-            {
-                currentPlaceModeCategory = "Block";
-            }
-            else if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item)
-            {
-                currentPlaceModeCategory = "Item";
-            }
-            else if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Macroblock)
-            {
-                currentPlaceModeCategory = "Macroblock";
-            }
 
-            if (lastPlaceModeCategory != currentPlaceModeCategory)
+            PlaceModeCategory currentPlaceModeCategory = Compatibility::GetCurrentPlaceModeCategory(Editor);
+            if (m_lastPlaceModeCategory != currentPlaceModeCategory)
             {
                 if (Setting_DefaultBlockMode_ActiveBlock
                     && Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block)
@@ -220,7 +243,7 @@ namespace EditorHelpers
                     }
                 }
             }
-            lastPlaceModeCategory = currentPlaceModeCategory;
+            m_lastPlaceModeCategory = currentPlaceModeCategory;
         }
 
         private string DisplayRadioSelection(const string&in idName, const string[]@ options, const string&in selection)
