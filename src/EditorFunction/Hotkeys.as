@@ -205,7 +205,7 @@ namespace EditorHelpers
         {
             if (!Enabled() || Editor is null)
             {
-                m_keysDown.RemoveRange(0, m_keysDown.Length - 1);
+                m_keysDown.RemoveRange(0, m_keysDown.Length);
                 m_mapElemColorPrev = 0;
                 m_mapElemColorPrevPrev = 0;
             }
