@@ -8,3 +8,7 @@
 # Sign scripts
 Sign.bat
 SignComp.bat
+
+# Temp
+tmp/
+temp/
