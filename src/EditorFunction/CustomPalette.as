@@ -114,6 +114,7 @@ namespace EditorHelpers
         private string m_paletteNewName;
         private bool m_deleteConfirm;
         private PaletteRandomizerMode m_paletteRandomize;
+        private uint64 m_parallelLoadYieldTime; // This signal is used yield the IndexInventory coroutine at reasonable times
 
         string Name() override { return "Custom Palette"; }
         bool Enabled() override { return Compatibility::EnableCustomPaletteFunction(); }
@@ -365,7 +366,8 @@ namespace EditorHelpers
 
             if (Signal_EnteredEditor())
             {
-                IndexInventory();
+                // COROUTINE USAGE!
+                startnew(CoroutineFunc(IndexInventory));
             }
 
             if (Signal_BlockItemPlaced() && m_paletteRandomize != PaletteRandomizerMode::NONE
@@ -418,6 +420,12 @@ namespace EditorHelpers
             Debug_LeaveMethod();
         }
 
+
+        // PARALLEL METHODS BEGIN
+        // - Be careful about calling these methods from the main thread. They
+        //      are designed to yield at specific intervals and calling them
+        //      from the main thread could impact behavior of classes.
+
         private bool VerifyInventoryItem(CGameCtnArticleNode@ rootNode, const string&in check)
         {
             Debug_EnterMethod("VerifyInventoryItem");
@@ -437,6 +445,13 @@ namespace EditorHelpers
         private void RecursiveAddInventoryArticle(CGameCtnArticleNode@ current, const string&in name, CGameEditorPluginMap::EPlaceMode placeMode, CGameCtnArticleNode@ sister)
         {
             Debug_EnterMethod("RecursiveAddInventoryArticle");
+
+            if ((m_parallelLoadYieldTime + 10) < Time::Now)
+            {
+                Debug("*** YIELDING NOW *** : Time::Now-" + tostring(Time::Now) + " m_parallelLoadYieldTime-" + tostring(m_parallelLoadYieldTime));
+                yield();
+                m_parallelLoadYieldTime = Time::Now;
+            }
 
             CGameCtnArticleNodeDirectory@ currentDir = cast<CGameCtnArticleNodeDirectory>(current);
             CGameCtnArticleNodeDirectory@ sisterDir = cast<CGameCtnArticleNodeDirectory>(sister);
@@ -543,6 +558,7 @@ namespace EditorHelpers
             // Index 0 is is used for normal block mode while Index 1 is used
             // for ghost block mode and free block mode. They are the same
             // blocks but the articles have different pointers.
+            m_parallelLoadYieldTime = Time::Now;
             RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[0], "Block", CGameEditorPluginMap::EPlaceMode::Block, Editor.PluginMapType.Inventory.RootNodes[1]);
             Debug("Loading inventory items");
             RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[3], "Item", CGameEditorPluginMap::EPlaceMode::Item, null);
@@ -556,6 +572,9 @@ namespace EditorHelpers
 
             Debug_LeaveMethod();
         }
+
+        // PARALLEL METHODS END
+
 
         private bool PlaceModeIncompatible(CGameEditorPluginMap::EPlaceMode modeCurr, CGameEditorPluginMap::EPlaceMode modeNew)
         {
