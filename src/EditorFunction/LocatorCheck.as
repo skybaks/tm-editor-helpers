@@ -52,15 +52,9 @@ namespace EditorHelpers
             {
                 if (m_initGameResources)
                 {
-                    auto appFidFile = cast<CSystemFidFile>(GetFidFromNod(GetApp()));
-                    if (appFidFile !is null)
-                    {
-                        m_initGameResources = false;
-                        CSystemFidsFolder@ skinsFidFolder = GetTreeFidsFolder(appFidFile.ParentFolder, "Skins");
-                        RecursiveAddDefaultSkinsPath(skinsFidFolder, "Skins\\", m_gameResources);
-                        CSystemFidsFolder@ mediaFidFolder = GetTreeFidsFolder(appFidFile.ParentFolder, "Media");
-                        RecursiveAddDefaultSkinsPath(mediaFidFolder, "Media\\", m_gameResources);
-                    }
+                    m_initGameResources = false;
+                    RecursiveAddDefaultSkinsPath(cast<CSystemFidsFolder>(Fids::GetGameFolder("GameData/Skins")), "Skins\\", m_gameResources);
+                    RecursiveAddDefaultSkinsPath(cast<CSystemFidsFolder>(Fids::GetGameFolder("GameData/Media")), "Media\\", m_gameResources);
                 }
             }
             else
@@ -170,19 +164,6 @@ namespace EditorHelpers
 
                 UI::TreePop();
             }
-        }
-
-        private CSystemFidsFolder@ GetTreeFidsFolder(CSystemFids@ fids, const string&in dirName)
-        {
-            for (uint i = 0; i < fids.Trees.Length; i++)
-            {
-                auto treeAsFidsFolder = cast<CSystemFidsFolder>(fids.Trees[i]);
-                if (treeAsFidsFolder !is null && treeAsFidsFolder.DirName == dirName)
-                {
-                    return treeAsFidsFolder;
-                }
-            }
-            return null;
         }
 
         private void RecursiveAddDefaultSkinsPath(CSystemFidsFolder@ fidsFolder, const string&in prefix, string[]& paths)

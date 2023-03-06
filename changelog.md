@@ -1,3 +1,7 @@
+# 5.15
+* Refactor usage of class CSystemFids - No change to functionaity
+
+
 # 5.14
 * Fix issue with custom palette timing out when loading 10k+ custom items
 
