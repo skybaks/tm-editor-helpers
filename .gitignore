@@ -12,3 +12,7 @@ SignComp.bat
 # Temp
 tmp/
 temp/
+
+# Build
+env/
+.vscode/

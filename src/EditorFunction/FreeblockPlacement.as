@@ -122,7 +122,7 @@ namespace EditorHelpers
             UI::TextDisabled("\tFree Block Placement");
             if (settingToolTipsEnabled)
             {
-                EditorHelpers::HelpMarker("Sets the placement grid of blocks in free mode");
+                EditorHelpers::HelpMarker("Sets the placement grid of blocks in free mode. Does not work for numbers < 1.0");
                 UI::SameLine();
             }
             Setting_FreeblockPlacement_ApplyGrid = UI::Checkbox("Apply Grid to Freeblocks", Setting_FreeblockPlacement_ApplyGrid);
@@ -131,7 +131,7 @@ namespace EditorHelpers
 
             if (settingToolTipsEnabled)
             {
-                EditorHelpers::HelpMarker("Apply a placement offset to blocks in free mode");
+                EditorHelpers::HelpMarker("Apply a placement offset to blocks in free mode. Use this place freeblocks between the 1m grid");
                 UI::SameLine();
             }
             Setting_FreeblockPlacement_ApplyTranslate = UI::Checkbox("Apply Translation to Freeblocks", Setting_FreeblockPlacement_ApplyTranslate);
