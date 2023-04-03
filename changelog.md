@@ -1,6 +1,7 @@
 # 5.16
 * Slight improvement to wording of freeblock placement tooltips
 * Fix bug where entering editor does not update podium status
+* Add some useful links to the Info section
 
 
 # 5.15

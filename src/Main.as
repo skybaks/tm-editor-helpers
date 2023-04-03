@@ -28,6 +28,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::LocatorCheck()
     , EditorHelpers::PodiumReminder()
     , EditorHelpers::CursorPosition()
+    , EditorHelpers::Links()
 };
 
 namespace Compatibility
