@@ -85,6 +85,8 @@ namespace EditorHelpers
             {
                 timerEnterEditorDelay.StartNew();
                 Debug("Restart entered editor time delay");
+                m_podiumCount = GetPodiumCount();
+                Debug("Podiums:" + tostring(m_podiumCount));
             }
 
             if (Signal_MapFileUpdated()
