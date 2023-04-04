@@ -39,6 +39,7 @@ namespace EditorHelpers
 
         string Name() override { return Compatibility::FreeblockModePreciseRotationName() + "Precise Rotation"; }
         bool Enabled() override { return Settings_FreeblockModePreciseRotation_Enabled; }
+        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {

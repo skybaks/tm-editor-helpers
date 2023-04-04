@@ -7,6 +7,7 @@ bool settingToolTipsEnabled = true;
 bool Setting_DebugLoggingEnabled = false;
 
 const string g_windowName = Icons::PuzzlePiece + " Editor Helpers";
+bool g_presetConfigMode = false;
 
 array<EditorHelpers::EditorFunction@> functions =
 {
@@ -29,6 +30,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::PodiumReminder()
     , EditorHelpers::CursorPosition()
     , EditorHelpers::Links()
+    , EditorHelpers::FunctionPresets()
 };
 
 namespace Compatibility
@@ -80,7 +82,9 @@ void RenderInterface()
         {
             for (uint index = 0; index < functions.Length; index++)
             {
+                UI::BeginDisabled(g_presetConfigMode && !functions[index].PresetConfigMode);
                 functions[index].RenderInterface_Action();
+                UI::EndDisabled();
             }
         }
 
@@ -88,7 +92,9 @@ void RenderInterface()
         {
             for (uint index = 0; index < functions.Length; index++)
             {
+                UI::BeginDisabled(g_presetConfigMode && !functions[index].PresetConfigMode);
                 functions[index].RenderInterface_Display();
+                UI::EndDisabled();
             }
         }
 
@@ -96,7 +102,9 @@ void RenderInterface()
         {
             for (uint index = 0; index < functions.Length; index++)
             {
+                UI::BeginDisabled(g_presetConfigMode && !functions[index].PresetConfigMode);
                 functions[index].RenderInterface_Build();
+                UI::EndDisabled();
             }
         }
 
@@ -104,7 +112,9 @@ void RenderInterface()
         {
             for (uint index = 0; index < functions.Length; index++)
             {
+                UI::BeginDisabled(g_presetConfigMode && !functions[index].PresetConfigMode);
                 functions[index].RenderInterface_Info();
+                UI::EndDisabled();
             }
         }
         UI::End();

@@ -77,6 +77,7 @@ namespace EditorHelpers
 
         string Name() override { return "Freeblock Placement"; }
         bool Enabled() override { return Compatibility::EnableFreeblockPlacementFunction(); }
+        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {

@@ -5,11 +5,15 @@ namespace EditorHelpers
     {
         bool FirstPass = true;
         CGameCtnEditorFree@ Editor { get const { return cast<CGameCtnEditorFree>(GetApp().Editor); } }
-        private string[] m_debugMethodStack = {};
+        private bool m_presetConfigMode = false;
+        private array<string> m_debugMethodStack = {};
 
         string Name() { return ""; }
         bool Enabled(){ return false; }
         bool HasSettingsEntry() { return true; }
+        bool SupportsPresets() { return false; }
+        bool get_PresetConfigMode() { return m_presetConfigMode; }
+        void set_PresetConfigMode(bool value) { m_presetConfigMode = value; }
         void Init(){}
         void RenderInterface_Action(){}
         void RenderInterface_Display(){}
@@ -20,6 +24,8 @@ namespace EditorHelpers
         void RenderInterface_MenuItem(){}
         void Update(float){}
         void OnKeyPress(bool down, VirtualKey key){}
+        Json::Value@ SerializePresets() { return Json::Value(); }
+        void DeserializePresets(Json::Value) {}
 
         void Debug_EnterMethod(const string&in methodName)
         {
