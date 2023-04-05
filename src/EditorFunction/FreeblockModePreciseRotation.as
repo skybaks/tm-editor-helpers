@@ -189,5 +189,21 @@ namespace EditorHelpers
                 inputRoll = Math::ToDeg(Editor.Cursor.Roll);
             }
         }
+
+        void SerializePresets(Json::Value@ json) override
+        {
+            json["pitch"] = tostring(inputPitch);
+            json["roll"] = tostring(inputRoll);
+        }
+
+        void DeserializePresets(Json::Value@ json) override
+        {
+        }
+
+        void RenderPresetValues(Json::Value@ json) override
+        {
+            UI::Text("Pitch: " + string(json.Get("pitch", Json::Value("0.0"))));
+            UI::Text("Roll: " + string(json.Get("roll", Json::Value("0.0"))));
+        }
     }
 }

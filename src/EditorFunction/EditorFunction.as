@@ -24,8 +24,9 @@ namespace EditorHelpers
         void RenderInterface_MenuItem(){}
         void Update(float){}
         void OnKeyPress(bool down, VirtualKey key){}
-        Json::Value@ SerializePresets() { return Json::Value(); }
-        void DeserializePresets(Json::Value) {}
+        void SerializePresets(Json::Value@) {}
+        void DeserializePresets(Json::Value@) {}
+        void RenderPresetValues(Json::Value@) {}
 
         void Debug_EnterMethod(const string&in methodName)
         {
