@@ -28,6 +28,7 @@ namespace EditorHelpers
 
         string Name() override { return "Block Cursor"; }
         bool Enabled() override { return Setting_BlockCursor_Enabled; }
+        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -76,6 +77,21 @@ namespace EditorHelpers
                 Editor.Cursor.CursorBox.IsShowLines = true;
             }
             lastBlockCursorOff = Setting_BlockCursor_HideBlockCursor;
+        }
+
+        void SerializePresets(Json::Value@ json) override
+        {
+            json["cursor_hidden"] = Setting_BlockCursor_HideBlockCursor;
+        }
+
+        void DeserializePresets(Json::Value@ json) override
+        {
+            Setting_BlockCursor_HideBlockCursor = bool(json.Get("cursor_hidden", Json::Value(false)));
+        }
+
+        void RenderPresetValues(Json::Value@ json) override
+        {
+            UI::Text("Block Cursor Hidden: " + bool(json.Get("cursor_hidden", Json::Value(false))));
         }
     }
 }

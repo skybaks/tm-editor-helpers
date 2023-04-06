@@ -192,18 +192,23 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
-            json["pitch"] = tostring(inputPitch);
-            json["roll"] = tostring(inputRoll);
+            json["step_size"] = Setting_FreeblockModePreciseRotation_StepSizeName;
+            json["pitch"] = inputPitch;
+            json["roll"] = inputRoll;
         }
 
         void DeserializePresets(Json::Value@ json) override
         {
+            Setting_FreeblockModePreciseRotation_StepSizeName = string(json.Get("step_size", Json::Value("Default")));
+            inputPitch = float(json.Get("pitch", Json::Value(0.0f)));
+            inputRoll = float(json.Get("roll", Json::Value(0.0f)));
         }
 
         void RenderPresetValues(Json::Value@ json) override
         {
-            UI::Text("Pitch: " + string(json.Get("pitch", Json::Value("0.0"))));
-            UI::Text("Roll: " + string(json.Get("roll", Json::Value("0.0"))));
+            UI::Text("Step Size: " + string(json.Get("step_size", Json::Value("Default"))));
+            UI::Text("Pitch: " + float(json.Get("pitch", Json::Value(0.0f))));
+            UI::Text("Roll: " + float(json.Get("roll", Json::Value(0.0f))));
         }
     }
 }

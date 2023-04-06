@@ -195,6 +195,7 @@ namespace EditorHelpers
 
         string Name() override { return "Custom Item Placement"; }
         bool Enabled() override { return Setting_CustomItemPlacement_Enabled; }
+        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -513,6 +514,45 @@ namespace EditorHelpers
 
             Debug_LeaveMethod();
         }
-    }
 
+        void SerializePresets(Json::Value@ json) override
+        {
+            json["ghost_mode"] = Setting_CustomItemPlacement_ApplyGhost;
+            json["autorotation"] = Setting_CustomItemPlacement_ApplyAutoRotation;
+            json["apply_grid"] = Setting_CustomItemPlacement_ApplyGrid;
+            json["grid_horiz"] = Setting_CustomItemPlacement_GridSizeHoriz;
+            json["grid_verti"] = Setting_CustomItemPlacement_GridSizeVerti;
+            json["apply_pivot"] = Setting_CustomItemPlacement_ApplyPivot;
+            json["pivot_x"] = Setting_CustomItemPlacement_ItemPivot.x;
+            json["pivot_y"] = Setting_CustomItemPlacement_ItemPivot.y;
+            json["pivot_z"] = Setting_CustomItemPlacement_ItemPivot.z;
+        }
+
+        void DeserializePresets(Json::Value@ json) override
+        {
+            Setting_CustomItemPlacement_ApplyGhost = bool(json.Get("ghost_mode", Json::Value(false)));
+            Setting_CustomItemPlacement_ApplyAutoRotation = bool(json.Get("autorotation", Json::Value(false)));
+            Setting_CustomItemPlacement_ApplyGrid = bool(json.Get("apply_grid", Json::Value(false)));
+            Setting_CustomItemPlacement_GridSizeHoriz = float(json.Get("grid_horiz", Json::Value(0.0f)));
+            Setting_CustomItemPlacement_GridSizeVerti = float(json.Get("grid_verti", Json::Value(0.0f)));
+            Setting_CustomItemPlacement_ApplyPivot = bool(json.Get("apply_pivot", Json::Value(false)));
+            Setting_CustomItemPlacement_ItemPivot.x = float(json.Get("pivot_x", Json::Value(0.0f)));
+            Setting_CustomItemPlacement_ItemPivot.y = float(json.Get("pivot_y", Json::Value(0.0f)));
+            Setting_CustomItemPlacement_ItemPivot.z = float(json.Get("pivot_z", Json::Value(0.0f)));
+        }
+
+        void RenderPresetValues(Json::Value@ json) override
+        {
+            UI::Text("Block Helpers Off: " + bool(json.Get("helpers_off", Json::Value(false))));
+            UI::Text("Apply Ghost Mode: " + bool(json.Get("ghost_mode", Json::Value(false))));
+            UI::Text("Apply Autorotation: " + bool(json.Get("autorotation", Json::Value(false))));
+            UI::Text("Apply Item Grid: " + bool(json.Get("apply_grid", Json::Value(false))));
+            UI::Text("Grid Horizontal: " + float(json.Get("grid_horiz", Json::Value(0.0f))));
+            UI::Text("Grid Vertical: " + float(json.Get("grid_verti", Json::Value(0.0f))));
+            UI::Text("Apply Item Pivot: " + bool(json.Get("apply_pivot", Json::Value(false))));
+            UI::Text("Pivot X: " + float(json.Get("pivot_x", Json::Value(0.0f))));
+            UI::Text("Pivot Y: " + float(json.Get("pivot_y", Json::Value(0.0f))));
+            UI::Text("Pivot Z: " + float(json.Get("pivot_z", Json::Value(0.0f))));
+        }
+    }
 }

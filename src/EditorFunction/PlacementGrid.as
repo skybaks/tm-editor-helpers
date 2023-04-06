@@ -36,6 +36,7 @@ namespace EditorHelpers
     {
         string Name() override { return "Placement Grid"; }
         bool Enabled() override { return Setting_PlacementGrid_Enabled; }
+        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -80,6 +81,24 @@ namespace EditorHelpers
             {
                 Editor.GridColorAlpha = 0.2;
             }
+        }
+
+        void SerializePresets(Json::Value@ json) override
+        {
+            json["grid_on"] = Setting_PlacementGrid_PlacementGridOn;
+            json["transparent"] = Setting_PlacementGrid_PlacementGridTransparent;
+        }
+
+        void DeserializePresets(Json::Value@ json) override
+        {
+            Setting_PlacementGrid_PlacementGridOn = bool(json.Get("grid_on", Json::Value(false)));
+            Setting_PlacementGrid_PlacementGridTransparent = bool(json.Get("transparent", Json::Value(false)));
+        }
+
+        void RenderPresetValues(Json::Value@ json) override
+        {
+            UI::Text("Placement Grid On: " + bool(json.Get("grid_on", Json::Value(false))));
+            UI::Text("Placement Grid Transparent: " + bool(json.Get("transparent", Json::Value(false))));
         }
     }
 }

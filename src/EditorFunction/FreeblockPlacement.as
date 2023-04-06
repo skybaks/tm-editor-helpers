@@ -172,5 +172,38 @@ namespace EditorHelpers
                 m_posPrev = m_pos;
             }
         }
+
+        void SerializePresets(Json::Value@ json) override
+        {
+            json["apply_grid"] = Setting_FreeblockPlacement_ApplyGrid;
+            json["horizontal_grid"] = m_HStep;
+            json["vertical_grid"] = m_VStep;
+            json["apply_translation"] = Setting_FreeblockPlacement_ApplyTranslate;
+            json["x_translation"] = m_XTranslate;
+            json["y_translation"] = m_YTranslate;
+            json["z_translation"] = m_ZTranslate;
+        }
+
+        void DeserializePresets(Json::Value@ json) override
+        {
+            Setting_FreeblockPlacement_ApplyGrid = bool(json.Get("apply_grid", Json::Value(false)));
+            m_HStep = float(json.Get("horizontal_grid", Json::Value(0.0f)));
+            m_VStep = float(json.Get("vertical_grid", Json::Value(0.0f)));
+            Setting_FreeblockPlacement_ApplyTranslate = bool(json.Get("apply_translation", Json::Value(false)));
+            m_XTranslate = float(json.Get("x_translation", Json::Value(0.0f)));
+            m_YTranslate = float(json.Get("y_translation", Json::Value(0.0f)));
+            m_ZTranslate = float(json.Get("z_translation", Json::Value(0.0f)));
+        }
+
+        void RenderPresetValues(Json::Value@ json) override
+        {
+            UI::Text("Apply Freeblock Grid: " + bool(json.Get("apply_grid", Json::Value(false))));
+            UI::Text("Horizontal Grid: " + float(json.Get("horizontal_grid", Json::Value(0.0f))));
+            UI::Text("Vertical Grid: " + float(json.Get("vertical_grid", Json::Value(0.0f))));
+            UI::Text("Apply Freeblock Translation: " + bool(json.Get("apply_translation", Json::Value(false))));
+            UI::Text("X Translation: " + float(json.Get("x_translation", Json::Value(0.0f))));
+            UI::Text("Y Translation: " + float(json.Get("y_translation", Json::Value(0.0f))));
+            UI::Text("Z Translation: " + float(json.Get("z_translation", Json::Value(0.0f))));
+        }
     }
 }

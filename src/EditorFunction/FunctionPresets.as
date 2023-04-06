@@ -162,7 +162,11 @@ namespace EditorHelpers
                                 EditorFunction@ ef = functions[index];
                                 if (ef.SupportsPresets() && m_presets[presetIndex].Functions.Exists(ef.Name()))
                                 {
-                                    ef.RenderPresetValues(cast<EditorFunctionPresetItem>(m_presets[presetIndex].Functions[ef.Name()]).json);
+                                    if (UI::TreeNode(ef.Name() + "##" + presetIndex, UI::TreeNodeFlags::DefaultOpen))
+                                    {
+                                        ef.RenderPresetValues(cast<EditorFunctionPresetItem>(m_presets[presetIndex].Functions[ef.Name()]).json);
+                                        UI::TreePop();
+                                    }
                                 }
                             }
                         }
