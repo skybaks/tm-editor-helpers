@@ -51,7 +51,7 @@ namespace EditorHelpers
             UI::SameLine();
             Setting_FunctionPresets_Enabled = UI::Checkbox("Enabled", Setting_FunctionPresets_Enabled);
             UI::BeginDisabled(!Setting_FunctionPresets_Enabled);
-            UI::TextWrapped("************************************** TODO **************************************");
+            UI::TextWrapped("The function presets enables you to surgically save the state of the plugin and recall that at any time.");
 
             Setting_FunctionPresets_WindowVisible = UI::Checkbox("Show Additional Window", Setting_FunctionPresets_WindowVisible);
             UI::EndDisabled();
@@ -83,6 +83,11 @@ namespace EditorHelpers
             UI::SetNextWindowSize(550, 350, UI::Cond::FirstUseEver);
             UI::Begin(g_windowName + ": " + Name(), Setting_FunctionPresets_WindowVisible);
 
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Create a new preset");
+                UI::SameLine();
+            }
             if (UI::Button(" New Preset"))
             {
                 m_presets.InsertLast(EditorFunctionPreset());
@@ -92,6 +97,11 @@ namespace EditorHelpers
 
             UI::BeginDisabled(m_deleteConfirm);
             UI::SameLine();
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Delete the currently selected preset");
+                UI::SameLine();
+            }
             if (UI::Button(" Delete Selected Preset"))
             {
                 m_deleteConfirm = true;
@@ -121,6 +131,11 @@ namespace EditorHelpers
                 }
             }
 
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Change the name of the currently selected preset");
+                UI::SameLine();
+            }
             m_presetNewName = UI::InputText("##SetNameInputText", m_presetNewName);
             UI::SameLine();
             if (UI::Button("Set Name")
@@ -145,6 +160,11 @@ namespace EditorHelpers
                     if (UI::BeginTable("FunctionPresetsTabBarTable", 2 /* cols */))
                     {
                         UI::TableNextColumn();
+                        if (settingToolTipsEnabled)
+                        {
+                            EditorHelpers::HelpMarker("Enable or disable individual functions to specify what data the preset should read/write to");
+                            UI::SameLine();
+                        }
                         UI::Text("Enabled Functions");
                         if (UI::BeginChild("FunctionPresetsTabBarTableChildCol1"))
                         {
@@ -170,6 +190,11 @@ namespace EditorHelpers
 
                         UI::TableNextColumn();
                         UI::BeginDisabled(m_presets[m_selectedPresetIndex].Functions.IsEmpty());
+                        if (settingToolTipsEnabled)
+                        {
+                            EditorHelpers::HelpMarker("Update this saved preset data based on what is currently entered in the Editor Helpers window(s)");
+                            UI::SameLine();
+                        }
                         if (UI::Button("Update Preset Data"))
                         {
                             for (uint index = 0; index < functions.Length; index++)
@@ -184,6 +209,11 @@ namespace EditorHelpers
                             SavePresets();
                         }
                         UI::SameLine();
+                        if (settingToolTipsEnabled)
+                        {
+                            EditorHelpers::HelpMarker("Apply the data saved in this preset to the Editor Helpers window(s)");
+                            UI::SameLine();
+                        }
                         if (UI::Button("Apply Preset"))
                         {
                             ApplyPreset(m_selectedPresetIndex);
@@ -208,9 +238,6 @@ namespace EditorHelpers
 
                         UI::EndTable();
                     }
-
-
-
 
                     UI::EndTabItem();
                 }
