@@ -156,6 +156,7 @@ namespace EditorHelpers
 
         string Name() override { return "Default Block Mode"; }
         bool Enabled() override { return Setting_DefaultBlockMode_Enabled; }
+        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -315,6 +316,36 @@ namespace EditorHelpers
                 UI::EndDisabled();
                 UI::PopStyleVar();
             }
+        }
+
+        void SerializePresets(Json::Value@ json) override
+        {
+            json["block_mode"] = Setting_DefaultBlockMode_BlockMode;
+            json["block_mode_enabled"] = Setting_DefaultBlockMode_ActiveBlock;
+            json["item_mode"] = Setting_DefaultBlockMode_ItemMode;
+            json["item_mode_enabled"] = Setting_DefaultBlockMode_ActiveItem;
+            json["macroblock_mode"] = Setting_DefaultBlockMode_MacroblockMode;
+            json["macroblock_mode_enabled"] = Setting_DefaultBlockMode_ActiveMacroblock;
+        }
+
+        void DeserializePresets(Json::Value@ json) override
+        {
+            Setting_DefaultBlockMode_BlockMode = string(json.Get("block_mode", Json::Value("Normal")));
+            Setting_DefaultBlockMode_ActiveBlock = bool(json.Get("block_mode_enabled", Json::Value(false)));
+            Setting_DefaultBlockMode_ItemMode = string(json.Get("item_mode", Json::Value("Normal")));
+            Setting_DefaultBlockMode_ActiveItem = bool(json.Get("item_mode_enabled", Json::Value(false)));
+            Setting_DefaultBlockMode_MacroblockMode = string(json.Get("macroblock_mode", Json::Value("Normal")));
+            Setting_DefaultBlockMode_ActiveMacroblock = bool(json.Get("macroblock_mode_enabled", Json::Value(false)));
+        }
+
+        void RenderPresetValues(Json::Value@ json) override
+        {
+            UI::Text("Block Mode: " + string(json.Get("block_mode", Json::Value("Normal"))));
+            UI::Text("Block Mode Active: " + bool(json.Get("block_mode_enabled", Json::Value(false))));
+            UI::Text("Item Mode: " + string(json.Get("item_mode", Json::Value("Normal"))));
+            UI::Text("Item Mode Active: " + bool(json.Get("item_mode_enabled", Json::Value(false))));
+            UI::Text("Macroblock Mode: " + string(json.Get("macroblock_mode", Json::Value("Normal"))));
+            UI::Text("Macroblock Mode Active: " + bool(json.Get("macroblock_mode_enabled", Json::Value(false))));
         }
     }
 }

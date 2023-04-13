@@ -38,7 +38,7 @@ namespace EditorHelpers
 
         string Name() override { return "Rotation Randomizer"; }
         bool Enabled() override { return Setting_RotationRandomizer_Enabled; }
-        bool SupportsPresets() { return true; }
+        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {

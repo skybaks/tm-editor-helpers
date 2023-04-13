@@ -34,6 +34,7 @@ namespace EditorHelpers
         private uint m_selectedPresetIndex;
         private bool m_forcePresetIndex;
         private string m_presetNewName;
+        private bool m_deleteConfirm;
 
         string Name() override { return "Presets"; }
         bool Enabled() override { return Setting_FunctionPresets_Enabled; }
@@ -89,9 +90,35 @@ namespace EditorHelpers
                 m_selectedPresetIndex = m_presets.Length - 1;
             }
 
+            UI::BeginDisabled(m_deleteConfirm);
             UI::SameLine();
             if (UI::Button(" Delete Selected Preset"))
             {
+                m_deleteConfirm = true;
+            }
+            UI::EndDisabled();
+            if (m_deleteConfirm)
+            {
+                UI::SameLine();
+                UI::Text("Are you sure?");
+                UI::SameLine();
+                if (UI::Button("Yes"))
+                {
+                    if (m_selectedPresetIndex >= 0 && m_selectedPresetIndex < m_presets.Length)
+                    {
+                        m_presets.RemoveAt(m_selectedPresetIndex);
+                        m_forcePresetIndex = true;
+                        m_selectedPresetIndex = m_selectedPresetIndex != 0 ? m_selectedPresetIndex - 1 : 0;
+
+                        SavePresets();
+                    }
+                    m_deleteConfirm = false;
+                }
+                UI::SameLine();
+                if (UI::Button("Cancel"))
+                {
+                    m_deleteConfirm = false;
+                }
             }
 
             m_presetNewName = UI::InputText("##SetNameInputText", m_presetNewName);
@@ -106,20 +133,6 @@ namespace EditorHelpers
                 SavePresets();
             }
 
-            if (UI::Button("Update Selected Preset")
-                && m_selectedPresetIndex >= 0 && m_selectedPresetIndex < m_presets.Length)
-            {
-                for (uint index = 0; index < functions.Length; index++)
-                {
-                    EditorFunction@ ef = functions[index];
-                    if (ef.SupportsPresets() && m_presets[m_selectedPresetIndex].Functions.Exists(ef.Name()))
-                    {
-                        ef.SerializePresets(cast<EditorFunctionPresetItem>(m_presets[m_selectedPresetIndex].Functions[ef.Name()]).json);
-                    }
-                }
-
-                SavePresets();
-            }
 
             UI::BeginTabBar("FunctionPresetsTabBarFunctionPresets");
             for (uint presetIndex = 0; presetIndex < m_presets.Length; ++presetIndex)
@@ -132,6 +145,7 @@ namespace EditorHelpers
                     if (UI::BeginTable("FunctionPresetsTabBarTable", 2 /* cols */))
                     {
                         UI::TableNextColumn();
+                        UI::Text("Enabled Functions");
                         if (UI::BeginChild("FunctionPresetsTabBarTableChildCol1"))
                         {
                             for (uint index = 0; index < functions.Length; index++)
@@ -155,6 +169,25 @@ namespace EditorHelpers
                         UI::EndChild();
 
                         UI::TableNextColumn();
+                        UI::BeginDisabled(m_presets[m_selectedPresetIndex].Functions.IsEmpty());
+                        if (UI::Button("Update Preset Data"))
+                        {
+                            for (uint index = 0; index < functions.Length; index++)
+                            {
+                                EditorFunction@ ef = functions[index];
+                                if (ef.SupportsPresets() && m_presets[m_selectedPresetIndex].Functions.Exists(ef.Name()))
+                                {
+                                    ef.SerializePresets(cast<EditorFunctionPresetItem>(m_presets[m_selectedPresetIndex].Functions[ef.Name()]).json);
+                                }
+                            }
+
+                            SavePresets();
+                        }
+                        UI::SameLine();
+                        if (UI::Button("Apply Preset"))
+                        {
+                            ApplyPreset(m_selectedPresetIndex);
+                        }
                         if (UI::BeginChild("FunctionPresetsTabBarTableChildCol2"))
                         {
                             for (uint index = 0; index < functions.Length; index++)
@@ -171,6 +204,7 @@ namespace EditorHelpers
                             }
                         }
                         UI::EndChild();
+                        UI::EndDisabled();
 
                         UI::EndTable();
                     }
@@ -205,6 +239,27 @@ namespace EditorHelpers
             {
                 LoadPresets();
             }
+        }
+
+        private void ApplyPreset(int presetIndex)
+        {
+            Debug_EnterMethod("ApplyPreset");
+
+            if (presetIndex >= 0 && presetIndex < int(m_presets.Length))
+            {
+                Debug("Applying preset data for name " + m_presets[presetIndex].Name);
+
+                for (uint index = 0; index < functions.Length; index++)
+                {
+                    EditorFunction@ ef = functions[index];
+                    if (ef.SupportsPresets() && m_presets[presetIndex].Functions.Exists(ef.Name()))
+                    {
+                        ef.DeserializePresets(cast<EditorFunctionPresetItem>(m_presets[presetIndex].Functions[ef.Name()]).json);
+                    }
+                }
+            }
+
+            Debug_LeaveMethod();
         }
 
         private void LoadPresets()

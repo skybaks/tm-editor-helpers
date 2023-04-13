@@ -150,6 +150,7 @@ namespace EditorHelpers
 
         string Name() override { return "Mood Changer"; }
         bool Enabled() override { return Setting_MoodChanger_Enabled; }
+        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -264,6 +265,22 @@ namespace EditorHelpers
                 UI::SameLine();
                 EditorHelpers::HelpMarker("Time format is invalid.\nFormat should be HH:MM:SS");
             }
+        }
+
+        void SerializePresets(Json::Value@ json) override
+        {
+            json["time"] = Editor.MoodTimeOfDayStr;
+        }
+
+        void DeserializePresets(Json::Value@ json) override
+        {
+            m_setTime = string(json.Get("time", Json::Value("12:06:00")));
+            m_settingChanged = true;
+        }
+
+        void RenderPresetValues(Json::Value@ json) override
+        {
+            UI::Text("Time: " + string(json.Get("time", Json::Value("12:06:00"))));
         }
     }
 }
