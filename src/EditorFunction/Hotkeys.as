@@ -136,6 +136,7 @@ namespace EditorHelpers
         private VirtualKey[] m_keysDown = {};
         private int m_mapElemColorPrev = 0;
         private int m_mapElemColorPrevPrev = 0;
+        private FunctionPresets@ m_presetsFunctionRef = null;
 
         private string m_rebindKeyName = "";
 
@@ -195,6 +196,20 @@ namespace EditorHelpers
                 HotkeySettingsTableRow("Quicksave", "ActivateQuicksave", Setting_Hotkeys_ActivateQuicksaveHotKey, Setting_Hotkeys_ActivateQuicksaveHotKeyEnabled, Setting_Hotkeys_ActivateQuicksaveHotKeyEnabled);
                 UI::EndDisabled();
 
+                if (m_presetsFunctionRef !is null)
+                {
+                    UI::BeginDisabled(!HotkeyInterface::Enabled_FunctionPresets());
+                    auto@ presets = m_presetsFunctionRef.GetPresets();
+                    for (uint i = 0; i < presets.Length; ++i)
+                    {
+                        if (HotkeySettingsTableRow("Preset: " + presets[i].Name, m_presetsFunctionRef.GetRebindKeyName(i), presets[i].Key, presets[i].HotkeyEnabled, presets[i].HotkeyEnabled))
+                        {
+                            m_presetsFunctionRef.SavePresets();
+                        }
+                    }
+                    UI::EndDisabled();
+                }
+
                 UI::EndTable();
             }
             UI::EndDisabled();
@@ -208,6 +223,19 @@ namespace EditorHelpers
                 m_keysDown.RemoveRange(0, m_keysDown.Length);
                 m_mapElemColorPrev = 0;
                 m_mapElemColorPrevPrev = 0;
+            }
+
+            if (m_presetsFunctionRef is null)
+            {
+                for (uint i = 0; i < functions.Length; ++i)
+                {
+                    @m_presetsFunctionRef = cast<FunctionPresets>(functions[i]);
+
+                    if (m_presetsFunctionRef !is null)
+                    {
+                        break;
+                    }
+                }
             }
         }
 
@@ -239,6 +267,14 @@ namespace EditorHelpers
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Show Editor Placement Grid", Setting_Hotkeys_VisualPlacementGridOnHotKey, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Editor Placement Grid Transparency", Setting_Hotkeys_VisualPlacementGridTransparentHotKey, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Quicksave", Setting_Hotkeys_ActivateQuicksaveHotKey, Setting_Hotkeys_ActivateQuicksaveHotKeyEnabled);
+                if (m_presetsFunctionRef !is null)
+                {
+                    auto@ presets = m_presetsFunctionRef.GetPresets();
+                    for (uint i = 0; i < presets.Length; ++i)
+                    {
+                        activeHotkeysHelper += HotkeyDisplayActiveRow(presets[i].Name, presets[i].Key, presets[i].HotkeyEnabled);
+                    }
+                }
                 UI::Text(activeHotkeysHelper);
                 UI::EndTooltip();
             }
@@ -340,6 +376,10 @@ namespace EditorHelpers
                 {
                     Setting_Hotkeys_ActivateQuicksaveHotKey = key;
                 }
+                else if (m_presetsFunctionRef !is null)
+                {
+                    m_presetsFunctionRef.RebindPresetKey(m_rebindKeyName, key);
+                }
 
                 m_rebindKeyName = "";
                 Debug_LeaveMethod();
@@ -369,6 +409,7 @@ namespace EditorHelpers
                 OnKeyPress_VisualPlacementGridOn(key);
                 OnKeyPress_VisualPlacementGridTransparent(key);
                 OnKeyPress_ActivateQuicksave(key);
+                OnKeyPress_FunctionPresets(key);
             }
 
             Debug_LeaveMethod();
@@ -550,15 +591,36 @@ namespace EditorHelpers
             Debug_LeaveMethod();
         }
 
-        private void HotkeySettingsTableRow(const string&in title, const string&in rebindName, const VirtualKey&in currentKey, bool&in enabledIn, bool&out enabledOut)
+        private void OnKeyPress_FunctionPresets(const VirtualKey&in key)
         {
+            Debug_EnterMethod("OnKeyPress_FunctionPresets");
+            if (m_presetsFunctionRef !is null)
+            {
+                auto@ presets = m_presetsFunctionRef.GetPresets();
+                for (uint i = 0; i < presets.Length; ++i)
+                {
+                    if (presets[i].HotkeyEnabled && presets[i].Key == key)
+                    {
+                        ShowHotkeyNotification("Preset: " + presets[i].Name, key);
+                        m_presetsFunctionRef.ApplyPreset(presets[i]);
+                    }
+                }
+            }
+            Debug_LeaveMethod();
+        }
+
+        private bool HotkeySettingsTableRow(const string&in title, const string&in rebindName, const VirtualKey&in currentKey, bool&in enabledIn, bool&out enabledOut)
+        {
+            bool changed = false;
             UI::TableNextRow();
             UI::TableNextColumn();
             UI::Text(title);
             UI::TableNextColumn();
             UI::Text(tostring(currentKey));
             UI::TableNextColumn();
-            enabledOut = UI::Checkbox("Enabled##" + rebindName, enabledIn);
+            bool newEnabled = UI::Checkbox("Enabled##" + rebindName, enabledIn);
+            changed = newEnabled != enabledIn;
+            enabledOut = newEnabled;
             UI::TableNextColumn();
             if (m_rebindKeyName == rebindName)
             {
@@ -571,6 +633,7 @@ namespace EditorHelpers
             {
                 m_rebindKeyName = rebindName;
             }
+            return changed;
         }
 
         private string HotkeyDisplayActiveRow(const string&in title, const VirtualKey&in key, const bool&in enabled)

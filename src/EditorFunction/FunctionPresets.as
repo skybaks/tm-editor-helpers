@@ -17,16 +17,28 @@ namespace EditorHelpers
         {
             Name = "Preset";
             Functions = {};
+            HotkeyEnabled = false;
+            VirtualKey Key = VirtualKey::B;
         }
 
         string Name;
         dictionary Functions;
+        bool HotkeyEnabled;
+        VirtualKey Key;
+    }
+
+    namespace HotkeyInterface
+    {
+        bool Enabled_FunctionPresets()
+        {
+            return Setting_FunctionPresets_Enabled;
+        }
     }
 
     [Setting category="Functions" name="Function Presets: Enabled" hidden]
     bool Setting_FunctionPresets_Enabled = true;
     [Setting category="Functions" name="Function Presets: Window Visible" hidden]
-    bool Setting_FunctionPresets_WindowVisible = true;
+    bool Setting_FunctionPresets_WindowVisible = false;
 
     class FunctionPresets : EditorHelpers::EditorFunction
     {
@@ -216,7 +228,7 @@ namespace EditorHelpers
                         }
                         if (UI::Button("Apply Preset"))
                         {
-                            ApplyPreset(m_selectedPresetIndex);
+                            ApplyPreset(m_presets[m_selectedPresetIndex]);
                         }
                         if (UI::BeginChild("FunctionPresetsTabBarTableChildCol2"))
                         {
@@ -268,25 +280,46 @@ namespace EditorHelpers
             }
         }
 
-        private void ApplyPreset(int presetIndex)
+        array<EditorFunctionPreset@>@ GetPresets() { return m_presets; }
+
+        void ApplyPreset(EditorFunctionPreset@ preset)
         {
             Debug_EnterMethod("ApplyPreset");
 
-            if (presetIndex >= 0 && presetIndex < int(m_presets.Length))
-            {
-                Debug("Applying preset data for name " + m_presets[presetIndex].Name);
+            Debug("Applying preset data for name " + preset.Name);
 
-                for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                EditorFunction@ ef = functions[index];
+                if (ef.SupportsPresets() && preset.Functions.Exists(ef.Name()))
                 {
-                    EditorFunction@ ef = functions[index];
-                    if (ef.SupportsPresets() && m_presets[presetIndex].Functions.Exists(ef.Name()))
-                    {
-                        ef.DeserializePresets(cast<EditorFunctionPresetItem>(m_presets[presetIndex].Functions[ef.Name()]).json);
-                    }
+                    ef.DeserializePresets(cast<EditorFunctionPresetItem>(preset.Functions[ef.Name()]).json);
                 }
             }
 
             Debug_LeaveMethod();
+        }
+
+        string GetRebindKeyName(const uint&in presetIndex)
+        {
+            if (presetIndex < 0 || presetIndex >= m_presets.Length)
+            {
+                return "";
+            }
+            return "Preset" + m_presets[presetIndex].Name + tostring(presetIndex);
+        }
+
+        void RebindPresetKey(const string&in rebindName, const VirtualKey&in key)
+        {
+            for (uint i = 0; i < m_presets.Length; ++i)
+            {
+                if (rebindName == GetRebindKeyName(i))
+                {
+                    m_presets[i].Key = key;
+                    SavePresets();
+                    break;
+                }
+            }
         }
 
         private void LoadPresets()
@@ -306,6 +339,8 @@ namespace EditorHelpers
             {
                 auto newPreset = EditorFunctionPreset();
                 newPreset.Name = presets[presetIndex].Get("name", Json::Value("Preset"));
+                newPreset.HotkeyEnabled = presets[presetIndex].Get("hotkey_enabled", Json::Value(false));
+                newPreset.Key = VirtualKey(int(presets[presetIndex].Get("hotkey", Json::Value(66))));
 
                 auto functions = presets[presetIndex].Get("functions", Json::Object());
                 array<string>@ functionKeys = functions.GetKeys();
@@ -324,7 +359,7 @@ namespace EditorHelpers
             Debug_LeaveMethod();
         }
 
-        private void SavePresets()
+        void SavePresets()
         {
             Debug_EnterMethod("SavePresets");
 
@@ -338,6 +373,8 @@ namespace EditorHelpers
 
                 preset["name"] = m_presets[presetIndex].Name;
                 preset["functions"] = Json::Object();
+                preset["hotkey_enabled"] = m_presets[presetIndex].HotkeyEnabled;
+                preset["hotkey"] = int(m_presets[presetIndex].Key);
 
                 auto keys = m_presets[presetIndex].Functions.GetKeys();
                 for (uint keyIndex = 0; keyIndex < keys.Length; ++keyIndex)
