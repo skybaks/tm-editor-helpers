@@ -12,8 +12,7 @@ namespace EditorHelpers
         bool Enabled(){ return false; }
         bool HasSettingsEntry() { return true; }
         bool SupportsPresets() { return false; }
-        bool get_PresetConfigMode() { return m_presetConfigMode; }
-        void set_PresetConfigMode(bool value) { m_presetConfigMode = value; }
+        bool PresetConfigMode { get { return m_presetConfigMode; } set { m_presetConfigMode = value; } }
         void Init(){}
         void RenderInterface_Action(){}
         void RenderInterface_Display(){}

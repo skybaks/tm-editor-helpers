@@ -86,11 +86,8 @@ namespace EditorHelpers
         {
             if (!Enabled() || !Setting_FunctionPresets_WindowVisible)
             {
-                g_presetConfigMode = false;
                 return;
             }
-
-            g_presetConfigMode = true;
 
             UI::SetNextWindowSize(550, 350, UI::Cond::FirstUseEver);
             UI::Begin(g_windowName + ": " + Name(), Setting_FunctionPresets_WindowVisible);
@@ -202,6 +199,24 @@ namespace EditorHelpers
 
                         UI::TableNextColumn();
                         UI::BeginDisabled(m_presets[m_selectedPresetIndex].Functions.IsEmpty());
+
+                        if (settingToolTipsEnabled)
+                        {
+                            EditorHelpers::HelpMarker("Configure the preset hotkey in the Openplanet settings menu");
+                            UI::SameLine();
+                        }
+                        string hotkeyText = "Hotkey: ";
+                        if (!m_presets[m_selectedPresetIndex].HotkeyEnabled)
+                        {
+                            hotkeyText += "Disabled";
+                        }
+                        else
+                        {
+                            hotkeyText += tostring(m_presets[m_selectedPresetIndex].Key);
+                        }
+                        UI::Text(hotkeyText);
+                        UI::Separator();
+
                         if (settingToolTipsEnabled)
                         {
                             EditorHelpers::HelpMarker("Update this saved preset data based on what is currently entered in the Editor Helpers window(s)");
