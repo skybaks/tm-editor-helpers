@@ -202,6 +202,7 @@ namespace EditorHelpers
             Setting_FreeblockModePreciseRotation_StepSizeName = string(json.Get("step_size", Json::Value("Default")));
             inputPitch = float(json.Get("pitch", Json::Value(0.0f)));
             inputRoll = float(json.Get("roll", Json::Value(0.0f)));
+            newInputToApply = true;
         }
 
         void RenderPresetValues(Json::Value@ json) override

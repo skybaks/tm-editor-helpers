@@ -94,6 +94,7 @@ namespace EditorHelpers
         void DeserializePresets(Json::Value@ json) override
         {
             Setting_CameraMode_CurrentMode = string(json.Get("camera", Json::Value("Orbital")));
+            SettingUpdated = true;
         }
 
         void RenderPresetValues(Json::Value@ json) override
