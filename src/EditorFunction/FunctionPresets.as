@@ -121,7 +121,7 @@ namespace EditorHelpers
                 return;
             }
 
-            UI::SetNextWindowSize(550, 350, UI::Cond::FirstUseEver);
+            UI::SetNextWindowSize(580, 350, UI::Cond::FirstUseEver);
             UI::Begin(g_windowName + ": " + Name(), Setting_FunctionPresets_WindowVisible);
 
             if (settingToolTipsEnabled)
@@ -202,7 +202,7 @@ namespace EditorHelpers
                     {
                         if (UI::BeginTable("FunctionPresetsTabBarTable", 2 /* cols */))
                         {
-                            UI::TableSetupColumn("Col1", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 200.0);
+                            UI::TableSetupColumn("Col1", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 250.0);
                             UI::TableSetupColumn("Col2");
 
                             UI::TableNextColumn();

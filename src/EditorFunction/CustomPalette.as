@@ -167,7 +167,7 @@ namespace EditorHelpers
                 return;
             }
 
-            UI::SetNextWindowSize(550, 350, UI::Cond::FirstUseEver);
+            UI::SetNextWindowSize(580, 350, UI::Cond::FirstUseEver);
             UI::Begin(g_windowName + ": " + Name(), Setting_CustomPalette_WindowVisible);
 
             UI::BeginTabBar("CustomPaletteTabBar");
