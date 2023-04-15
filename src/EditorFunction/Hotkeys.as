@@ -272,7 +272,7 @@ namespace EditorHelpers
                     auto@ presets = m_presetsFunctionRef.GetPresets();
                     for (uint i = 0; i < presets.Length; ++i)
                     {
-                        activeHotkeysHelper += HotkeyDisplayActiveRow(presets[i].Name, presets[i].Key, presets[i].HotkeyEnabled);
+                        activeHotkeysHelper += HotkeyDisplayActiveRow("Preset: " + presets[i].Name, presets[i].Key, presets[i].HotkeyEnabled);
                     }
                 }
                 UI::Text(activeHotkeysHelper);

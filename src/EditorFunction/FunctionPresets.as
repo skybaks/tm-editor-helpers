@@ -39,6 +39,8 @@ namespace EditorHelpers
     bool Setting_FunctionPresets_Enabled = true;
     [Setting category="Functions" name="Function Presets: Window Visible" hidden]
     bool Setting_FunctionPresets_WindowVisible = false;
+    [Setting category="Functions" name="Function Presets: Show Activate Buttons" hidden]
+    bool Setting_FunctionPresets_ShowActivateButtons = true;
 
     class FunctionPresets : EditorHelpers::EditorFunction
     {
@@ -63,11 +65,41 @@ namespace EditorHelpers
             UI::SameLine();
             Setting_FunctionPresets_Enabled = UI::Checkbox("Enabled", Setting_FunctionPresets_Enabled);
             UI::BeginDisabled(!Setting_FunctionPresets_Enabled);
-            UI::TextWrapped("The function presets enables you to surgically save the state of the plugin and recall that at any time.");
+            string settingsDescription = "The function presets enables you to surgically save the state of the"
+            " plugin and recall it at any time. Add, remove, and configure presets from the additional presets window."
+            " You can also bind hotkeys to your defined presets through the hotkey settings.";
+            UI::TextWrapped(settingsDescription);
 
             Setting_FunctionPresets_WindowVisible = UI::Checkbox("Show Additional Window", Setting_FunctionPresets_WindowVisible);
+            Setting_FunctionPresets_ShowActivateButtons = UI::Checkbox("Show Preset Buttons on Action tab", Setting_FunctionPresets_ShowActivateButtons);
             UI::EndDisabled();
             UI::PopID();
+        }
+
+        void RenderInterface_Action() override
+        {
+            if (!Enabled()) { return; }
+
+            if (Setting_FunctionPresets_ShowActivateButtons)
+            {
+                for (uint i = 0; i < m_presets.Length; ++i)
+                {
+                    if (settingToolTipsEnabled)
+                    {
+                        string helperText = "Click this button to activate the " + m_presets[i].Name + " preset";
+                        if (m_presets[i].HotkeyEnabled)
+                        {
+                            helperText += " or use the hotkey [" + tostring(m_presets[i].Key) + "]";
+                        }
+                        EditorHelpers::HelpMarker(helperText);
+                        UI::SameLine();
+                    }
+                    if (UI::Button("Preset: " + m_presets[i].Name))
+                    {
+                        ApplyPreset(m_presets[i]);
+                    }
+                }
+            }
         }
 
         void RenderInterface_Display() override
