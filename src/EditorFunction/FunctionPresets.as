@@ -198,105 +198,114 @@ namespace EditorHelpers
                 {
                     m_selectedPresetIndex = presetIndex;
 
-                    if (UI::BeginTable("FunctionPresetsTabBarTable", 2 /* cols */))
+                    if (UI::BeginChild("FunctionPresetsTabBarFunctionPresetsChild", flags: int(UI::WindowFlags::NoScrollbar)))
                     {
-                        UI::TableNextColumn();
-                        if (settingToolTipsEnabled)
+                        if (UI::BeginTable("FunctionPresetsTabBarTable", 2 /* cols */))
                         {
-                            EditorHelpers::HelpMarker("Enable or disable individual functions to specify what data the preset should read/write to");
-                            UI::SameLine();
-                        }
-                        UI::Text("Enabled Functions");
-                        if (UI::BeginChild("FunctionPresetsTabBarTableChildCol1"))
-                        {
-                            for (uint index = 0; index < functions.Length; index++)
-                            {
-                                EditorFunction@ ef = functions[index];
-                                if (ef.SupportsPresets())
-                                {
-                                    ef.PresetConfigMode = UI::Checkbox(ef.Name() + "##" + tostring(index), m_presets[presetIndex].Functions.Exists(ef.Name()));
+                            UI::TableSetupColumn("Col1", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 200.0);
+                            UI::TableSetupColumn("Col2");
 
-                                    if (ef.PresetConfigMode && !m_presets[presetIndex].Functions.Exists(ef.Name()))
-                                    {
-                                        m_presets[presetIndex].Functions.Set(ef.Name(), EditorFunctionPresetItem());
-                                    }
-                                    else if (!ef.PresetConfigMode && m_presets[presetIndex].Functions.Exists(ef.Name()))
-                                    {
-                                        m_presets[presetIndex].Functions.Delete(ef.Name());
-                                    }
-                                }
+                            UI::TableNextColumn();
+                            if (settingToolTipsEnabled)
+                            {
+                                EditorHelpers::HelpMarker("Enable or disable individual functions to specify what data the preset should read/write to");
+                                UI::SameLine();
                             }
-                        }
-                        UI::EndChild();
-
-                        UI::TableNextColumn();
-                        UI::BeginDisabled(m_presets[m_selectedPresetIndex].Functions.IsEmpty());
-
-                        if (settingToolTipsEnabled)
-                        {
-                            EditorHelpers::HelpMarker("Configure the preset hotkey in the Openplanet settings menu");
-                            UI::SameLine();
-                        }
-                        string hotkeyText = "Hotkey: ";
-                        if (!m_presets[m_selectedPresetIndex].HotkeyEnabled)
-                        {
-                            hotkeyText += "Disabled";
-                        }
-                        else
-                        {
-                            hotkeyText += tostring(m_presets[m_selectedPresetIndex].Key);
-                        }
-                        UI::Text(hotkeyText);
-                        UI::Separator();
-
-                        if (settingToolTipsEnabled)
-                        {
-                            EditorHelpers::HelpMarker("Update this saved preset data based on what is currently entered in the Editor Helpers window(s)");
-                            UI::SameLine();
-                        }
-                        if (UI::Button("Update Preset Data"))
-                        {
-                            for (uint index = 0; index < functions.Length; index++)
+                            UI::Text("Enabled Functions");
+                            if (UI::BeginChild("FunctionPresetsTabBarTableChildCol1"))
                             {
-                                EditorFunction@ ef = functions[index];
-                                if (ef.SupportsPresets() && m_presets[m_selectedPresetIndex].Functions.Exists(ef.Name()))
+                                for (uint index = 0; index < functions.Length; index++)
                                 {
-                                    ef.SerializePresets(cast<EditorFunctionPresetItem>(m_presets[m_selectedPresetIndex].Functions[ef.Name()]).json);
-                                }
-                            }
-
-                            SavePresets();
-                        }
-                        UI::SameLine();
-                        if (settingToolTipsEnabled)
-                        {
-                            EditorHelpers::HelpMarker("Apply the data saved in this preset to the Editor Helpers window(s)");
-                            UI::SameLine();
-                        }
-                        if (UI::Button("Apply Preset"))
-                        {
-                            ApplyPreset(m_presets[m_selectedPresetIndex]);
-                        }
-                        if (UI::BeginChild("FunctionPresetsTabBarTableChildCol2"))
-                        {
-                            for (uint index = 0; index < functions.Length; index++)
-                            {
-                                EditorFunction@ ef = functions[index];
-                                if (ef.SupportsPresets() && m_presets[presetIndex].Functions.Exists(ef.Name()))
-                                {
-                                    if (UI::TreeNode(ef.Name() + "##" + presetIndex, UI::TreeNodeFlags::DefaultOpen))
+                                    EditorFunction@ ef = functions[index];
+                                    if (ef.SupportsPresets())
                                     {
-                                        ef.RenderPresetValues(cast<EditorFunctionPresetItem>(m_presets[presetIndex].Functions[ef.Name()]).json);
-                                        UI::TreePop();
+                                        ef.PresetConfigMode = UI::Checkbox(ef.Name() + "##" + tostring(index), m_presets[presetIndex].Functions.Exists(ef.Name()));
+
+                                        if (ef.PresetConfigMode && !m_presets[presetIndex].Functions.Exists(ef.Name()))
+                                        {
+                                            m_presets[presetIndex].Functions.Set(ef.Name(), EditorFunctionPresetItem());
+                                            SavePresets();
+                                        }
+                                        else if (!ef.PresetConfigMode && m_presets[presetIndex].Functions.Exists(ef.Name()))
+                                        {
+                                            m_presets[presetIndex].Functions.Delete(ef.Name());
+                                            SavePresets();
+                                        }
                                     }
                                 }
                             }
-                        }
-                        UI::EndChild();
-                        UI::EndDisabled();
+                            UI::EndChild();
 
-                        UI::EndTable();
+                            UI::TableNextColumn();
+                            UI::BeginDisabled(m_presets[m_selectedPresetIndex].Functions.IsEmpty());
+
+                            if (settingToolTipsEnabled)
+                            {
+                                EditorHelpers::HelpMarker("Configure the preset hotkey in the Openplanet settings menu");
+                                UI::SameLine();
+                            }
+                            string hotkeyText = "Hotkey: ";
+                            if (!m_presets[m_selectedPresetIndex].HotkeyEnabled)
+                            {
+                                hotkeyText += "Disabled";
+                            }
+                            else
+                            {
+                                hotkeyText += tostring(m_presets[m_selectedPresetIndex].Key);
+                            }
+                            UI::Text(hotkeyText);
+                            UI::Separator();
+
+                            if (settingToolTipsEnabled)
+                            {
+                                EditorHelpers::HelpMarker("Update this saved preset data based on what is currently entered in the Editor Helpers window(s)");
+                                UI::SameLine();
+                            }
+                            if (UI::Button("Update Preset Data"))
+                            {
+                                for (uint index = 0; index < functions.Length; index++)
+                                {
+                                    EditorFunction@ ef = functions[index];
+                                    if (ef.SupportsPresets() && m_presets[m_selectedPresetIndex].Functions.Exists(ef.Name()))
+                                    {
+                                        ef.SerializePresets(cast<EditorFunctionPresetItem>(m_presets[m_selectedPresetIndex].Functions[ef.Name()]).json);
+                                    }
+                                }
+
+                                SavePresets();
+                            }
+                            UI::SameLine();
+                            if (settingToolTipsEnabled)
+                            {
+                                EditorHelpers::HelpMarker("Apply the data saved in this preset to the Editor Helpers window(s)");
+                                UI::SameLine();
+                            }
+                            if (UI::Button("Apply Preset"))
+                            {
+                                ApplyPreset(m_presets[m_selectedPresetIndex]);
+                            }
+                            if (UI::BeginChild("FunctionPresetsTabBarTableChildCol2"))
+                            {
+                                for (uint index = 0; index < functions.Length; index++)
+                                {
+                                    EditorFunction@ ef = functions[index];
+                                    if (ef.SupportsPresets() && m_presets[presetIndex].Functions.Exists(ef.Name()))
+                                    {
+                                        if (UI::TreeNode(ef.Name() + "##" + presetIndex, UI::TreeNodeFlags::DefaultOpen))
+                                        {
+                                            ef.RenderPresetValues(cast<EditorFunctionPresetItem>(m_presets[presetIndex].Functions[ef.Name()]).json);
+                                            UI::TreePop();
+                                        }
+                                    }
+                                }
+                            }
+                            UI::EndChild();
+                            UI::EndDisabled();
+
+                            UI::EndTable();
+                        }
                     }
+                    UI::EndChild();
 
                     UI::EndTabItem();
                 }
