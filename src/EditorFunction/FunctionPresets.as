@@ -35,7 +35,7 @@ namespace EditorHelpers
             Name = "Preset";
             Functions = {};
             HotkeyEnabled = false;
-            VirtualKey Key = VirtualKey::B;
+            Key = VirtualKey::B;
         }
 
         EditorFunctionPresetItem@ GetItem(const string&in name)
@@ -75,7 +75,7 @@ namespace EditorHelpers
     {
         private array<EditorFunctionPreset@> m_presets;
         private uint m_selectedPresetIndex;
-        private bool m_forcePresetIndex;
+        private int m_forcePresetIndex;
         private string m_presetNewName;
         private bool m_deleteConfirm;
         private bool m_signalSave;
@@ -162,8 +162,7 @@ namespace EditorHelpers
             if (UI::Button(" New Preset"))
             {
                 m_presets.InsertLast(EditorFunctionPreset());
-                m_forcePresetIndex = true;
-                m_selectedPresetIndex = m_presets.Length - 1;
+                m_forcePresetIndex = m_presets.Length - 1;
             }
 
             UI::BeginDisabled(m_deleteConfirm);
@@ -188,8 +187,7 @@ namespace EditorHelpers
                     if (m_selectedPresetIndex >= 0 && m_selectedPresetIndex < m_presets.Length)
                     {
                         m_presets.RemoveAt(m_selectedPresetIndex);
-                        m_forcePresetIndex = true;
-                        m_selectedPresetIndex = m_selectedPresetIndex != 0 ? m_selectedPresetIndex - 1 : 0;
+                        m_forcePresetIndex = m_selectedPresetIndex != 0 ? m_selectedPresetIndex - 1 : 0;
 
                         m_signalSave = true;
                     }
@@ -214,7 +212,7 @@ namespace EditorHelpers
             {
                 m_presets[m_selectedPresetIndex].Name = m_presetNewName;
                 m_presetNewName = "";
-                m_forcePresetIndex = true;
+                m_forcePresetIndex = m_selectedPresetIndex;
 
                 m_signalSave = true;
             }
@@ -223,7 +221,7 @@ namespace EditorHelpers
             UI::BeginTabBar("FunctionPresetsTabBarFunctionPresets");
             for (uint presetIndex = 0; presetIndex < m_presets.Length; ++presetIndex)
             {
-                UI::TabItemFlags flags = m_forcePresetIndex && presetIndex == m_selectedPresetIndex ? UI::TabItemFlags::SetSelected : UI::TabItemFlags::None;
+                UI::TabItemFlags flags = int(presetIndex) == m_forcePresetIndex ? UI::TabItemFlags::SetSelected : UI::TabItemFlags::None;
                 if (UI::BeginTabItem(m_presets[presetIndex].Name + "##" + tostring(presetIndex), flags))
                 {
                     m_selectedPresetIndex = presetIndex;
@@ -370,7 +368,7 @@ namespace EditorHelpers
                     UI::EndTabItem();
                 }
             }
-            m_forcePresetIndex = false;
+            m_forcePresetIndex = -1;
             UI::EndTabBar();
 
             UI::End();

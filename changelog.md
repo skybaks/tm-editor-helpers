@@ -2,6 +2,10 @@
 * Slight improvement to wording of freeblock placement tooltips
 * Fix bug where entering editor does not update podium status
 * Add some useful links to the Info section
+* Add Presets feature
+  * Create a custom preset to recall specific settings at any time
+  * Add an optional hotkey to each preset
+* Fix bug where tab wouldnt autoselect when creating a new palette
 
 
 # 5.15
