@@ -110,7 +110,7 @@ namespace EditorHelpers
         private CGameCtnArticleNodeArticle@ m_selectedArticlePrev;
         private EditorInventoryPalette@[] m_palettes;
         private uint m_selectedPaletteIndex;
-        private bool m_forcePaletteIndex;
+        private int m_forcePaletteIndex;
         private string m_paletteNewName;
         private bool m_deleteConfirm;
         private PaletteRandomizerMode m_paletteRandomize;
@@ -142,7 +142,7 @@ namespace EditorHelpers
                 m_filterStringPrev = "";
                 @m_selectedArticlePrev = null;
                 HotkeyInterface::g_CustomPalette_QuickswitchPreviousTrigger = false;
-                m_forcePaletteIndex = false;
+                m_forcePaletteIndex = -1;
                 m_deleteConfirm = false;
                 m_paletteRandomize = PaletteRandomizerMode::NONE;
             }
@@ -167,7 +167,7 @@ namespace EditorHelpers
                 return;
             }
 
-            UI::SetNextWindowSize(550, 350, UI::Cond::FirstUseEver);
+            UI::SetNextWindowSize(580, 350, UI::Cond::FirstUseEver);
             UI::Begin(g_windowName + ": " + Name(), Setting_CustomPalette_WindowVisible);
 
             UI::BeginTabBar("CustomPaletteTabBar");
@@ -208,8 +208,7 @@ namespace EditorHelpers
                     if (UI::Button(" New Palette"))
                     {
                         m_palettes.InsertLast(EditorInventoryPalette());
-                        m_forcePaletteIndex = true;
-                        m_selectedPaletteIndex = m_palettes.Length - 1;
+                        m_forcePaletteIndex = m_palettes.Length - 1;
                     }
                     UI::BeginDisabled(m_deleteConfirm);
                     UI::SameLine();
@@ -233,8 +232,7 @@ namespace EditorHelpers
                             if (m_selectedPaletteIndex >= 0 && m_selectedPaletteIndex < m_palettes.Length)
                             {
                                 m_palettes.RemoveAt(m_selectedPaletteIndex);
-                                m_forcePaletteIndex = true;
-                                m_selectedPaletteIndex = m_selectedPaletteIndex != 0 ? m_selectedPaletteIndex - 1 : 0;
+                                m_forcePaletteIndex = m_selectedPaletteIndex != 0 ? m_selectedPaletteIndex - 1 : 0;
                             }
                             m_deleteConfirm = false;
 
@@ -259,7 +257,7 @@ namespace EditorHelpers
                     {
                         m_palettes[m_selectedPaletteIndex].Name = m_paletteNewName;
                         m_paletteNewName = "";
-                        m_forcePaletteIndex = true;
+                        m_forcePaletteIndex = m_selectedPaletteIndex;
 
                         SavePalettes();
                     }
@@ -323,7 +321,7 @@ namespace EditorHelpers
                 UI::BeginTabBar("CustomPaletteTabBarCustomPalettes");
                 for (uint paletteIndex = 0; paletteIndex < m_palettes.Length; ++paletteIndex)
                 {
-                    UI::TabItemFlags flags = m_forcePaletteIndex && paletteIndex == m_selectedPaletteIndex ? UI::TabItemFlags::SetSelected : UI::TabItemFlags::None;
+                    UI::TabItemFlags flags = int(paletteIndex) == m_forcePaletteIndex ? UI::TabItemFlags::SetSelected : UI::TabItemFlags::None;
                     if (UI::BeginTabItem(m_palettes[paletteIndex].Name + "##" + tostring(paletteIndex), flags))
                     {
                         m_selectedPaletteIndex = paletteIndex;
@@ -332,7 +330,7 @@ namespace EditorHelpers
                         UI::EndTabItem();
                     }
                 }
-                m_forcePaletteIndex = false;
+                m_forcePaletteIndex = -1;
                 UI::EndTabBar();
 
                 UI::EndTabItem();

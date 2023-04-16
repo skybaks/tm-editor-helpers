@@ -36,6 +36,7 @@ namespace EditorHelpers
 
         string Name() override { return "Camera Modes"; }
         bool Enabled() override { return Setting_CameraMode_Enabled; }
+        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -83,6 +84,35 @@ namespace EditorHelpers
                 }
                 UI::EndCombo();
             }
+        }
+
+        void SerializePresets(Json::Value@ json) override
+        {
+            json["camera"] = Setting_CameraMode_CurrentMode;
+        }
+
+        void DeserializePresets(Json::Value@ json) override
+        {
+            if (bool(json.Get("enable_camera", Json::Value(true))))
+            {
+                Setting_CameraMode_CurrentMode = string(json.Get("camera", Json::Value("Orbital")));
+                SettingUpdated = true;
+            }
+        }
+
+        void RenderPresetValues(Json::Value@ json) override
+        {
+            if (bool(json.Get("enable_camera", Json::Value(true))))
+            {
+                UI::Text("Camera Mode: " + string(json.Get("camera", Json::Value("Orbital"))));
+            }
+        }
+
+        bool RenderPresetEnables(Json::Value@ json) override
+        {
+            bool changed = false;
+            if (JsonCheckboxChanged(json, "enable_camera", "Camera")) { changed = true; }
+            return changed;
         }
     }
 }

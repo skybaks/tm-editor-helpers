@@ -40,6 +40,7 @@ namespace EditorHelpers
 
         string Name() override { return "Block Helpers"; }
         bool Enabled() override { return Setting_BlockHelpers_Enabled; }
+        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -86,6 +87,34 @@ namespace EditorHelpers
                 Compatibility::SetHideBlockHelpers(Editor, false);
             }
             lastBlockHelpersOff = Setting_BlockHelpers_BlockHelpersOff;
+        }
+
+        void SerializePresets(Json::Value@ json) override
+        {
+            json["helpers_off"] = Setting_BlockHelpers_BlockHelpersOff;
+        }
+
+        void DeserializePresets(Json::Value@ json) override
+        {
+            if (bool(json.Get("enable_helpers_off", Json::Value(true))))
+            {
+                Setting_BlockHelpers_BlockHelpersOff = bool(json.Get("helpers_off", Json::Value(false)));
+            }
+        }
+
+        void RenderPresetValues(Json::Value@ json) override
+        {
+            if (bool(json.Get("enable_helpers_off", Json::Value(true))))
+            {
+                UI::Text("Block Helpers Off: " + bool(json.Get("helpers_off", Json::Value(false))));
+            }
+        }
+
+        bool RenderPresetEnables(Json::Value@ json) override
+        {
+            bool changed = false;
+            if (JsonCheckboxChanged(json, "enable_helpers_off", "Helpers Off")) { changed = true; }
+            return changed;
         }
     }
 }

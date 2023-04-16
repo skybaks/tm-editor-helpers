@@ -29,6 +29,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::PodiumReminder()
     , EditorHelpers::CursorPosition()
     , EditorHelpers::Links()
+    , EditorHelpers::FunctionPresets()
 };
 
 namespace Compatibility
