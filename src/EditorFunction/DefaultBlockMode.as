@@ -330,22 +330,49 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
-            Setting_DefaultBlockMode_BlockMode = string(json.Get("block_mode", Json::Value("Normal")));
-            Setting_DefaultBlockMode_ActiveBlock = bool(json.Get("block_mode_enabled", Json::Value(false)));
-            Setting_DefaultBlockMode_ItemMode = string(json.Get("item_mode", Json::Value("Normal")));
-            Setting_DefaultBlockMode_ActiveItem = bool(json.Get("item_mode_enabled", Json::Value(false)));
-            Setting_DefaultBlockMode_MacroblockMode = string(json.Get("macroblock_mode", Json::Value("Normal")));
-            Setting_DefaultBlockMode_ActiveMacroblock = bool(json.Get("macroblock_mode_enabled", Json::Value(false)));
+            if (bool(json.Get("enable_block_mode", Json::Value(true))))
+            {
+                Setting_DefaultBlockMode_BlockMode = string(json.Get("block_mode", Json::Value("Normal")));
+                Setting_DefaultBlockMode_ActiveBlock = bool(json.Get("block_mode_enabled", Json::Value(false)));
+            }
+            if (bool(json.Get("enable_item_mode", Json::Value(true))))
+            {
+                Setting_DefaultBlockMode_ItemMode = string(json.Get("item_mode", Json::Value("Normal")));
+                Setting_DefaultBlockMode_ActiveItem = bool(json.Get("item_mode_enabled", Json::Value(false)));
+            }
+            if (bool(json.Get("enable_macroblock_mode", Json::Value(true))))
+            {
+                Setting_DefaultBlockMode_MacroblockMode = string(json.Get("macroblock_mode", Json::Value("Normal")));
+                Setting_DefaultBlockMode_ActiveMacroblock = bool(json.Get("macroblock_mode_enabled", Json::Value(false)));
+            }
         }
 
         void RenderPresetValues(Json::Value@ json) override
         {
-            UI::Text("Block Mode: " + string(json.Get("block_mode", Json::Value("Normal"))));
-            UI::Text("Block Mode Active: " + bool(json.Get("block_mode_enabled", Json::Value(false))));
-            UI::Text("Item Mode: " + string(json.Get("item_mode", Json::Value("Normal"))));
-            UI::Text("Item Mode Active: " + bool(json.Get("item_mode_enabled", Json::Value(false))));
-            UI::Text("Macroblock Mode: " + string(json.Get("macroblock_mode", Json::Value("Normal"))));
-            UI::Text("Macroblock Mode Active: " + bool(json.Get("macroblock_mode_enabled", Json::Value(false))));
+            if (bool(json.Get("enable_block_mode", Json::Value(true))))
+            {
+                UI::Text("Block Mode: " + string(json.Get("block_mode", Json::Value("Normal"))));
+                UI::Text("Block Mode Active: " + bool(json.Get("block_mode_enabled", Json::Value(false))));
+            }
+            if (bool(json.Get("enable_item_mode", Json::Value(true))))
+            {
+                UI::Text("Item Mode: " + string(json.Get("item_mode", Json::Value("Normal"))));
+                UI::Text("Item Mode Active: " + bool(json.Get("item_mode_enabled", Json::Value(false))));
+            }
+            if (bool(json.Get("enable_macroblock_mode", Json::Value(true))))
+            {
+                UI::Text("Macroblock Mode: " + string(json.Get("macroblock_mode", Json::Value("Normal"))));
+                UI::Text("Macroblock Mode Active: " + bool(json.Get("macroblock_mode_enabled", Json::Value(false))));
+            }
+        }
+
+        bool RenderPresetEnables(Json::Value@ json) override
+        {
+            bool changed = false;
+            if (JsonCheckboxChanged(json, "enable_block_mode", "Block mode")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_item_mode", "Item mode")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_macroblock_mode", "Macroblock mode")) { changed = true; }
+            return changed;
         }
     }
 }

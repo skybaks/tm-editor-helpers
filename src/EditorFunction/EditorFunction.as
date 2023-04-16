@@ -22,10 +22,11 @@ namespace EditorHelpers
         void RenderInterface_ChildWindow(){}
         void RenderInterface_MenuItem(){}
         void Update(float){}
-        void OnKeyPress(bool down, VirtualKey key){}
-        void SerializePresets(Json::Value@) {}
-        void DeserializePresets(Json::Value@) {}
-        void RenderPresetValues(Json::Value@) {}
+        void OnKeyPress(bool down, VirtualKey key) {}
+        void SerializePresets(Json::Value@ json) {}
+        void DeserializePresets(Json::Value@ json) {}
+        void RenderPresetValues(Json::Value@ json) {}
+        bool RenderPresetEnables(Json::Value@ json) { return false; }
 
         void Debug_EnterMethod(const string&in methodName)
         {

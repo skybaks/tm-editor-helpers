@@ -91,14 +91,36 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
-            Setting_PlacementGrid_PlacementGridOn = bool(json.Get("grid_on", Json::Value(false)));
-            Setting_PlacementGrid_PlacementGridTransparent = bool(json.Get("transparent", Json::Value(false)));
+            if (bool(json.Get("enable_grid_on", Json::Value(true))))
+            {
+                Setting_PlacementGrid_PlacementGridOn = bool(json.Get("grid_on", Json::Value(false)));
+            }
+            if (bool(json.Get("enable_grid_transparent", Json::Value(true))))
+            {
+                Setting_PlacementGrid_PlacementGridTransparent = bool(json.Get("transparent", Json::Value(false)));
+            }
         }
 
         void RenderPresetValues(Json::Value@ json) override
         {
-            UI::Text("Placement Grid On: " + bool(json.Get("grid_on", Json::Value(false))));
-            UI::Text("Placement Grid Transparent: " + bool(json.Get("transparent", Json::Value(false))));
+            if (bool(json.Get("enable_grid_on", Json::Value(true))))
+            {
+                UI::Text("Placement Grid On: " + bool(json.Get("grid_on", Json::Value(false))));
+            }
+            if (bool(json.Get("enable_grid_transparent", Json::Value(true))))
+            {
+                UI::Text("Placement Grid Transparent: " + bool(json.Get("transparent", Json::Value(false))));
+            }
+        }
+
+        bool RenderPresetEnables(Json::Value@ json) override
+        {
+            //json["enable_grid_on"] = UI::Checkbox("Grid On", bool(json.Get("enable_grid_on", Json::Value(true))));
+            //json["enable_grid_transparent"] = UI::Checkbox("Grid Transparent", bool(json.Get("enable_grid_transparent", Json::Value(true))));
+            bool changed = false;
+            if (JsonCheckboxChanged(json, "enable_grid_on", "Grid On")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_grid_transparent", "Grid Transparent")) { changed = true; }
+            return changed;
         }
     }
 }

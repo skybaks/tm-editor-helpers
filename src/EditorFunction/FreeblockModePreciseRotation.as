@@ -199,17 +199,37 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
-            Setting_FreeblockModePreciseRotation_StepSizeName = string(json.Get("step_size", Json::Value("Default")));
-            inputPitch = float(json.Get("pitch", Json::Value(0.0f)));
-            inputRoll = float(json.Get("roll", Json::Value(0.0f)));
-            newInputToApply = true;
+            if (bool(json.Get("enable_step_size", Json::Value(true))))
+            {
+                Setting_FreeblockModePreciseRotation_StepSizeName = string(json.Get("step_size", Json::Value("Default")));
+            }
+            if (bool(json.Get("enable_pitch_roll", Json::Value(true))))
+            {
+                inputPitch = float(json.Get("pitch", Json::Value(0.0f)));
+                inputRoll = float(json.Get("roll", Json::Value(0.0f)));
+                newInputToApply = true;
+            }
         }
 
         void RenderPresetValues(Json::Value@ json) override
         {
-            UI::Text("Step Size: " + string(json.Get("step_size", Json::Value("Default"))));
-            UI::Text("Pitch: " + float(json.Get("pitch", Json::Value(0.0f))));
-            UI::Text("Roll: " + float(json.Get("roll", Json::Value(0.0f))));
+            if (bool(json.Get("enable_step_size", Json::Value(true))))
+            {
+                UI::Text("Step Size: " + string(json.Get("step_size", Json::Value("Default"))));
+            }
+            if (bool(json.Get("enable_pitch_roll", Json::Value(true))))
+            {
+                UI::Text("Pitch: " + float(json.Get("pitch", Json::Value(0.0f))));
+                UI::Text("Roll: " + float(json.Get("roll", Json::Value(0.0f))));
+            }
+        }
+
+        bool RenderPresetEnables(Json::Value@ json) override
+        {
+            bool changed = false;
+            if (JsonCheckboxChanged(json, "enable_step_size", "Step Size")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_pitch_roll", "Pitch/Roll")) { changed = true; }
+            return changed;
         }
     }
 }

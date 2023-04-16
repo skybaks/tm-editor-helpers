@@ -426,48 +426,82 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
-            string mode = string(json.Get("randomizer_mode", Json::Value("OFF")));
-            if (mode == "RANDOM")
+            if (bool(json.Get("enable_randomizer_mode", Json::Value(true))))
             {
-                selectedMode = RotationRandomizerMode::RANDOM;
+                string mode = string(json.Get("randomizer_mode", Json::Value("OFF")));
+                if (mode == "RANDOM")
+                {
+                    selectedMode = RotationRandomizerMode::RANDOM;
+                }
+                else if (mode == "FIXED_STEP")
+                {
+                    selectedMode = RotationRandomizerMode::FIXED_STEP;
+                }
+                else
+                {
+                    selectedMode = RotationRandomizerMode::OFF;
+                }
             }
-            else if (mode == "FIXED_STEP")
+            if (bool(json.Get("enable_axes", Json::Value(true))))
             {
-                selectedMode = RotationRandomizerMode::FIXED_STEP;
+                axisX = bool(json.Get("axis_x", Json::Value(false)));
+                axisY = bool(json.Get("axis_y", Json::Value(false)));
+                axisZ = bool(json.Get("axis_z", Json::Value(false)));
             }
-            else
+            if (bool(json.Get("enable_axis_limits", Json::Value(true))))
             {
-                selectedMode = RotationRandomizerMode::OFF;
+                limitsY.x = float(json.Get("y_lim_min", Json::Value(0.0f)));
+                limitsY.y = float(json.Get("y_lim_max", Json::Value(0.0f)));
+                limitsX.x = float(json.Get("x_lim_min", Json::Value(0.0f)));
+                limitsX.y = float(json.Get("x_lim_max", Json::Value(0.0f)));
+                limitsZ.x = float(json.Get("z_lim_min", Json::Value(0.0f)));
+                limitsZ.y = float(json.Get("z_lim_max", Json::Value(0.0f)));
             }
-            axisX = bool(json.Get("axis_x", Json::Value(false)));
-            axisY = bool(json.Get("axis_y", Json::Value(false)));
-            axisZ = bool(json.Get("axis_z", Json::Value(false)));
-            limitsY.x = float(json.Get("y_lim_min", Json::Value(0.0f)));
-            limitsY.y = float(json.Get("y_lim_max", Json::Value(0.0f)));
-            limitsX.x = float(json.Get("x_lim_min", Json::Value(0.0f)));
-            limitsX.y = float(json.Get("x_lim_max", Json::Value(0.0f)));
-            limitsZ.x = float(json.Get("z_lim_min", Json::Value(0.0f)));
-            limitsZ.y = float(json.Get("z_lim_max", Json::Value(0.0f)));
-            stepY = float(json.Get("step_y", Json::Value(0.0f)));
-            stepX = float(json.Get("step_x", Json::Value(0.0f)));
-            stepZ = float(json.Get("step_z", Json::Value(0.0f)));
+            if (bool(json.Get("enable_axis_steps", Json::Value(true))))
+            {
+                stepY = float(json.Get("step_y", Json::Value(0.0f)));
+                stepX = float(json.Get("step_x", Json::Value(0.0f)));
+                stepZ = float(json.Get("step_z", Json::Value(0.0f)));
+            }
         }
 
         void RenderPresetValues(Json::Value@ json) override
         {
-            UI::Text("Randomizer Mode: " + string(json.Get("randomizer_mode", Json::Value("OFF"))));
-            UI::Text("Enable X Axis: " + bool(json.Get("axis_x", Json::Value(false))));
-            UI::Text("Enable Y Axis: " + bool(json.Get("axis_y", Json::Value(false))));
-            UI::Text("Enable Z Axis: " + bool(json.Get("axis_z", Json::Value(false))));
-            UI::Text("Y Limit (Min): " + float(json.Get("y_lim_min", Json::Value(0.0f))));
-            UI::Text("Y Limit (Max): " + float(json.Get("y_lim_max", Json::Value(0.0f))));
-            UI::Text("X Limit (Min): " + float(json.Get("x_lim_min", Json::Value(0.0f))));
-            UI::Text("X Limit (Max): " + float(json.Get("x_lim_max", Json::Value(0.0f))));
-            UI::Text("Z Limit (Min): " + float(json.Get("z_lim_min", Json::Value(0.0f))));
-            UI::Text("Z Limit (Max): " + float(json.Get("z_lim_max", Json::Value(0.0f))));
-            UI::Text("Step Y: " + float(json.Get("step_y", Json::Value(0.0f))));
-            UI::Text("Step X: " + float(json.Get("step_x", Json::Value(0.0f))));
-            UI::Text("Step Z: " + float(json.Get("step_z", Json::Value(0.0f))));
+            if (bool(json.Get("enable_randomizer_mode", Json::Value(true))))
+            {
+                UI::Text("Randomizer Mode: " + string(json.Get("randomizer_mode", Json::Value("OFF"))));
+            }
+            if (bool(json.Get("enable_axes", Json::Value(true))))
+            {
+                UI::Text("Enable X Axis: " + bool(json.Get("axis_x", Json::Value(false))));
+                UI::Text("Enable Y Axis: " + bool(json.Get("axis_y", Json::Value(false))));
+                UI::Text("Enable Z Axis: " + bool(json.Get("axis_z", Json::Value(false))));
+            }
+            if (bool(json.Get("enable_axis_limits", Json::Value(true))))
+            {
+                UI::Text("Y Limit (Min): " + float(json.Get("y_lim_min", Json::Value(0.0f))));
+                UI::Text("Y Limit (Max): " + float(json.Get("y_lim_max", Json::Value(0.0f))));
+                UI::Text("X Limit (Min): " + float(json.Get("x_lim_min", Json::Value(0.0f))));
+                UI::Text("X Limit (Max): " + float(json.Get("x_lim_max", Json::Value(0.0f))));
+                UI::Text("Z Limit (Min): " + float(json.Get("z_lim_min", Json::Value(0.0f))));
+                UI::Text("Z Limit (Max): " + float(json.Get("z_lim_max", Json::Value(0.0f))));
+            }
+            if (bool(json.Get("enable_axis_steps", Json::Value(true))))
+            {
+                UI::Text("Step Y: " + float(json.Get("step_y", Json::Value(0.0f))));
+                UI::Text("Step X: " + float(json.Get("step_x", Json::Value(0.0f))));
+                UI::Text("Step Z: " + float(json.Get("step_z", Json::Value(0.0f))));
+            }
+        }
+
+        bool RenderPresetEnables(Json::Value@ json) override
+        {
+            bool changed = false;
+            if (JsonCheckboxChanged(json, "enable_randomizer_mode", "Randomizer Mode")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_axes", "Enable Axes")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_axis_limits", "Axis Limits")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_axis_steps", "Axis Steps")) { changed = true; }
+            return changed;
         }
     }
 }

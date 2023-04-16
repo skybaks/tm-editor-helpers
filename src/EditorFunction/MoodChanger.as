@@ -274,13 +274,26 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
-            m_setTime = string(json.Get("time", Json::Value("12:06:00")));
-            m_settingChanged = true;
+            if (bool(json.Get("enable_time", Json::Value(true))))
+            {
+                m_setTime = string(json.Get("time", Json::Value("12:06:00")));
+                m_settingChanged = true;
+            }
         }
 
         void RenderPresetValues(Json::Value@ json) override
         {
-            UI::Text("Time: " + string(json.Get("time", Json::Value("12:06:00"))));
+            if (bool(json.Get("enable_time", Json::Value(true))))
+            {
+                UI::Text("Time: " + string(json.Get("time", Json::Value("12:06:00"))));
+            }
+        }
+
+        bool RenderPresetEnables(Json::Value@ json) override
+        {
+            bool changed = false;
+            if (JsonCheckboxChanged(json, "enable_time", "Time")) { changed = true; }
+            return changed;
         }
     }
 }
