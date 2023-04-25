@@ -96,7 +96,7 @@ namespace EditorHelpers
     [Setting category="Functions" name="CustomPalette: Enabled" hidden]
     bool Setting_CustomPalette_Enabled = true;
     [Setting category="Functions" name="CustomPalette: Window Visible" hidden]
-    bool Setting_CustomPalette_WindowVisible = false;
+    bool Setting_CustomPalette_WindowVisible = true;
     [Setting category="Functions" name="CustomPalette: Article History Max" hidden]
     uint Setting_CustomPalette_ArticleHistoryMax = 10;
 

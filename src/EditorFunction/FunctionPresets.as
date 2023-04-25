@@ -67,7 +67,7 @@ namespace EditorHelpers
     [Setting category="Functions" name="Function Presets: Enabled" hidden]
     bool Setting_FunctionPresets_Enabled = true;
     [Setting category="Functions" name="Function Presets: Window Visible" hidden]
-    bool Setting_FunctionPresets_WindowVisible = false;
+    bool Setting_FunctionPresets_WindowVisible = true;
     [Setting category="Functions" name="Function Presets: Show Activate Buttons" hidden]
     bool Setting_FunctionPresets_ShowActivateButtons = true;
 
