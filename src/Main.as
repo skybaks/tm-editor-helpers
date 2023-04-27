@@ -24,7 +24,7 @@ array<EditorHelpers::EditorFunction@> functions =
     , EditorHelpers::DefaultBlockMode()
     , EditorHelpers::MoodChanger()
     , EditorHelpers::CameraModes()
-    , EditorHelpers::CustomPalette()
+    , EditorHelpers::EditorInventory()
     , EditorHelpers::LocatorCheck()
     , EditorHelpers::PodiumReminder()
     , EditorHelpers::CursorPosition()

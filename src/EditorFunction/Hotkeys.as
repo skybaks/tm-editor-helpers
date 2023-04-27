@@ -98,12 +98,12 @@ namespace EditorHelpers
     [Setting category="Functions" name="Hotkeys: CustomItemPivot HotKey" hidden]
     VirtualKey Setting_Hotkeys_CustomItemPivotHotKey = VirtualKey::U;
 
-    // Plugin: CustomPalette
+    // Plugin: EditorInventory
 
-    [Setting category="Functions" name="Hotkeys: CustomPaletteQuickswitchPrevious HotKey Enabled" hidden]
-    bool Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled = false;
-    [Setting category="Functions" name="Hotkeys: CustomPaletteQuickswitchPrevious HotKey" hidden]
-    VirtualKey Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKey = VirtualKey::B;
+    [Setting category="Functions" name="Hotkeys: EditorInventoryQuickswitchPrevious HotKey Enabled" hidden]
+    bool Setting_Hotkeys_EditorInventoryQuickswitchPreviousHotKeyEnabled = false;
+    [Setting category="Functions" name="Hotkeys: EditorInventoryQuickswitchPrevious HotKey" hidden]
+    VirtualKey Setting_Hotkeys_EditorInventoryQuickswitchPreviousHotKey = VirtualKey::B;
 
     // Plugin: FreeblockPlacement
 
@@ -179,8 +179,8 @@ namespace EditorHelpers
                 HotkeySettingsTableRow("Toggle Apply Custom Item Pivot", "CustomItemPivot", Setting_Hotkeys_CustomItemPivotHotKey, Setting_Hotkeys_CustomItemPivotHotKeyEnabled, Setting_Hotkeys_CustomItemPivotHotKeyEnabled);
                 UI::EndDisabled();
 
-                UI::BeginDisabled(!HotkeyInterface::Enabled_CustomPalette());
-                HotkeySettingsTableRow("Quickswitch To Previous Block/Item/Macroblock", "CustomPaletteQuickswitchPrevious", Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKey, Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled, Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled);
+                UI::BeginDisabled(!HotkeyInterface::Enabled_EditorInventory());
+                HotkeySettingsTableRow("Quickswitch To Previous Block/Item/Macroblock", "EditorInventoryQuickswitchPrevious", Setting_Hotkeys_EditorInventoryQuickswitchPreviousHotKey, Setting_Hotkeys_EditorInventoryQuickswitchPreviousHotKeyEnabled, Setting_Hotkeys_EditorInventoryQuickswitchPreviousHotKeyEnabled);
                 UI::EndDisabled();
 
                 UI::BeginDisabled(!HotkeyInterface::Enabled_FreeblockPlacement());
@@ -262,7 +262,7 @@ namespace EditorHelpers
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item AutoRotation", Setting_Hotkeys_CustomItemAutoRotationHotKey, Setting_Hotkeys_CustomItemAutoRotationHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Grid", Setting_Hotkeys_CustomItemGridHotKey, Setting_Hotkeys_CustomItemGridHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Item Pivot", Setting_Hotkeys_CustomItemPivotHotKey, Setting_Hotkeys_CustomItemPivotHotKeyEnabled);
-                activeHotkeysHelper += HotkeyDisplayActiveRow("Quickswitch To Previous Block/Item/Macroblock", Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKey, Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled);
+                activeHotkeysHelper += HotkeyDisplayActiveRow("Quickswitch To Previous Block/Item/Macroblock", Setting_Hotkeys_EditorInventoryQuickswitchPreviousHotKey, Setting_Hotkeys_EditorInventoryQuickswitchPreviousHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Apply Custom Freeblock Grid", Setting_Hotkeys_FreeblockPlacementApplyGridHotKey, Setting_Hotkeys_FreeblockPlacementApplyGridHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Show Editor Placement Grid", Setting_Hotkeys_VisualPlacementGridOnHotKey, Setting_Hotkeys_VisualPlacementGridOnHotKeyEnabled);
                 activeHotkeysHelper += HotkeyDisplayActiveRow("Toggle Editor Placement Grid Transparency", Setting_Hotkeys_VisualPlacementGridTransparentHotKey, Setting_Hotkeys_VisualPlacementGridTransparentHotKeyEnabled);
@@ -356,9 +356,9 @@ namespace EditorHelpers
                 {
                     Setting_Hotkeys_CustomItemPivotHotKey = key;
                 }
-                else if (m_rebindKeyName == "CustomPaletteQuickswitchPrevious")
+                else if (m_rebindKeyName == "EditorInventoryQuickswitchPrevious")
                 {
-                    Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKey = key;
+                    Setting_Hotkeys_EditorInventoryQuickswitchPreviousHotKey = key;
                 }
                 else if (m_rebindKeyName == "FreeblockPlacementApplyGrid")
                 {
@@ -404,7 +404,7 @@ namespace EditorHelpers
                 OnKeyPress_CustomItemAutoRotation(key);
                 OnKeyPress_CustomItemGrid(key);
                 OnKeyPress_CustomItemPivot(key);
-                OnKeyPress_CustomPaletteQuickswitchPrevious(key);
+                OnKeyPress_EditorInventoryQuickswitchPrevious(key);
                 OnKeyPress_FreeblockPlacementApplyGrid(key);
                 OnKeyPress_VisualPlacementGridOn(key);
                 OnKeyPress_VisualPlacementGridTransparent(key);
@@ -531,12 +531,12 @@ namespace EditorHelpers
             Debug_LeaveMethod();
         }
 
-        private void OnKeyPress_CustomPaletteQuickswitchPrevious(const VirtualKey&in key)
+        private void OnKeyPress_EditorInventoryQuickswitchPrevious(const VirtualKey&in key)
         {
-            Debug_EnterMethod("OnKeyPress_CustomPaletteQuickswitchPrevious");
-            if (Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKeyEnabled && key == Setting_Hotkeys_CustomPaletteQuickswitchPreviousHotKey)
+            Debug_EnterMethod("OnKeyPress_EditorInventoryQuickswitchPrevious");
+            if (Setting_Hotkeys_EditorInventoryQuickswitchPreviousHotKeyEnabled && key == Setting_Hotkeys_EditorInventoryQuickswitchPreviousHotKey)
             {
-                Debug("Activate CustomPaletteQuickswitchPrevious");
+                Debug("Activate EditorInventoryQuickswitchPrevious");
                 ShowHotkeyNotification("Quickswitch To Previous Block/Item/Macroblock", key);
                 HotkeyInterface::QuickswitchPreviousArticle();
             }

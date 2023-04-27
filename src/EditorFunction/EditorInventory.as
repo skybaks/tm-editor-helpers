@@ -46,13 +46,13 @@ namespace EditorHelpers
 
     namespace Compatibility
     {
-        bool EnableCustomPaletteFunction()
+        bool EnableEditorInventoryFunction()
         {
 #if TMNEXT
 #else
-            Setting_CustomPalette_Enabled = false;
+            Setting_EditorInventory_Enabled = false;
 #endif
-            return Setting_CustomPalette_Enabled;
+            return Setting_EditorInventory_Enabled;
         }
 
         bool IsBlockMode(CGameEditorPluginMap::EPlaceMode mode)
@@ -77,30 +77,30 @@ namespace EditorHelpers
 
     namespace HotkeyInterface
     {
-        bool g_CustomPalette_QuickswitchPreviousTrigger = false;
+        bool g_EditorInventory_QuickswitchPreviousTrigger = false;
 
-        bool Enabled_CustomPalette()
+        bool Enabled_EditorInventory()
         {
-            return Setting_CustomPalette_Enabled;
+            return Setting_EditorInventory_Enabled;
         }
 
         void QuickswitchPreviousArticle()
         {
-            if (Setting_CustomPalette_Enabled)
+            if (Setting_EditorInventory_Enabled)
             {
-                g_CustomPalette_QuickswitchPreviousTrigger = true;
+                g_EditorInventory_QuickswitchPreviousTrigger = true;
             }
         }
     }
 
-    [Setting category="Functions" name="CustomPalette: Enabled" hidden]
-    bool Setting_CustomPalette_Enabled = true;
-    [Setting category="Functions" name="CustomPalette: Window Visible" hidden]
-    bool Setting_CustomPalette_WindowVisible = true;
-    [Setting category="Functions" name="CustomPalette: Article History Max" hidden]
-    uint Setting_CustomPalette_ArticleHistoryMax = 10;
+    [Setting category="Functions" name="EditorInventory: Enabled" hidden]
+    bool Setting_EditorInventory_Enabled = true;
+    [Setting category="Functions" name="EditorInventory: Window Visible" hidden]
+    bool Setting_EditorInventory_WindowVisible = true;
+    [Setting category="Functions" name="EditorInventory: Article History Max" hidden]
+    uint Setting_EditorInventory_ArticleHistoryMax = 10;
 
-    class CustomPalette : EditorHelpers::EditorFunction
+    class EditorInventory : EditorHelpers::EditorFunction
     {
         private EditorInventoryArticle@[] m_articles;
         private EditorInventoryArticle@[] m_articlesFiltered;
@@ -116,20 +116,20 @@ namespace EditorHelpers
         private PaletteRandomizerMode m_paletteRandomize;
         private uint64 m_parallelLoadYieldTime; // This signal is used yield the IndexInventory coroutine at reasonable times
 
-        string Name() override { return "Custom Palette"; }
-        bool Enabled() override { return Compatibility::EnableCustomPaletteFunction(); }
+        string Name() override { return "Editor Inventory"; }
+        bool Enabled() override { return Compatibility::EnableEditorInventoryFunction(); }
 
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
-            Setting_CustomPalette_Enabled = UI::Checkbox("Enabled", Setting_CustomPalette_Enabled);
-            UI::BeginDisabled(!Setting_CustomPalette_Enabled);
+            Setting_EditorInventory_Enabled = UI::Checkbox("Enabled", Setting_EditorInventory_Enabled);
+            UI::BeginDisabled(!Setting_EditorInventory_Enabled);
             UI::TextWrapped("This function opens an additional display window that contains a searchable list of all blocks, items, and macroblocks in the editor. It also shows all recent blocks, items, and macroblocks used.");
 
-            Setting_CustomPalette_WindowVisible = UI::Checkbox("Show Additional Window", Setting_CustomPalette_WindowVisible);
-            Setting_CustomPalette_ArticleHistoryMax = Math::Clamp(UI::InputInt("Max number of recent blocks/items/macroblocks", Setting_CustomPalette_ArticleHistoryMax), 5, 100);
+            Setting_EditorInventory_WindowVisible = UI::Checkbox("Show Additional Window", Setting_EditorInventory_WindowVisible);
+            Setting_EditorInventory_ArticleHistoryMax = Math::Clamp(UI::InputInt("Max number of recent blocks/items/macroblocks", Setting_EditorInventory_ArticleHistoryMax), 5, 100);
             UI::EndDisabled();
             UI::PopID();
         }
@@ -141,7 +141,7 @@ namespace EditorHelpers
                 m_filterString = "";
                 m_filterStringPrev = "";
                 @m_selectedArticlePrev = null;
-                HotkeyInterface::g_CustomPalette_QuickswitchPreviousTrigger = false;
+                HotkeyInterface::g_EditorInventory_QuickswitchPreviousTrigger = false;
                 m_forcePaletteIndex = -1;
                 m_deleteConfirm = false;
                 m_paletteRandomize = PaletteRandomizerMode::NONE;
@@ -157,18 +157,18 @@ namespace EditorHelpers
                 EditorHelpers::HelpMarker("Show or hide the window for the custom block palette");
                 UI::SameLine();
             }
-            Setting_CustomPalette_WindowVisible = UI::Checkbox("Show Custom Palette Window", Setting_CustomPalette_WindowVisible);
+            Setting_EditorInventory_WindowVisible = UI::Checkbox("Show Editor Inventory Window", Setting_EditorInventory_WindowVisible);
         }
 
         void RenderInterface_ChildWindow() override
         {
-            if (!Enabled() || Editor is null || m_articles.Length == 0 || !Setting_CustomPalette_WindowVisible)
+            if (!Enabled() || Editor is null || m_articles.Length == 0 || !Setting_EditorInventory_WindowVisible)
             {
                 return;
             }
 
             UI::SetNextWindowSize(580, 350, UI::Cond::FirstUseEver);
-            UI::Begin(g_windowName + ": " + Name(), Setting_CustomPalette_WindowVisible);
+            UI::Begin(g_windowName + ": " + Name(), Setting_EditorInventory_WindowVisible);
 
             UI::BeginTabBar("CustomPaletteTabBar");
             if (UI::BeginTabItem("Search"))
@@ -347,9 +347,9 @@ namespace EditorHelpers
                 return;
             }
 
-            if (UI::MenuItem(Icons::PuzzlePiece + " " + Name(), selected: Setting_CustomPalette_WindowVisible))
+            if (UI::MenuItem(Icons::PuzzlePiece + " " + Name(), selected: Setting_EditorInventory_WindowVisible))
             {
-                Setting_CustomPalette_WindowVisible = !Setting_CustomPalette_WindowVisible;
+                Setting_EditorInventory_WindowVisible = !Setting_EditorInventory_WindowVisible;
             }
         }
 
@@ -369,7 +369,7 @@ namespace EditorHelpers
             }
 
             if (Signal_BlockItemPlaced() && m_paletteRandomize != PaletteRandomizerMode::NONE
-                && Setting_CustomPalette_WindowVisible
+                && Setting_EditorInventory_WindowVisible
                 && m_selectedPaletteIndex >= 0 && m_selectedPaletteIndex < m_palettes.Length
                 && m_palettes[m_selectedPaletteIndex].Articles.Length > 0)
             {
@@ -409,11 +409,11 @@ namespace EditorHelpers
             }
             @m_selectedArticlePrev = selectedArticle;
 
-            if (HotkeyInterface::g_CustomPalette_QuickswitchPreviousTrigger && m_articlesHistory.Length > 1)
+            if (HotkeyInterface::g_EditorInventory_QuickswitchPreviousTrigger && m_articlesHistory.Length > 1)
             {
                 SetCurrentArticle(m_articlesHistory[1]);
             }
-            HotkeyInterface::g_CustomPalette_QuickswitchPreviousTrigger = false;
+            HotkeyInterface::g_EditorInventory_QuickswitchPreviousTrigger = false;
 
             Debug_LeaveMethod();
         }
@@ -666,7 +666,7 @@ namespace EditorHelpers
                 }
             }
 
-            while (m_articlesHistory.Length >= Setting_CustomPalette_ArticleHistoryMax)
+            while (m_articlesHistory.Length >= Setting_EditorInventory_ArticleHistoryMax)
             {
                 Debug("History too long-- remove one from end");
                 m_articlesHistory.RemoveAt(m_articlesHistory.Length-1);
@@ -752,7 +752,13 @@ namespace EditorHelpers
                 m_palettes.RemoveRange(0, m_palettes.Length);
             }
 
-            auto json = Json::FromFile(IO::FromStorageFolder("EditorFunction_CustomPalette.json"));
+            if (IO::FileExists(IO::FromStorageFolder("EditorFunction_CustomPalette.json")))
+            {
+                Debug("Renaming legacy palettes file");
+                IO::Move(IO::FromStorageFolder("EditorFunction_CustomPalette.json"), IO::FromStorageFolder("EditorFunction_EditorInventory.json"));
+            }
+
+            auto json = Json::FromFile(IO::FromStorageFolder("EditorFunction_EditorInventory.json"));
 
             auto palettes = json.Get("palettes", Json::Array());
             for (uint paletteIndex = 0; paletteIndex < palettes.Length; ++paletteIndex)
@@ -799,7 +805,7 @@ namespace EditorHelpers
             }
 
             json["palettes"] = palettes;
-            Json::ToFile(IO::FromStorageFolder("EditorFunction_CustomPalette.json"), json);
+            Json::ToFile(IO::FromStorageFolder("EditorFunction_EditorInventory.json"), json);
         }
     }
 }

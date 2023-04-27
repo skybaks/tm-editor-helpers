@@ -6,6 +6,7 @@
   * Create a custom preset to recall specific settings at any time
   * Add an optional hotkey to each preset
 * Fix bug where tab wouldnt autoselect when creating a new palette
+* "Custom Palette" renamed to "Editor Inventory"
 
 
 # 5.15
