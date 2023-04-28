@@ -43,12 +43,23 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_RotationRandomizer_Enabled = UI::Checkbox("Enabled", Setting_RotationRandomizer_Enabled);
             UI::BeginDisabled(!Setting_RotationRandomizer_Enabled);
-            UI::TextWrapped("Provides an interface which allows you to activate and customize the limits of the rotation randomizer. When the randomizer is turned on a random rotation within the defined limits will be chosen for each selected axis after you place a block or item.");
+            UI::TextWrapped("Provides an interface which allows you to activate and customize the limits of the"
+                " rotation randomizer. When the randomizer is turned on a random rotation within the defined limits"
+                " will be chosen for each selected axis after you place a block or item.");
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("RotationRandomizer::Mode");
+                EditorHelpers::SetHighlightId("RotationRandomizer::AxesLimitsSteps");
+            }
+
             UI::PopID();
         }
 
@@ -72,8 +83,9 @@ namespace EditorHelpers
         void RenderInterface_Build() override
         {
             if (!Enabled()) return;
-
             UI::PushID("RotationRandomizer::RenderInterface_Build");
+
+            EditorHelpers::BeginHighlight("RotationRandomizer::Mode");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Randomize rotation after click\n\nRANDOM - Randomize selected axis's within defined limits\nFIXED_STEP - Increment selected axis's by fixed step");
@@ -95,7 +107,9 @@ namespace EditorHelpers
                 }
                 UI::EndCombo();
             }
+            EditorHelpers::EndHighlight();
 
+            EditorHelpers::BeginHighlight("RotationRandomizer::AxesLimitsSteps");
             int columnCount = 3;
             if (selectedMode == RotationRandomizerMode::FIXED_STEP)
             {
@@ -186,6 +200,7 @@ namespace EditorHelpers
 
                 UI::EndTable();
             }
+            EditorHelpers::EndHighlight();
 
             UI::PopID();
         }
@@ -498,9 +513,25 @@ namespace EditorHelpers
         {
             bool changed = false;
             if (JsonCheckboxChanged(json, "enable_randomizer_mode", "Randomizer Mode")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("RotationRandomizer::Mode");
+            }
             if (JsonCheckboxChanged(json, "enable_axes", "Enable Axes")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("RotationRandomizer::AxesLimitsSteps");
+            }
             if (JsonCheckboxChanged(json, "enable_axis_limits", "Axis Limits")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("RotationRandomizer::AxesLimitsSteps");
+            }
             if (JsonCheckboxChanged(json, "enable_axis_steps", "Axis Steps")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("RotationRandomizer::AxesLimitsSteps");
+            }
             return changed;
         }
     }

@@ -155,12 +155,22 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_MoodChanger_Enabled = UI::Checkbox("Enabled", Setting_MoodChanger_Enabled);
             UI::BeginDisabled(!Setting_MoodChanger_Enabled);
             UI::TextWrapped("This provides an interface to modify the game time of a map down to the second for a 24 hour period.");
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("MoodChanger::CurrentTime");
+                EditorHelpers::SetHighlightId("MoodChanger::Presets");
+                EditorHelpers::SetHighlightId("MoodChanger::SetTime");
+            }
+
             UI::PopID();
         }
 
@@ -212,13 +222,16 @@ namespace EditorHelpers
 
             UI::TextDisabled("\tMood");
 
+            EditorHelpers::BeginHighlight("MoodChanger::CurrentTime");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Sets the mood to a specific time of the day");
                 UI::SameLine();
             }
             UI::Text("Current map time: " + Editor.MoodTimeOfDayStr);
+            EditorHelpers::EndHighlight();
 
+            EditorHelpers::BeginHighlight("MoodChanger::Presets");
             if (m_presets !is null)
             {
                 if (UI::BeginCombo("Mood Presets",
@@ -246,7 +259,9 @@ namespace EditorHelpers
                 }
                 UI::EndDisabled();
             }
+            EditorHelpers::EndHighlight();
 
+            EditorHelpers::BeginHighlight("MoodChanger::SetTime");
             UI::Text("Set map time:");
             UI::SameLine();
             UI::SetNextItemWidth(UI::GetWindowSize().x * 0.4f);
@@ -265,6 +280,7 @@ namespace EditorHelpers
                 UI::SameLine();
                 EditorHelpers::HelpMarker("Time format is invalid.\nFormat should be HH:MM:SS");
             }
+            EditorHelpers::EndHighlight();
         }
 
         void SerializePresets(Json::Value@ json) override
@@ -293,6 +309,10 @@ namespace EditorHelpers
         {
             bool changed = false;
             if (JsonCheckboxChanged(json, "enable_time", "Time")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("MoodChanger::CurrentTime");
+            }
             return changed;
         }
     }

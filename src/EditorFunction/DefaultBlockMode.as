@@ -161,15 +161,24 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_DefaultBlockMode_Enabled = UI::Checkbox("Enabled", Setting_DefaultBlockMode_Enabled);
             UI::BeginDisabled(!Setting_DefaultBlockMode_Enabled);
-            UI::TextWrapped("This allows you to choose a default mode for block, item, and macroblock modes. That means that when you switch to block, item, or macroblock mode your default will be picked.");
-
+            UI::TextWrapped("This allows you to choose a default mode for block, item, and macroblock modes. That means"
+                " that when you switch to block, item, or macroblock mode your default will be picked.");
             DisplayModeOptions();
-
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Blocks");
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Items");
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Macroblocks");
+            }
+
             UI::PopID();
         }
 
@@ -181,7 +190,7 @@ namespace EditorHelpers
             }
 
             UI::TextDisabled("\tMode Defaults");
-            DisplayModeOptions(true);
+            DisplayModeOptions(true, true);
         }
 
         void Init() override 
@@ -264,13 +273,14 @@ namespace EditorHelpers
             return newSelection;
         }
 
-        private void DisplayModeOptions(bool includeToolTips = false)
+        private void DisplayModeOptions(bool includeToolTips = false, bool allowHighlights = false)
         {
             vec2 spacingOrig = UI::GetStyleVarVec2(UI::StyleVar::ItemSpacing);
             vec2 spacingNew = vec2(1.0, spacingOrig.y);
 
             if (Compatibility::SelectableBlockModes.Length > 1)
             {
+                if (allowHighlights) { EditorHelpers::BeginHighlight("DefaultBlockMode::Blocks"); }
                 if (includeToolTips && settingToolTipsEnabled)
                 {
                     EditorHelpers::HelpMarker("Enable and set the default block mode to use");
@@ -283,10 +293,12 @@ namespace EditorHelpers
                 Setting_DefaultBlockMode_BlockMode = DisplayRadioSelection("Block", Compatibility::SelectableBlockModes, Setting_DefaultBlockMode_BlockMode);
                 UI::EndDisabled();
                 UI::PopStyleVar();
+                if (allowHighlights) { EditorHelpers::EndHighlight(); }
             }
 
             if (Compatibility::SelectableItemModes.Length > 1)
             {
+                if (allowHighlights) { EditorHelpers::BeginHighlight("DefaultBlockMode::Items"); }
                 if (includeToolTips && settingToolTipsEnabled)
                 {
                     EditorHelpers::HelpMarker("Enable and set the default item mode to use");
@@ -299,10 +311,12 @@ namespace EditorHelpers
                 Setting_DefaultBlockMode_ItemMode = DisplayRadioSelection("Item", Compatibility::SelectableItemModes, Setting_DefaultBlockMode_ItemMode);
                 UI::EndDisabled();
                 UI::PopStyleVar();
+                if (allowHighlights) { EditorHelpers::EndHighlight(); }
             }
 
             if (Compatibility::SelectableMacroblockModes.Length > 1)
             {
+                if (allowHighlights) { EditorHelpers::BeginHighlight("DefaultBlockMode::Macroblocks"); }
                 if (includeToolTips && settingToolTipsEnabled)
                 {
                     EditorHelpers::HelpMarker("Enable and set the default macroblock mode to use");
@@ -315,6 +329,7 @@ namespace EditorHelpers
                 Setting_DefaultBlockMode_MacroblockMode = DisplayRadioSelection("Macroblock", Compatibility::SelectableMacroblockModes, Setting_DefaultBlockMode_MacroblockMode);
                 UI::EndDisabled();
                 UI::PopStyleVar();
+                if (allowHighlights) { EditorHelpers::EndHighlight(); }
             }
         }
 
@@ -370,8 +385,20 @@ namespace EditorHelpers
         {
             bool changed = false;
             if (JsonCheckboxChanged(json, "enable_block_mode", "Block mode")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Blocks");
+            }
             if (JsonCheckboxChanged(json, "enable_item_mode", "Item mode")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Items");
+            }
             if (JsonCheckboxChanged(json, "enable_macroblock_mode", "Macroblock mode")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Macroblocks");
+            }
             return changed;
         }
     }

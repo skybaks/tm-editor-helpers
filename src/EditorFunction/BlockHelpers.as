@@ -45,6 +45,8 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_BlockHelpers_Enabled = UI::Checkbox("Enabled", Setting_BlockHelpers_Enabled);
@@ -52,6 +54,12 @@ namespace EditorHelpers
             UI::TextWrapped("Enables hiding/showing the clip helpers on placed blocks in the editor.");
             Setting_BlockHelpers_BlockHelpersOff = UI::Checkbox("Block Helpers Off", Setting_BlockHelpers_BlockHelpersOff);
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("BlockHelpers::HelpersOff");
+            }
+
             UI::PopID();
         }
 
@@ -67,12 +75,14 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
 
+            EditorHelpers::BeginHighlight("BlockHelpers::HelpersOff");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Hide/Show block clip helpers");
                 UI::SameLine();
             }
             Setting_BlockHelpers_BlockHelpersOff = UI::Checkbox("Block Helpers Off", Setting_BlockHelpers_BlockHelpersOff);
+            EditorHelpers::EndHighlight();
         }
 
         void Update(float) override
@@ -114,6 +124,10 @@ namespace EditorHelpers
         {
             bool changed = false;
             if (JsonCheckboxChanged(json, "enable_helpers_off", "Helpers Off")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("BlockHelpers::HelpersOff");
+            }
             return changed;
         }
     }

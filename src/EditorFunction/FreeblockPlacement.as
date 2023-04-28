@@ -82,6 +82,8 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_FreeblockPlacement_Enabled = UI::Checkbox("Enabled", Setting_FreeblockPlacement_Enabled);
@@ -90,6 +92,13 @@ namespace EditorHelpers
             Setting_FreeblockPlacement_PersistGrid = UI::Checkbox("Persist Force Freeblock Grid selection between editor sessions", Setting_FreeblockPlacement_PersistGrid);
             Setting_FreeblockPlacement_PersistTranslate = UI::Checkbox("Persist Force Freeblock Translate selection between editor sessions", Setting_FreeblockPlacement_PersistTranslate);
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockPlacement::Grid");
+                EditorHelpers::SetHighlightId("FreeblockPlacement::Translate");
+            }
+
             UI::PopID();
         }
 
@@ -121,6 +130,7 @@ namespace EditorHelpers
             UI::PushID("FreeblockPlacement::RenderInterface");
 
             UI::TextDisabled("\tFree Block Placement");
+            EditorHelpers::BeginHighlight("FreeblockPlacement::Grid");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Sets the placement grid of blocks in free mode. Does not work for numbers < 1.0");
@@ -129,7 +139,9 @@ namespace EditorHelpers
             Setting_FreeblockPlacement_ApplyGrid = UI::Checkbox("Apply Grid to Freeblocks", Setting_FreeblockPlacement_ApplyGrid);
             m_HStep = Math::Max(UI::InputFloat("Horizontal Grid", m_HStep), 0.0f);
             m_VStep = Math::Max(UI::InputFloat("Vertical Grid", m_VStep), 0.0f);
+            EditorHelpers::EndHighlight();
 
+            EditorHelpers::BeginHighlight("FreeblockPlacement::Translate");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Apply a placement offset to blocks in free mode. Use this place freeblocks between the 1m grid");
@@ -139,6 +151,7 @@ namespace EditorHelpers
             m_XTranslate = UI::InputFloat("X Translation", m_XTranslate);
             m_YTranslate = UI::InputFloat("Y Translation", m_YTranslate);
             m_ZTranslate = UI::InputFloat("Z Translation", m_ZTranslate);
+            EditorHelpers::EndHighlight();
 
             UI::PopID();
         }
@@ -222,7 +235,15 @@ namespace EditorHelpers
         {
             bool changed = false;
             if (JsonCheckboxChanged(json, "enable_grid", "Freeblock Grid")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockPlacement::Grid");
+            }
             if (JsonCheckboxChanged(json, "enable_translate", "Freeblock Translation")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockPlacement::Translate");
+            }
             return changed;
         }
     }

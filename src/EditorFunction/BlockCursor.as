@@ -33,13 +33,22 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_BlockCursor_Enabled = UI::Checkbox("Enabled", Setting_BlockCursor_Enabled);
             UI::BeginDisabled(!Setting_BlockCursor_Enabled);
-            UI::TextWrapped("Enables hiding/showing the colored box that surrounds the current block or item in your cursor.");
+            UI::TextWrapped("Enables hiding/showing the colored box that surrounds the current block or item in your"
+                " cursor.");
             Setting_BlockCursor_HideBlockCursor = UI::Checkbox("Block Cursor Hidden", Setting_BlockCursor_HideBlockCursor);
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("BlockCursor::HideCursor");
+            }
+
             UI::PopID();
         }
 
@@ -55,12 +64,14 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
 
+            EditorHelpers::BeginHighlight("BlockCursor::HideCursor");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Hide/Show block cursor box");
                 UI::SameLine();
             }
             Setting_BlockCursor_HideBlockCursor = UI::Checkbox("Block Cursor Hidden", Setting_BlockCursor_HideBlockCursor);
+            EditorHelpers::EndHighlight();
         }
 
         void Update(float) override
@@ -104,6 +115,10 @@ namespace EditorHelpers
         {
             bool changed = false;
             if (JsonCheckboxChanged(json, "enable_cursor_hidden", "Cursor Hidden")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("BlockCursor::HideCursor");
+            }
             return changed;
         }
     }

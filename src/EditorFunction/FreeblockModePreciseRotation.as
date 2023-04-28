@@ -44,13 +44,23 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Settings_FreeblockModePreciseRotation_Enabled = UI::Checkbox("Enabled", Settings_FreeblockModePreciseRotation_Enabled);
             UI::BeginDisabled(!Settings_FreeblockModePreciseRotation_Enabled);
-            UI::TextWrapped("Provides an interface to set any rotation angle in degrees. Also includes step presets for Nadeo slope angles.");
+            UI::TextWrapped("Provides an interface to set any rotation angle in degrees. Also includes step presets"
+                " for Nadeo slope angles.");
             Setting_FreeblockModePreciseRotation_PersistStep = UI::Checkbox("Persist angle step size selection between editor sessions", Setting_FreeblockModePreciseRotation_PersistStep);
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::StepSize");
+                EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::PitchRoll");
+            }
+
             UI::PopID();
         }
 
@@ -101,6 +111,7 @@ namespace EditorHelpers
             UI::PushID("FreeblockModePreciseRotation::RenderInterface");
 
             UI::TextDisabled("\tRotation");
+            EditorHelpers::BeginHighlight("FreeblockModePreciseRotation::StepSize");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Sets the rotational step size of the pitch and roll inputs to a game slope.");
@@ -147,7 +158,9 @@ namespace EditorHelpers
                 UI::SameLine();
             }
             UI::Text("Current Step: " + tostring(stepSize) + " deg");
+            EditorHelpers::EndHighlight();
 
+            EditorHelpers::BeginHighlight("FreeblockModePreciseRotation::PitchRoll");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Pitch of the block in degrees. Use the +/- to increment or enter any value.");
@@ -171,6 +184,7 @@ namespace EditorHelpers
                 inputRoll = inputRollResult;
                 newInputToApply = true;
             }
+            EditorHelpers::EndHighlight();
             UI::PopID();
         }
 
@@ -228,7 +242,15 @@ namespace EditorHelpers
         {
             bool changed = false;
             if (JsonCheckboxChanged(json, "enable_step_size", "Step Size")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::StepSize");
+            }
             if (JsonCheckboxChanged(json, "enable_pitch_roll", "Pitch/Roll")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::PitchRoll");
+            }
             return changed;
         }
     }

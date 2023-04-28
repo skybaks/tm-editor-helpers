@@ -12,13 +12,20 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_Links_Enabled = UI::Checkbox("Enabled", Setting_Links_Enabled);
             UI::BeginDisabled(!Setting_Links_Enabled);
-            UI::TextWrapped("Displays a collection of useful links in the Info section of the Editor Helpers window.");
-
+            UI::TextWrapped("Displays some links in the Info section of the Editor Helpers window.");
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("Links::Display");
+            }
+
             UI::PopID();
         }
 
@@ -26,6 +33,7 @@ namespace EditorHelpers
         {
             if (!Enabled()) { return; }
 
+            EditorHelpers::BeginHighlight("Links::Display");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Open the Editor Helpers Github Wiki");
@@ -35,6 +43,7 @@ namespace EditorHelpers
             {
                 OpenBrowserURL("https://github.com/skybaks/tm-editor-helpers/wiki");
             }
+            EditorHelpers::EndHighlight();
         }
     }
 }

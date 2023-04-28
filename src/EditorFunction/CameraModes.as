@@ -41,12 +41,20 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_CameraMode_Enabled = UI::Checkbox("Enabled", Setting_CameraMode_Enabled);
             UI::BeginDisabled(!Setting_CameraMode_Enabled);
             UI::TextWrapped("Provides an interface for switching to other cameras in the map editor.");
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("CameraModes::CameraMode");
+            }
+
             UI::PopID();
         }
 
@@ -65,12 +73,12 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
 
+            EditorHelpers::BeginHighlight("CameraModes::CameraMode");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Switch between Orbital (default) camera and Free camera.");
                 UI::SameLine();
             }
-
             if (UI::BeginCombo("Camera mode", Setting_CameraMode_CurrentMode)) {
                 if (UI::Selectable("Orbital (default)", false))
                 {
@@ -84,6 +92,7 @@ namespace EditorHelpers
                 }
                 UI::EndCombo();
             }
+            EditorHelpers::EndHighlight();
         }
 
         void SerializePresets(Json::Value@ json) override
@@ -112,6 +121,10 @@ namespace EditorHelpers
         {
             bool changed = false;
             if (JsonCheckboxChanged(json, "enable_camera", "Camera")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("CameraModes::CameraMode");
+            }
             return changed;
         }
     }

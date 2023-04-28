@@ -126,7 +126,11 @@ namespace EditorHelpers
             UI::SameLine();
             Setting_EditorInventory_Enabled = UI::Checkbox("Enabled", Setting_EditorInventory_Enabled);
             UI::BeginDisabled(!Setting_EditorInventory_Enabled);
-            UI::TextWrapped("This function opens an additional display window that contains a searchable list of all blocks, items, and macroblocks in the editor. It also shows all recent blocks, items, and macroblocks used.");
+            UI::TextWrapped("This function opens an additional display window that contains a searchable list of all"
+                " blocks, items, and macroblocks in the editor. It also shows all recent blocks, items, and"
+                " macroblocks used. You can also create your own custom sets and place from a random selection within"
+                " a set."
+            );
 
             Setting_EditorInventory_WindowVisible = UI::Checkbox("Show Additional Window", Setting_EditorInventory_WindowVisible);
             Setting_EditorInventory_ArticleHistoryMax = Math::Clamp(UI::InputInt("Max number of recent blocks/items/macroblocks", Setting_EditorInventory_ArticleHistoryMax), 5, 100);

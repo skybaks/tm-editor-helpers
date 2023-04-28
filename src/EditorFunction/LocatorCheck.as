@@ -35,12 +35,22 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_LocatorCheck_Enabled = UI::Checkbox("Enabled", Setting_LocatorCheck_Enabled);
             UI::BeginDisabled(!Setting_LocatorCheck_Enabled);
-            UI::TextWrapped("This function will read the file header information from your map file each time you save to check the linked media dependencies and the results will be displayed. This should let you know if your media locators are working or not.");
+            UI::TextWrapped("This function will read the file header information from your map file each time you save"
+                " to check the linked media dependencies and the results will be displayed. This should let you know"
+                " if your media locators are working or not.");
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("LocatorCheck::Display");
+            }
+
             UI::PopID();
         }
 
@@ -86,6 +96,7 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
 
+            EditorHelpers::BeginHighlight("LocatorCheck::Display");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Check locators embedded in the map");
@@ -164,6 +175,7 @@ namespace EditorHelpers
 
                 UI::TreePop();
             }
+            EditorHelpers::EndHighlight();
         }
 
         private void RecursiveAddDefaultSkinsPath(CSystemFidsFolder@ fidsFolder, const string&in prefix, string[]& paths)

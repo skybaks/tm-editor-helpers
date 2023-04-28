@@ -33,12 +33,20 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_Quicksave_Enabled = UI::Checkbox("Enabled", Setting_Quicksave_Enabled);
             UI::BeginDisabled(!Setting_Quicksave_Enabled);
             UI::TextWrapped("Provides an interface to be able to save your map in one click without popup dialogs.");
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("Quicksave::Display");
+            }
+
             UI::PopID();
         }
 
@@ -60,6 +68,7 @@ namespace EditorHelpers
         {
             if (!Enabled() || Editor is null) return;
 
+            EditorHelpers::BeginHighlight("Quicksave::Display");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Save map in one click");
@@ -73,6 +82,7 @@ namespace EditorHelpers
             UI::EndDisabled();
             UI::SameLine();
             UI::Text(Editor.PluginMapType.MapFileName);
+            EditorHelpers::EndHighlight();
         }
 
         void Update(float dt) override

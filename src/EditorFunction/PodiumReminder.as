@@ -40,11 +40,14 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_PodiumReminder_Enabled = UI::Checkbox("Enabled", Setting_PodiumReminder_Enabled);
             UI::BeginDisabled(!Setting_PodiumReminder_Enabled);
-            UI::TextWrapped("This function will keep track of the podiums in a map and generate notifications so you don't forget to place a podium.");
+            UI::TextWrapped("This function will keep track of the podiums in a map and generate notifications so"
+                " you don't forget to place a podium.");
 
             Setting_PodiumReminder_NotificationEnabled = UI::Checkbox("Display a notification when map is saved", Setting_PodiumReminder_NotificationEnabled);
 
@@ -52,8 +55,13 @@ namespace EditorHelpers
             UI::SameLine();
             float notificationLength = UI::InputFloat("##Setting_PodiumReminder_NotificationLength", Setting_PodiumReminder_NotificationLength);
             Setting_PodiumReminder_NotificationLength = Math::Min(25.0, Math::Max(1.0, notificationLength));
-
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("PodiumReminder::ReminderText");
+            }
+
             UI::PopID();
         }
 
@@ -121,6 +129,8 @@ namespace EditorHelpers
         void RenderInterface_Info() override
         {
             if (!Enabled()) return;
+
+            EditorHelpers::BeginHighlight("PodiumReminder::ReminderText");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Reminder to place a podium");
@@ -147,6 +157,7 @@ namespace EditorHelpers
                 UI::SameLine();
                 UI::Text("Podium Check: Valid");
             }
+            EditorHelpers::EndHighlight();
         }
 
         private int GetPodiumCount()

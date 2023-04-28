@@ -41,14 +41,26 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_PlacementGrid_Enabled = UI::Checkbox("Enabled", Setting_PlacementGrid_Enabled);
             UI::BeginDisabled(!Setting_PlacementGrid_Enabled);
-            UI::TextWrapped("Enables forcing on the editor's placement grid, also know as 'helpers'. Normally you would need to turn this on each time you enter the editor but with this function the plugin can do that for you. Additionally, there is an option to make the grid a transparent wireframe which can be quite helpful for building in free block mode and off grid.");
+            UI::TextWrapped("Enables forcing on the editor's placement grid, also know as 'helpers'. Normally you"
+                " would need to turn this on each time you enter the editor but with this function the plugin can do"
+                " that for you. Additionally, there is an option to make the grid a transparent wireframe which can"
+                " be quite helpful for building in free block mode and off grid.");
             Setting_PlacementGrid_PlacementGridOn = UI::Checkbox("Force the placement grid on", Setting_PlacementGrid_PlacementGridOn);
             Setting_PlacementGrid_PlacementGridTransparent = UI::Checkbox("Make the placement grid transparent", Setting_PlacementGrid_PlacementGridTransparent);
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("PlacementGrid::GridOn");
+                EditorHelpers::SetHighlightId("PlacementGrid::Transparent");
+            }
+
             UI::PopID();
         }
 
@@ -56,14 +68,19 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
 
+            EditorHelpers::BeginHighlight("PlacementGrid::GridOn");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Display the horizontal block grid");
                 UI::SameLine();
             }
             Setting_PlacementGrid_PlacementGridOn = UI::Checkbox("Placement Grid On", Setting_PlacementGrid_PlacementGridOn);
+            EditorHelpers::EndHighlight();
+
             UI::SameLine();
+            EditorHelpers::BeginHighlight("PlacementGrid::Transparent");
             Setting_PlacementGrid_PlacementGridTransparent = UI::Checkbox("Transparent", Setting_PlacementGrid_PlacementGridTransparent);
+            EditorHelpers::EndHighlight();
         }
 
         void Update(float) override
@@ -115,11 +132,17 @@ namespace EditorHelpers
 
         bool RenderPresetEnables(Json::Value@ json) override
         {
-            //json["enable_grid_on"] = UI::Checkbox("Grid On", bool(json.Get("enable_grid_on", Json::Value(true))));
-            //json["enable_grid_transparent"] = UI::Checkbox("Grid Transparent", bool(json.Get("enable_grid_transparent", Json::Value(true))));
             bool changed = false;
             if (JsonCheckboxChanged(json, "enable_grid_on", "Grid On")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("PlacementGrid::GridOn");
+            }
             if (JsonCheckboxChanged(json, "enable_grid_transparent", "Grid Transparent")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("PlacementGrid::Transparent");
+            }
             return changed;
         }
     }

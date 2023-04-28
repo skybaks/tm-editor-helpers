@@ -49,12 +49,20 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_CursorPosition_Enabled = UI::Checkbox("Enabled", Setting_CursorPosition_Enabled);
             UI::BeginDisabled(!Setting_CursorPosition_Enabled);
             UI::TextWrapped("Displays the cursor position (x, y, z) in the map.");
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("CursorPosition::PositionDisplay");
+            }
+
             UI::PopID();
         }
 
@@ -75,6 +83,8 @@ namespace EditorHelpers
         void RenderInterface_Info() override
         {
             if (!Enabled() || Editor is null) return;
+
+            EditorHelpers::BeginHighlight("CursorPosition::PositionDisplay");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Current X, Y, Z position of the block/item cursor");
@@ -84,6 +94,7 @@ namespace EditorHelpers
                   Text::Format("%8.3f", m_position.x) + " "
                 + Text::Format("%8.3f", m_position.y) + " "
                 + Text::Format("%8.3f", m_position.z));
+            EditorHelpers::EndHighlight();
         }
     }
 }

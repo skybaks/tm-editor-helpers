@@ -200,15 +200,28 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_CustomItemPlacement_Enabled = UI::Checkbox("Enabled", Setting_CustomItemPlacement_Enabled);
             UI::BeginDisabled(!Setting_CustomItemPlacement_Enabled);
-            UI::TextWrapped("Provides the ability to modify aspects of item placement on the fly. This includes changing an item's placement grid, changing an item's primary pivot point, and/or forcing ghost mode on the item.");
+            UI::TextWrapped("Provides the ability to modify aspects of item placement on the fly. This includes"
+                " changing an item's placement grid, changing an item's primary pivot point, and/or forcing ghost"
+                " mode on the item.");
             Setting_CustomItemPlacement_PersistGhost = UI::Checkbox("Persist Force Item Ghost Mode selection between editor sessions", Setting_CustomItemPlacement_PersistGhost);
             Setting_CustomItemPlacement_PersistGrid = UI::Checkbox("Persist Force Item Grid selection between editor sessions", Setting_CustomItemPlacement_PersistGrid);
             Setting_CustomItemPlacement_PersistPivot = UI::Checkbox("Persist Force Item Pivot selection between editor sessions", Setting_CustomItemPlacement_PersistPivot);
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("CustomItemPlacement::GhostMode");
+                EditorHelpers::SetHighlightId("CustomItemPlacement::Autorotation");
+                EditorHelpers::SetHighlightId("CustomItemPlacement::ItemGrid");
+                EditorHelpers::SetHighlightId("CustomItemPlacement::ItemPivot");
+            }
+
             UI::PopID();
         }
 
@@ -258,21 +271,27 @@ namespace EditorHelpers
             if (!Enabled()) return;
 
             UI::PushID("CustomItemPlacement::RenderInterface");
+
+            EditorHelpers::BeginHighlight("CustomItemPlacement::GhostMode");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Forces Ghost Mode on all items");
                 UI::SameLine();
             }
             Setting_CustomItemPlacement_ApplyGhost = UI::Checkbox("Ghost Item Mode", Setting_CustomItemPlacement_ApplyGhost);
+            EditorHelpers::EndHighlight();
 
+            EditorHelpers::BeginHighlight("CustomItemPlacement::Autorotation");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Activate AutoRotation for the current item. Also forces placement grid to <0, 0> so autorotation can operate.");
                 UI::SameLine();
             }
             Setting_CustomItemPlacement_ApplyAutoRotation = UI::Checkbox("Item AutoRotation", Setting_CustomItemPlacement_ApplyAutoRotation);
+            EditorHelpers::EndHighlight();
 
             UI::TextDisabled("\tItem Placement");
+            EditorHelpers::BeginHighlight("CustomItemPlacement::ItemGrid");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Forces the following placement grid on all items");
@@ -281,8 +300,10 @@ namespace EditorHelpers
             Setting_CustomItemPlacement_ApplyGrid = UI::Checkbox("Apply Grid to Items", Setting_CustomItemPlacement_ApplyGrid);
             Setting_CustomItemPlacement_GridSizeHoriz = UI::InputFloat("Horizontal Grid", Setting_CustomItemPlacement_GridSizeHoriz);
             Setting_CustomItemPlacement_GridSizeVerti = UI::InputFloat("Vertical Grid", Setting_CustomItemPlacement_GridSizeVerti);
+            EditorHelpers::EndHighlight();
 
             UI::TextDisabled("\tItem Pivot");
+            EditorHelpers::BeginHighlight("CustomItemPlacement::ItemPivot");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Advanced manipulation of item pivot");
@@ -292,6 +313,8 @@ namespace EditorHelpers
             Setting_CustomItemPlacement_ItemPivot.x = UI::InputFloat("Pivot X", Setting_CustomItemPlacement_ItemPivot.x);
             Setting_CustomItemPlacement_ItemPivot.y = UI::InputFloat("Pivot Y", Setting_CustomItemPlacement_ItemPivot.y);
             Setting_CustomItemPlacement_ItemPivot.z = UI::InputFloat("Pivot Z", Setting_CustomItemPlacement_ItemPivot.z);
+            EditorHelpers::EndHighlight();
+
             UI::PopID();
         }
 
@@ -582,9 +605,25 @@ namespace EditorHelpers
         {
             bool changed = false;
             if (JsonCheckboxChanged(json, "enable_ghost_mode", "Ghost Mode")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("CustomItemPlacement::GhostMode");
+            }
             if (JsonCheckboxChanged(json, "enable_autorotation", "Autorotation")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("CustomItemPlacement::Autorotation");
+            }
             if (JsonCheckboxChanged(json, "enable_item_grid", "Item Grid")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("CustomItemPlacement::ItemGrid");
+            }
             if (JsonCheckboxChanged(json, "enable_item_pivot", "Item Pivot")) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("CustomItemPlacement::ItemPivot");
+            }
             return changed;
         }
     }
