@@ -152,18 +152,6 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface_Display() override
-        {
-            if (!Enabled()) return;
-
-            if (settingToolTipsEnabled)
-            {
-                EditorHelpers::HelpMarker("Show or hide the window for the custom block palette");
-                UI::SameLine();
-            }
-            Setting_EditorInventory_WindowVisible = UI::Checkbox("Show Editor Inventory Window", Setting_EditorInventory_WindowVisible);
-        }
-
         void RenderInterface_ChildWindow() override
         {
             if (!Enabled() || Editor is null || m_articles.Length == 0 || !Setting_EditorInventory_WindowVisible)

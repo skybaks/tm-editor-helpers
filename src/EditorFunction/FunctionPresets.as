@@ -132,18 +132,6 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface_Display() override
-        {
-            if (!Enabled()) { return; }
-
-            if (settingToolTipsEnabled)
-            {
-                EditorHelpers::HelpMarker("Show or hide the window for managing presets");
-                UI::SameLine();
-            }
-            Setting_FunctionPresets_WindowVisible = UI::Checkbox("Show Presets Window", Setting_FunctionPresets_WindowVisible);
-        }
-
         void RenderInterface_ChildWindow() override
         {
             if (!Enabled() || !Setting_FunctionPresets_WindowVisible)
@@ -260,9 +248,9 @@ namespace EditorHelpers
 
                             if (UI::BeginChild("FunctionPresetsTabBarTableChildCol1"))
                             {
-                                for (uint index = 0; index < functions.Length; index++)
+                                for (uint index = 0; index < g_functions.Length; index++)
                                 {
-                                    EditorFunction@ ef = functions[index];
+                                    EditorFunction@ ef = g_functions[index];
                                     if (ef.SupportsPresets())
                                     {
                                         auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
@@ -316,9 +304,9 @@ namespace EditorHelpers
                             }
                             if (UI::Button("Update Preset Data"))
                             {
-                                for (uint index = 0; index < functions.Length; index++)
+                                for (uint index = 0; index < g_functions.Length; index++)
                                 {
-                                    EditorFunction@ ef = functions[index];
+                                    EditorFunction@ ef = g_functions[index];
                                     auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
                                     if (ef.SupportsPresets() && presetItem !is null)
                                     {
@@ -345,9 +333,9 @@ namespace EditorHelpers
                                     UI::TableSetupColumn("Col1");
                                     UI::TableSetupColumn("Col2");
 
-                                    for (uint index = 0; index < functions.Length; index++)
+                                    for (uint index = 0; index < g_functions.Length; index++)
                                     {
-                                        EditorFunction@ ef = functions[index];
+                                        EditorFunction@ ef = g_functions[index];
                                         auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
                                         if (ef.SupportsPresets() && presetItem !is null)
                                         {
@@ -409,9 +397,9 @@ namespace EditorHelpers
 
             Debug("Applying preset data for name " + preset.Name);
 
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functions.Length; index++)
             {
-                EditorFunction@ ef = functions[index];
+                EditorFunction@ ef = g_functions[index];
                 auto@ presetItem = preset.GetItem(ef.Name());
                 if (ef.SupportsPresets() && presetItem !is null)
                 {

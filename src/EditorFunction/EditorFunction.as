@@ -1,16 +1,6 @@
 
 namespace EditorHelpers
 {
-    enum EditorFunctionInterfaceCategory
-    {
-        None,
-        Action,
-        Display,
-        Build,
-        Info,
-        Mixed
-    }
-
     abstract class EditorFunction
     {
         bool FirstPass = true;
@@ -21,7 +11,6 @@ namespace EditorHelpers
         bool Enabled(){ return false; }
         bool HasSettingsEntry() { return true; }
         bool SupportsPresets() { return false; }
-        EditorFunctionInterfaceCategory get_Category() { return EditorFunctionInterfaceCategory::None; }
         void Init(){}
         void RenderInterface_Action(){}
         void RenderInterface_Display(){}

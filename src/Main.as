@@ -8,33 +8,42 @@ bool Setting_DebugLoggingEnabled = false;
 
 const string g_windowName = Icons::PuzzlePiece + " Editor Helpers";
 
-array<EditorHelpers::EditorFunction@> functions =
+array<EditorHelpers::EditorFunction@> g_functionsNone =
 {
-      EditorHelpers::EventSignals()                     // None
-    , EditorHelpers::RememberPlacementModes()           // None
-
-    , EditorHelpers::Quicksave()                        // Action
-    , EditorHelpers::Hotkeys()                          // Action
-
-    , EditorHelpers::BlockHelpers()                     // Display
-    , EditorHelpers::BlockCursor()                      // Display
-    , EditorHelpers::PlacementGrid()                    // Display
-    , EditorHelpers::CameraModes()                      // Display
-    , EditorHelpers::EditorInventory()                  // Display
-    , EditorHelpers::FunctionPresets()                  // Display / Action
-
-    , EditorHelpers::CustomItemPlacement()              // Build
-    , EditorHelpers::FreeblockModePreciseRotation()     // Build
-    , EditorHelpers::RotationRandomizer()               // Build
-    , EditorHelpers::FreeblockPlacement()               // Build
-    , EditorHelpers::DefaultBlockMode()                 // Build
-    , EditorHelpers::MoodChanger()                      // Build
-
-    , EditorHelpers::LocatorCheck()                     // Info
-    , EditorHelpers::PodiumReminder()                   // Info
-    , EditorHelpers::CursorPosition()                   // Info
-    , EditorHelpers::Links()                            // Info
+      EditorHelpers::EventSignals()
+    , EditorHelpers::RememberPlacementModes()
+    , EditorHelpers::EditorInventory()
 };
+array<EditorHelpers::EditorFunction@> g_functionsAction =
+{
+      EditorHelpers::Quicksave()
+    , EditorHelpers::Hotkeys()
+    , EditorHelpers::FunctionPresets()
+};
+array<EditorHelpers::EditorFunction@> g_functionsDisplay =
+{
+      EditorHelpers::BlockHelpers()
+    , EditorHelpers::BlockCursor()
+    , EditorHelpers::PlacementGrid()
+    , EditorHelpers::CameraModes()
+};
+array<EditorHelpers::EditorFunction@> g_functionsBuild =
+{
+      EditorHelpers::CustomItemPlacement()
+    , EditorHelpers::FreeblockModePreciseRotation()
+    , EditorHelpers::RotationRandomizer()
+    , EditorHelpers::FreeblockPlacement()
+    , EditorHelpers::DefaultBlockMode()
+    , EditorHelpers::MoodChanger()
+};
+array<EditorHelpers::EditorFunction@> g_functionsInfo =
+{
+      EditorHelpers::LocatorCheck()
+    , EditorHelpers::PodiumReminder()
+    , EditorHelpers::CursorPosition()
+    , EditorHelpers::Links()
+};
+array<EditorHelpers::EditorFunction@> g_functions;
 
 namespace Compatibility
 {
@@ -64,9 +73,9 @@ void RenderMenu()
             settingWindowVisible = !settingWindowVisible;
         }
 
-        for (uint index = 0; index < functions.Length; index++)
+        for (uint index = 0; index < g_functions.Length; index++)
         {
-            functions[index].RenderInterface_MenuItem();
+            g_functions[index].RenderInterface_MenuItem();
         }
         UI::EndMenu();
     }
@@ -83,41 +92,41 @@ void RenderInterface()
         UI::Begin(g_windowName, settingWindowVisible);
         if (UI::CollapsingHeader("Action"))
         {
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functionsAction.Length; index++)
             {
-                functions[index].RenderInterface_Action();
+                g_functionsAction[index].RenderInterface_Action();
             }
         }
 
         if (UI::CollapsingHeader("Display"))
         {
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functionsDisplay.Length; index++)
             {
-                functions[index].RenderInterface_Display();
+                g_functionsDisplay[index].RenderInterface_Display();
             }
         }
 
         if (UI::CollapsingHeader("Build"))
         {
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functionsBuild.Length; index++)
             {
-                functions[index].RenderInterface_Build();
+                g_functionsBuild[index].RenderInterface_Build();
             }
         }
 
         if (UI::CollapsingHeader("Info"))
         {
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functionsInfo.Length; index++)
             {
-                functions[index].RenderInterface_Info();
+                g_functionsInfo[index].RenderInterface_Info();
             }
         }
         UI::End();
     }
 
-    for (uint index = 0; index < functions.Length; index++)
+    for (uint index = 0; index < g_functions.Length; index++)
     {
-        functions[index].RenderInterface_ChildWindow();
+        g_functions[index].RenderInterface_ChildWindow();
     }
 }
 
@@ -128,16 +137,18 @@ void RenderSettingsPage()
     UI::Markdown("# Editor Helpers");
     settingToolTipsEnabled = UI::Checkbox("Show tooltips in the editor helpers window", settingToolTipsEnabled);
     Setting_DebugLoggingEnabled = UI::Checkbox("Enable EXTREMELY VERBOSE logging to Openplanet.log", Setting_DebugLoggingEnabled);
-    UI::TextWrapped("Listed in these settings are each individual function of the editor helpers plugin. You can enable or disable each plugin individually. Disabling a function will remove any UI associated with it and stop it from operating. Turn on and off the things you want to customize your experience with this plugin.");
+    UI::TextWrapped("Listed in these settings are each individual function of the editor helpers plugin. You can"
+        " enable or disable each plugin individually. Disabling a function will remove any UI associated with it and"
+        " stop it from operating. Turn on and off the things you want to customize your experience with this plugin.");
     UI::Dummy(vec2(20.0f, 20.0f));
     UI::PopID();
 
     UI::Separator();
-    for (uint index = 0; index < functions.Length; index++)
+    for (uint index = 0; index < g_functions.Length; index++)
     {
-        if (functions[index].HasSettingsEntry())
+        if (g_functions[index].HasSettingsEntry())
         {
-            functions[index].RenderInterface_Settings();
+            g_functions[index].RenderInterface_Settings();
             UI::Dummy(vec2(10.0f, 10.0f));
             UI::Separator();
         }
@@ -147,14 +158,20 @@ void RenderSettingsPage()
 void OnKeyPress(bool down, VirtualKey key)
 {
     if (!EditorHelpers::HasPermission()) return;
-    for (uint index = 0; index < functions.Length; index++)
+    for (uint index = 0; index < g_functions.Length; index++)
     {
-        functions[index].OnKeyPress(down, key);
+        g_functions[index].OnKeyPress(down, key);
     }
 }
 
 void Main()
 {
+    for (uint i = 0; i < g_functionsNone.Length; ++i) { g_functions.InsertLast(g_functionsNone[i]); }
+    for (uint i = 0; i < g_functionsAction.Length; ++i) { g_functions.InsertLast(g_functionsAction[i]); }
+    for (uint i = 0; i < g_functionsDisplay.Length; ++i) { g_functions.InsertLast(g_functionsDisplay[i]); }
+    for (uint i = 0; i < g_functionsBuild.Length; ++i) { g_functions.InsertLast(g_functionsBuild[i]); }
+    for (uint i = 0; i < g_functionsInfo.Length; ++i) { g_functions.InsertLast(g_functionsInfo[i]); }
+
     int dt = 0;
     float dtSeconds = 0.0;
     int prevFrameTime = Time::Now;
@@ -168,11 +185,11 @@ void Main()
         EditorHelpers::permissionReduceSpamTimer.Update(dtSeconds);
         if (EditorHelpers::HasPermission())
         {
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functions.Length; index++)
             {
-                functions[index].Init();
-                functions[index].Update(dt);
-                functions[index].FirstPass = false;
+                g_functions[index].Init();
+                g_functions[index].Update(dt);
+                g_functions[index].FirstPass = false;
             }
         }
         prevFrameTime = Time::Now;

@@ -227,9 +227,9 @@ namespace EditorHelpers
 
             if (m_presetsFunctionRef is null)
             {
-                for (uint i = 0; i < functions.Length; ++i)
+                for (uint i = 0; i < g_functions.Length; ++i)
                 {
-                    @m_presetsFunctionRef = cast<FunctionPresets>(functions[i]);
+                    @m_presetsFunctionRef = cast<FunctionPresets>(g_functions[i]);
 
                     if (m_presetsFunctionRef !is null)
                     {
