@@ -120,10 +120,10 @@ namespace EditorHelpers
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_helpers_off", "Helpers Off")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_helpers_off", "Helpers Off", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("BlockHelpers::HelpersOff");

@@ -10,26 +10,30 @@ const string g_windowName = Icons::PuzzlePiece + " Editor Helpers";
 
 array<EditorHelpers::EditorFunction@> functions =
 {
-      EditorHelpers::EventSignals()
-    , EditorHelpers::Quicksave()
-    , EditorHelpers::BlockHelpers()
-    , EditorHelpers::BlockCursor()
-    , EditorHelpers::PlacementGrid()
-    , EditorHelpers::RememberPlacementModes()
-    , EditorHelpers::CustomItemPlacement()
-    , EditorHelpers::FreeblockModePreciseRotation()
-    , EditorHelpers::Hotkeys()
-    , EditorHelpers::RotationRandomizer()
-    , EditorHelpers::FreeblockPlacement()
-    , EditorHelpers::DefaultBlockMode()
-    , EditorHelpers::MoodChanger()
-    , EditorHelpers::CameraModes()
-    , EditorHelpers::EditorInventory()
-    , EditorHelpers::LocatorCheck()
-    , EditorHelpers::PodiumReminder()
-    , EditorHelpers::CursorPosition()
-    , EditorHelpers::Links()
-    , EditorHelpers::FunctionPresets()
+      EditorHelpers::EventSignals()                     // None
+    , EditorHelpers::RememberPlacementModes()           // None
+
+    , EditorHelpers::Quicksave()                        // Action
+    , EditorHelpers::Hotkeys()                          // Action
+
+    , EditorHelpers::BlockHelpers()                     // Display
+    , EditorHelpers::BlockCursor()                      // Display
+    , EditorHelpers::PlacementGrid()                    // Display
+    , EditorHelpers::CameraModes()                      // Display
+    , EditorHelpers::EditorInventory()                  // Display
+    , EditorHelpers::FunctionPresets()                  // Display / Action
+
+    , EditorHelpers::CustomItemPlacement()              // Build
+    , EditorHelpers::FreeblockModePreciseRotation()     // Build
+    , EditorHelpers::RotationRandomizer()               // Build
+    , EditorHelpers::FreeblockPlacement()               // Build
+    , EditorHelpers::DefaultBlockMode()                 // Build
+    , EditorHelpers::MoodChanger()                      // Build
+
+    , EditorHelpers::LocatorCheck()                     // Info
+    , EditorHelpers::PodiumReminder()                   // Info
+    , EditorHelpers::CursorPosition()                   // Info
+    , EditorHelpers::Links()                            // Info
 };
 
 namespace Compatibility

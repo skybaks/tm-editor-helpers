@@ -601,25 +601,25 @@ namespace EditorHelpers
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_ghost_mode", "Ghost Mode")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_ghost_mode", "Ghost Mode", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("CustomItemPlacement::GhostMode");
             }
-            if (JsonCheckboxChanged(json, "enable_autorotation", "Autorotation")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_autorotation", "Autorotation", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("CustomItemPlacement::Autorotation");
             }
-            if (JsonCheckboxChanged(json, "enable_item_grid", "Item Grid")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_item_grid", "Item Grid", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("CustomItemPlacement::ItemGrid");
             }
-            if (JsonCheckboxChanged(json, "enable_item_pivot", "Item Pivot")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_item_pivot", "Item Pivot", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("CustomItemPlacement::ItemPivot");

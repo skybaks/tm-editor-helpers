@@ -130,15 +130,15 @@ namespace EditorHelpers
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_grid_on", "Grid On")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_grid_on", "Grid On", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("PlacementGrid::GridOn");
             }
-            if (JsonCheckboxChanged(json, "enable_grid_transparent", "Grid Transparent")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_grid_transparent", "Grid Transparent", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("PlacementGrid::Transparent");

@@ -231,15 +231,15 @@ namespace EditorHelpers
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_grid", "Freeblock Grid")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_grid", "Freeblock Grid", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("FreeblockPlacement::Grid");
             }
-            if (JsonCheckboxChanged(json, "enable_translate", "Freeblock Translation")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_translate", "Freeblock Translation", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("FreeblockPlacement::Translate");

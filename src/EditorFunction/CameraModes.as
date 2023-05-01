@@ -117,10 +117,10 @@ namespace EditorHelpers
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_camera", "Camera")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_camera", "Camera", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("CameraModes::CameraMode");

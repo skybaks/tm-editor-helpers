@@ -381,20 +381,20 @@ namespace EditorHelpers
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_block_mode", "Block mode")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_block_mode", "Block mode", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("DefaultBlockMode::Blocks");
             }
-            if (JsonCheckboxChanged(json, "enable_item_mode", "Item mode")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_item_mode", "Item mode", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("DefaultBlockMode::Items");
             }
-            if (JsonCheckboxChanged(json, "enable_macroblock_mode", "Macroblock mode")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_macroblock_mode", "Macroblock mode", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("DefaultBlockMode::Macroblocks");

@@ -509,25 +509,25 @@ namespace EditorHelpers
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_randomizer_mode", "Randomizer Mode")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_randomizer_mode", "Randomizer Mode", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("RotationRandomizer::Mode");
             }
-            if (JsonCheckboxChanged(json, "enable_axes", "Enable Axes")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_axes", "Enable Axes", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("RotationRandomizer::AxesLimitsSteps");
             }
-            if (JsonCheckboxChanged(json, "enable_axis_limits", "Axis Limits")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_axis_limits", "Axis Limits", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("RotationRandomizer::AxesLimitsSteps");
             }
-            if (JsonCheckboxChanged(json, "enable_axis_steps", "Axis Steps")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_axis_steps", "Axis Steps", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("RotationRandomizer::AxesLimitsSteps");

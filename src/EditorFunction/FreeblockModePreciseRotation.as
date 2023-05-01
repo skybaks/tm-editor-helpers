@@ -238,15 +238,15 @@ namespace EditorHelpers
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_step_size", "Step Size")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_step_size", "Step Size", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::StepSize");
             }
-            if (JsonCheckboxChanged(json, "enable_pitch_roll", "Pitch/Roll")) { changed = true; }
+            if (JsonCheckboxChanged(json, "enable_pitch_roll", "Pitch/Roll", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::PitchRoll");

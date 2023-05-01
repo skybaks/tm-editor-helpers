@@ -159,10 +159,12 @@ namespace EditorHelpers
                 EditorHelpers::HelpMarker("Create a new preset");
                 UI::SameLine();
             }
+            bool newPreset = false;
             if (UI::Button(" New Preset"))
             {
                 m_presets.InsertLast(EditorFunctionPreset());
                 m_forcePresetIndex = m_presets.Length - 1;
+                newPreset = true;
             }
 
             UI::BeginDisabled(m_deleteConfirm);
@@ -240,6 +242,22 @@ namespace EditorHelpers
                                 UI::SameLine();
                             }
                             UI::Text("Enabled Functions");
+                            UI::Separator();
+
+                            bool forceValueFlag = false;
+                            bool forceValue = true;
+                            if (UI::Button(" Select All") || newPreset)
+                            {
+                                forceValueFlag = true;
+                                forceValue = true;
+                            }
+                            UI::SameLine();
+                            if (UI::Button(" Select None"))
+                            {
+                                forceValueFlag = true;
+                                forceValue = false;
+                            }
+
                             if (UI::BeginChild("FunctionPresetsTabBarTableChildCol1"))
                             {
                                 for (uint index = 0; index < functions.Length; index++)
@@ -248,9 +266,7 @@ namespace EditorHelpers
                                     if (ef.SupportsPresets())
                                     {
                                         auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
-                                        ef.PresetConfigMode = UI::Checkbox(ef.Name() + "##" + tostring(index), presetItem !is null);
-
-                                        if (ef.PresetConfigMode && presetItem is null)
+                                        if (presetItem is null)
                                         {
                                             @presetItem = EditorFunctionPresetItem(ef.Name());
                                             if (presetItem !is null)
@@ -260,31 +276,12 @@ namespace EditorHelpers
                                                 m_signalSave = true;
                                             }
                                         }
-                                        else if (!ef.PresetConfigMode && presetItem !is null)
-                                        {
-                                            int presetItemIndex = m_presets[presetIndex].Functions.FindByRef(presetItem);
-                                            if (presetItemIndex >= 0)
-                                            {
-                                                m_presets[presetIndex].Functions.RemoveAt(presetItemIndex);
-                                                m_signalSave = true;
-                                            }
-                                        }
 
-                                        if (ef.PresetConfigMode && presetItem !is null)
+                                        if (presetItem !is null)
                                         {
-                                            // Using table to indent this until API is updated
-                                            // https://github.com/openplanet-nl/issues/issues/297
-                                            if (UI::BeginTable("PresetEnableTable", 2 /* cols */))
+                                            if (ef.RenderPresetEnables(presetItem.JsonData, forceValue, forceValueFlag))
                                             {
-                                                UI::TableSetupColumn("Col1", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 20.0);
-                                                UI::TableSetupColumn("Col2");
-                                                UI::TableNextColumn();
-                                                UI::TableNextColumn();
-                                                if (ef.RenderPresetEnables(presetItem.JsonData))
-                                                {
-                                                    m_signalSave = true;
-                                                }
-                                                UI::EndTable();
+                                                m_signalSave = true;
                                             }
                                         }
                                     }
@@ -349,11 +346,7 @@ namespace EditorHelpers
                                     auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
                                     if (ef.SupportsPresets() && presetItem !is null)
                                     {
-                                        if (UI::TreeNode(ef.Name() + "##" + presetIndex, UI::TreeNodeFlags::DefaultOpen))
-                                        {
-                                            ef.RenderPresetValues(presetItem.JsonData);
-                                            UI::TreePop();
-                                        }
+                                        ef.RenderPresetValues(presetItem.JsonData);
                                     }
                                 }
                             }
@@ -514,10 +507,11 @@ namespace EditorHelpers
         }
     }
 
-    bool JsonCheckboxChanged(Json::Value@ json, const string&in key, const string&in text, bool defaultValue = true)
+    bool JsonCheckboxChanged(Json::Value@ json, const string&in key, const string&in text, bool defaultValue, bool forceValue)
     {
         bool beforeVal = bool(json.Get(key, Json::Value(defaultValue)));
         bool afterVal = UI::Checkbox(text, beforeVal);
+        if (forceValue) { afterVal = defaultValue; }
         json[key] = afterVal;
         return beforeVal != afterVal;
     }
