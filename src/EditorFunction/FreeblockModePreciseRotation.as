@@ -232,12 +232,25 @@ namespace EditorHelpers
             if (!Enabled()) { return; }
             if (bool(json.Get("enable_step_size", Json::Value(true))))
             {
-                UI::Text("Step Size: " + string(json.Get("step_size", Json::Value("Default"))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Step Size");
+                UI::TableNextColumn();
+                UI::Text(string(json.Get("step_size", Json::Value("Default"))));
             }
             if (bool(json.Get("enable_pitch_roll", Json::Value(true))))
             {
-                UI::Text("Pitch: " + float(json.Get("pitch", Json::Value(0.0f))));
-                UI::Text("Roll: " + float(json.Get("roll", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Pitch");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("pitch", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Roll");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("roll", Json::Value(0.0f)))));
             }
         }
 

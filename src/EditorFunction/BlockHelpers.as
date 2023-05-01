@@ -119,7 +119,11 @@ namespace EditorHelpers
             if (!Enabled()) { return; }
             if (bool(json.Get("enable_helpers_off", Json::Value(true))))
             {
-                UI::Text("Block Helpers Off: " + bool(json.Get("helpers_off", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Block Helpers Off");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("helpers_off", Json::Value(false)))));
             }
         }
 

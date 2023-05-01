@@ -221,16 +221,49 @@ namespace EditorHelpers
             if (!Enabled()) { return; }
             if (bool(json.Get("enable_grid", Json::Value(true))))
             {
-                UI::Text("Apply Freeblock Grid: " + bool(json.Get("apply_grid", Json::Value(false))));
-                UI::Text("Horizontal Grid: " + float(json.Get("horizontal_grid", Json::Value(0.0f))));
-                UI::Text("Vertical Grid: " + float(json.Get("vertical_grid", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Apply Freeblock Grid");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("apply_grid", Json::Value(false)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Horizontal Grid");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("horizontal_grid", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Vertical Grid");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("vertical_grid", Json::Value(0.0f)))));
             }
             if (bool(json.Get("enable_translate", Json::Value(true))))
             {
-                UI::Text("Apply Freeblock Translation: " + bool(json.Get("apply_translation", Json::Value(false))));
-                UI::Text("X Translation: " + float(json.Get("x_translation", Json::Value(0.0f))));
-                UI::Text("Y Translation: " + float(json.Get("y_translation", Json::Value(0.0f))));
-                UI::Text("Z Translation: " + float(json.Get("z_translation", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Apply Freeblock Translation");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("apply_translation", Json::Value(false)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("X Translation");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("x_translation", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Y Translation");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("y_translation", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Z Translation");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("z_translation", Json::Value(0.0f)))));
             }
         }
 

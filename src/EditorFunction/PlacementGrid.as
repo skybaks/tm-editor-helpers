@@ -125,11 +125,19 @@ namespace EditorHelpers
             if (!Enabled()) { return; }
             if (bool(json.Get("enable_grid_on", Json::Value(true))))
             {
-                UI::Text("Placement Grid On: " + bool(json.Get("grid_on", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Placement Grid On");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("grid_on", Json::Value(false)))));
             }
             if (bool(json.Get("enable_grid_transparent", Json::Value(true))))
             {
-                UI::Text("Placement Grid Transparent: " + bool(json.Get("transparent", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Placement Grid Transparent");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("transparent", Json::Value(false)))));
             }
         }
 

@@ -583,24 +583,65 @@ namespace EditorHelpers
             if (!Enabled()) { return; }
             if (bool(json.Get("enable_ghost_mode", Json::Value(true))))
             {
-                UI::Text("Apply Ghost Mode: " + bool(json.Get("ghost_mode", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Apply Ghost Mode");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("ghost_mode", Json::Value(false)))));
             }
             if (bool(json.Get("enable_autorotation", Json::Value(true))))
             {
-                UI::Text("Apply Autorotation: " + bool(json.Get("autorotation", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Apply Autorotation");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("autorotation", Json::Value(false)))));
             }
             if (bool(json.Get("enable_item_grid", Json::Value(true))))
             {
-                UI::Text("Apply Item Grid: " + bool(json.Get("apply_grid", Json::Value(false))));
-                UI::Text("Grid Horizontal: " + float(json.Get("grid_horiz", Json::Value(0.0f))));
-                UI::Text("Grid Vertical: " + float(json.Get("grid_verti", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Apply Item Grid");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("apply_grid", Json::Value(false)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Grid Horizontal");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("grid_horiz", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Grid Vertical");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("grid_verti", Json::Value(0.0f)))));
             }
             if (bool(json.Get("enable_item_pivot", Json::Value(true))))
             {
-                UI::Text("Apply Item Pivot: " + bool(json.Get("apply_pivot", Json::Value(false))));
-                UI::Text("Pivot X: " + float(json.Get("pivot_x", Json::Value(0.0f))));
-                UI::Text("Pivot Y: " + float(json.Get("pivot_y", Json::Value(0.0f))));
-                UI::Text("Pivot Z: " + float(json.Get("pivot_z", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Apply Item Pivot");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("apply_pivot", Json::Value(false)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Pivot X");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("pivot_x", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Pivot Y");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("pivot_y", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Pivot Z");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("pivot_z", Json::Value(0.0f)))));
             }
         }
 

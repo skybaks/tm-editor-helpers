@@ -304,7 +304,11 @@ namespace EditorHelpers
             if (!Enabled()) { return; }
             if (bool(json.Get("enable_time", Json::Value(true))))
             {
-                UI::Text("Time: " + string(json.Get("time", Json::Value("12:06:00"))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Time");
+                UI::TableNextColumn();
+                UI::Text(string(json.Get("time", Json::Value("12:06:00"))));
             }
         }
 

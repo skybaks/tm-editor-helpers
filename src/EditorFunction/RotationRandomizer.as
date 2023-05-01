@@ -487,28 +487,89 @@ namespace EditorHelpers
             if (!Enabled()) { return; }
             if (bool(json.Get("enable_randomizer_mode", Json::Value(true))))
             {
-                UI::Text("Randomizer Mode: " + string(json.Get("randomizer_mode", Json::Value("OFF"))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Randomizer Mode");
+                UI::TableNextColumn();
+                UI::Text(string(json.Get("randomizer_mode", Json::Value("OFF"))));
             }
             if (bool(json.Get("enable_axes", Json::Value(true))))
             {
-                UI::Text("Enable X Axis: " + bool(json.Get("axis_x", Json::Value(false))));
-                UI::Text("Enable Y Axis: " + bool(json.Get("axis_y", Json::Value(false))));
-                UI::Text("Enable Z Axis: " + bool(json.Get("axis_z", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Enable X Axis");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("axis_x", Json::Value(false)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Enable Y Axis");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("axis_y", Json::Value(false)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Enable Z Axis");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("axis_z", Json::Value(false)))));
             }
             if (bool(json.Get("enable_axis_limits", Json::Value(true))))
             {
-                UI::Text("Y Limit (Min): " + float(json.Get("y_lim_min", Json::Value(0.0f))));
-                UI::Text("Y Limit (Max): " + float(json.Get("y_lim_max", Json::Value(0.0f))));
-                UI::Text("X Limit (Min): " + float(json.Get("x_lim_min", Json::Value(0.0f))));
-                UI::Text("X Limit (Max): " + float(json.Get("x_lim_max", Json::Value(0.0f))));
-                UI::Text("Z Limit (Min): " + float(json.Get("z_lim_min", Json::Value(0.0f))));
-                UI::Text("Z Limit (Max): " + float(json.Get("z_lim_max", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Y Limit (Min)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("y_lim_min", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Y Limit (Max)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("y_lim_max", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("X Limit (Min)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("x_lim_min", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("X Limit (Max)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("x_lim_max", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Z Limit (Min)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("z_lim_min", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Z Limit (Max)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("z_lim_max", Json::Value(0.0f)))));
             }
             if (bool(json.Get("enable_axis_steps", Json::Value(true))))
             {
-                UI::Text("Step Y: " + float(json.Get("step_y", Json::Value(0.0f))));
-                UI::Text("Step X: " + float(json.Get("step_x", Json::Value(0.0f))));
-                UI::Text("Step Z: " + float(json.Get("step_z", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Step Y");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("step_y", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Step X");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("step_x", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Step Z");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("step_z", Json::Value(0.0f)))));
             }
         }
 

@@ -340,14 +340,22 @@ namespace EditorHelpers
                             }
                             if (UI::BeginChild("FunctionPresetsTabBarTableChildCol2"))
                             {
-                                for (uint index = 0; index < functions.Length; index++)
+                                if (UI::BeginTable("FunctionPresetsRenderPresetValuesTable", 2 /* cols */))
                                 {
-                                    EditorFunction@ ef = functions[index];
-                                    auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
-                                    if (ef.SupportsPresets() && presetItem !is null)
+                                    UI::TableSetupColumn("Col1");
+                                    UI::TableSetupColumn("Col2");
+
+                                    for (uint index = 0; index < functions.Length; index++)
                                     {
-                                        ef.RenderPresetValues(presetItem.JsonData);
+                                        EditorFunction@ ef = functions[index];
+                                        auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
+                                        if (ef.SupportsPresets() && presetItem !is null)
+                                        {
+                                            ef.RenderPresetValues(presetItem.JsonData);
+                                        }
                                     }
+
+                                    UI::EndTable();
                                 }
                             }
                             UI::EndChild();

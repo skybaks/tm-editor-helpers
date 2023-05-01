@@ -110,7 +110,11 @@ namespace EditorHelpers
             if (!Enabled()) { return; }
             if (bool(json.Get("enable_cursor_hidden", Json::Value(true))))
             {
-                UI::Text("Block Cursor Hidden: " + bool(json.Get("cursor_hidden", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Block Cursor Hidden");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("cursor_hidden", Json::Value(false)))));
             }
         }
 

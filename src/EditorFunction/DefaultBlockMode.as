@@ -369,18 +369,45 @@ namespace EditorHelpers
             if (!Enabled()) { return; }
             if (bool(json.Get("enable_block_mode", Json::Value(true))))
             {
-                UI::Text("Block Mode: " + string(json.Get("block_mode", Json::Value("Normal"))));
-                UI::Text("Block Mode Active: " + bool(json.Get("block_mode_enabled", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Block Mode");
+                UI::TableNextColumn();
+                UI::Text(string(json.Get("block_mode", Json::Value("Normal"))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Block Mode Active");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("block_mode_enabled", Json::Value(false)))));
             }
             if (bool(json.Get("enable_item_mode", Json::Value(true))))
             {
-                UI::Text("Item Mode: " + string(json.Get("item_mode", Json::Value("Normal"))));
-                UI::Text("Item Mode Active: " + bool(json.Get("item_mode_enabled", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Item Mode");
+                UI::TableNextColumn();
+                UI::Text(string(json.Get("item_mode", Json::Value("Normal"))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Item Mode Active");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("item_mode_enabled", Json::Value(false)))));
             }
             if (bool(json.Get("enable_macroblock_mode", Json::Value(true))))
             {
-                UI::Text("Macroblock Mode: " + string(json.Get("macroblock_mode", Json::Value("Normal"))));
-                UI::Text("Macroblock Mode Active: " + bool(json.Get("macroblock_mode_enabled", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Macroblock Mode");
+                UI::TableNextColumn();
+                UI::Text(string(json.Get("macroblock_mode", Json::Value("Normal"))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Macroblock Mode Active");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("macroblock_mode_enabled", Json::Value(false)))));
             }
         }
 

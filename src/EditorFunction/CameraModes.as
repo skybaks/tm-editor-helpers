@@ -116,7 +116,11 @@ namespace EditorHelpers
             if (!Enabled()) { return; }
             if (bool(json.Get("enable_camera", Json::Value(true))))
             {
-                UI::Text("Camera Mode: " + string(json.Get("camera", Json::Value("Orbital"))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Camera Mode");
+                UI::TableNextColumn();
+                UI::Text(tostring(string(json.Get("camera", Json::Value("Orbital")))));
             }
         }
 
