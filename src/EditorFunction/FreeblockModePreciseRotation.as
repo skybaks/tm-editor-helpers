@@ -206,6 +206,7 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["step_size"] = Setting_FreeblockModePreciseRotation_StepSizeName;
             json["pitch"] = inputPitch;
             json["roll"] = inputRoll;
@@ -213,6 +214,7 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_step_size", Json::Value(true))))
             {
                 Setting_FreeblockModePreciseRotation_StepSizeName = string(json.Get("step_size", Json::Value("Default")));
@@ -227,6 +229,7 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_step_size", Json::Value(true))))
             {
                 UI::Text("Step Size: " + string(json.Get("step_size", Json::Value("Default"))));
@@ -241,6 +244,7 @@ namespace EditorHelpers
         bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
+            if (!Enabled()) { return changed; }
             if (JsonCheckboxChanged(json, "enable_step_size", "Step Size", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {

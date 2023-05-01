@@ -97,11 +97,13 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["camera"] = Setting_CameraMode_CurrentMode;
         }
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_camera", Json::Value(true))))
             {
                 Setting_CameraMode_CurrentMode = string(json.Get("camera", Json::Value("Orbital")));
@@ -111,6 +113,7 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_camera", Json::Value(true))))
             {
                 UI::Text("Camera Mode: " + string(json.Get("camera", Json::Value("Orbital"))));
@@ -120,6 +123,7 @@ namespace EditorHelpers
         bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
+            if (!Enabled()) { return changed; }
             if (JsonCheckboxChanged(json, "enable_camera", "Camera", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {

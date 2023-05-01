@@ -424,6 +424,7 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["randomizer_mode"] = tostring(selectedMode);
             json["axis_x"] = axisX;
             json["axis_y"] = axisY;
@@ -441,6 +442,7 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_randomizer_mode", Json::Value(true))))
             {
                 string mode = string(json.Get("randomizer_mode", Json::Value("OFF")));
@@ -482,6 +484,7 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_randomizer_mode", Json::Value(true))))
             {
                 UI::Text("Randomizer Mode: " + string(json.Get("randomizer_mode", Json::Value("OFF"))));
@@ -512,6 +515,7 @@ namespace EditorHelpers
         bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
+            if (!Enabled()) { return changed; }
             if (JsonCheckboxChanged(json, "enable_randomizer_mode", "Randomizer Mode", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {

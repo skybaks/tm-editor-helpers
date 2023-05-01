@@ -540,6 +540,7 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["ghost_mode"] = Setting_CustomItemPlacement_ApplyGhost;
             json["autorotation"] = Setting_CustomItemPlacement_ApplyAutoRotation;
             json["apply_grid"] = Setting_CustomItemPlacement_ApplyGrid;
@@ -553,6 +554,7 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_ghost_mode", Json::Value(true))))
             {
                 Setting_CustomItemPlacement_ApplyGhost = bool(json.Get("ghost_mode", Json::Value(false)));
@@ -578,6 +580,7 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_ghost_mode", Json::Value(true))))
             {
                 UI::Text("Apply Ghost Mode: " + bool(json.Get("ghost_mode", Json::Value(false))));
@@ -604,6 +607,7 @@ namespace EditorHelpers
         bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
+            if (!Enabled()) { return changed; }
             if (JsonCheckboxChanged(json, "enable_ghost_mode", "Ghost Mode", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {

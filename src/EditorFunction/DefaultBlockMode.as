@@ -335,6 +335,7 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["block_mode"] = Setting_DefaultBlockMode_BlockMode;
             json["block_mode_enabled"] = Setting_DefaultBlockMode_ActiveBlock;
             json["item_mode"] = Setting_DefaultBlockMode_ItemMode;
@@ -345,6 +346,7 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_block_mode", Json::Value(true))))
             {
                 Setting_DefaultBlockMode_BlockMode = string(json.Get("block_mode", Json::Value("Normal")));
@@ -364,6 +366,7 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_block_mode", Json::Value(true))))
             {
                 UI::Text("Block Mode: " + string(json.Get("block_mode", Json::Value("Normal"))));
@@ -384,6 +387,7 @@ namespace EditorHelpers
         bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
+            if (!Enabled()) { return changed; }
             if (JsonCheckboxChanged(json, "enable_block_mode", "Block mode", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {

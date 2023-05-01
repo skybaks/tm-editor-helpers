@@ -101,11 +101,13 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["helpers_off"] = Setting_BlockHelpers_BlockHelpersOff;
         }
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_helpers_off", Json::Value(true))))
             {
                 Setting_BlockHelpers_BlockHelpersOff = bool(json.Get("helpers_off", Json::Value(false)));
@@ -114,6 +116,7 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_helpers_off", Json::Value(true))))
             {
                 UI::Text("Block Helpers Off: " + bool(json.Get("helpers_off", Json::Value(false))));
@@ -123,6 +126,7 @@ namespace EditorHelpers
         bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
+            if (!Enabled()) { return changed; }
             if (JsonCheckboxChanged(json, "enable_helpers_off", "Helpers Off", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {

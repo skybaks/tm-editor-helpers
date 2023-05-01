@@ -102,12 +102,14 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["grid_on"] = Setting_PlacementGrid_PlacementGridOn;
             json["transparent"] = Setting_PlacementGrid_PlacementGridTransparent;
         }
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_grid_on", Json::Value(true))))
             {
                 Setting_PlacementGrid_PlacementGridOn = bool(json.Get("grid_on", Json::Value(false)));
@@ -120,6 +122,7 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_grid_on", Json::Value(true))))
             {
                 UI::Text("Placement Grid On: " + bool(json.Get("grid_on", Json::Value(false))));
@@ -133,6 +136,7 @@ namespace EditorHelpers
         bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
+            if (!Enabled()) { return changed; }
             if (JsonCheckboxChanged(json, "enable_grid_on", "Grid On", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {

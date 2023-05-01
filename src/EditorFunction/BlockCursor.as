@@ -92,11 +92,13 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["cursor_hidden"] = Setting_BlockCursor_HideBlockCursor;
         }
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_cursor_hidden", Json::Value(true))))
             {
                 Setting_BlockCursor_HideBlockCursor = bool(json.Get("cursor_hidden", Json::Value(false)));
@@ -105,6 +107,7 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_cursor_hidden", Json::Value(true))))
             {
                 UI::Text("Block Cursor Hidden: " + bool(json.Get("cursor_hidden", Json::Value(false))));
@@ -114,6 +117,7 @@ namespace EditorHelpers
         bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
+            if (!Enabled()) { return changed; }
             if (JsonCheckboxChanged(json, "enable_cursor_hidden", "Cursor Hidden", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {

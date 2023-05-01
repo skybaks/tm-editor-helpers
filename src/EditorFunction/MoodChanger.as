@@ -285,11 +285,13 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["time"] = Editor.MoodTimeOfDayStr;
         }
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_time", Json::Value(true))))
             {
                 m_setTime = string(json.Get("time", Json::Value("12:06:00")));
@@ -299,6 +301,7 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_time", Json::Value(true))))
             {
                 UI::Text("Time: " + string(json.Get("time", Json::Value("12:06:00"))));
@@ -308,6 +311,7 @@ namespace EditorHelpers
         bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
+            if (!Enabled()) { return changed; }
             if (JsonCheckboxChanged(json, "enable_time", "Time", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {

@@ -188,6 +188,7 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["apply_grid"] = Setting_FreeblockPlacement_ApplyGrid;
             json["horizontal_grid"] = m_HStep;
             json["vertical_grid"] = m_VStep;
@@ -199,6 +200,7 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_grid", Json::Value(true))))
             {
                 Setting_FreeblockPlacement_ApplyGrid = bool(json.Get("apply_grid", Json::Value(false)));
@@ -216,6 +218,7 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_grid", Json::Value(true))))
             {
                 UI::Text("Apply Freeblock Grid: " + bool(json.Get("apply_grid", Json::Value(false))));
@@ -234,6 +237,7 @@ namespace EditorHelpers
         bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
+            if (!Enabled()) { return changed; }
             if (JsonCheckboxChanged(json, "enable_grid", "Freeblock Grid", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
