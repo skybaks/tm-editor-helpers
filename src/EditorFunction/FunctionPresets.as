@@ -38,6 +38,24 @@ namespace EditorHelpers
             Key = VirtualKey::B;
         }
 
+        void Init()
+        {
+            for (uint index = 0; index < g_functions.Length; index++)
+            {
+                EditorFunction@ ef = g_functions[index];
+                if (ef.SupportsPresets())
+                {
+                    auto@ presetItem = GetItem(ef.Name());
+                    if (presetItem is null)
+                    {
+                        @presetItem = EditorFunctionPresetItem(ef.Name());
+                        ef.SerializePresets(presetItem.JsonData);
+                        Functions.InsertLast(presetItem);
+                    }
+                }
+            }
+        }
+
         EditorFunctionPresetItem@ GetItem(const string&in name)
         {
             for (uint i = 0; i < Functions.Length; ++i)
@@ -150,9 +168,12 @@ namespace EditorHelpers
             bool newPreset = false;
             if (UI::Button(" New Preset"))
             {
-                m_presets.InsertLast(EditorFunctionPreset());
+                auto@ newFunctionPreset = EditorFunctionPreset();
+                newFunctionPreset.Init();
+                m_presets.InsertLast(newFunctionPreset);
                 m_forcePresetIndex = m_presets.Length - 1;
                 newPreset = true;
+                m_signalSave = true;
             }
 
             UI::BeginDisabled(m_deleteConfirm);
@@ -248,32 +269,14 @@ namespace EditorHelpers
 
                             if (UI::BeginChild("FunctionPresetsTabBarTableChildCol1"))
                             {
-                                for (uint index = 0; index < g_functions.Length; index++)
-                                {
-                                    EditorFunction@ ef = g_functions[index];
-                                    if (ef.SupportsPresets())
-                                    {
-                                        auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
-                                        if (presetItem is null)
-                                        {
-                                            @presetItem = EditorFunctionPresetItem(ef.Name());
-                                            if (presetItem !is null)
-                                            {
-                                                ef.SerializePresets(presetItem.JsonData);
-                                                m_presets[presetIndex].Functions.InsertLast(presetItem);
-                                                m_signalSave = true;
-                                            }
-                                        }
-
-                                        if (presetItem !is null)
-                                        {
-                                            if (ef.RenderPresetEnables(presetItem.JsonData, forceValue, forceValueFlag))
-                                            {
-                                                m_signalSave = true;
-                                            }
-                                        }
-                                    }
-                                }
+                                UI::TextDisabled("\tAction");
+                                RenderPresetEnables(g_functionsAction, m_presets[m_selectedPresetIndex], forceValue, forceValueFlag);
+                                UI::TextDisabled("\tDisplay");
+                                RenderPresetEnables(g_functionsDisplay, m_presets[m_selectedPresetIndex], forceValue, forceValueFlag);
+                                UI::TextDisabled("\tBuild");
+                                RenderPresetEnables(g_functionsBuild, m_presets[m_selectedPresetIndex], forceValue, forceValueFlag);
+                                UI::TextDisabled("\tInfo");
+                                RenderPresetEnables(g_functionsInfo, m_presets[m_selectedPresetIndex], forceValue, forceValueFlag);
                             }
                             UI::EndChild();
 
@@ -333,15 +336,22 @@ namespace EditorHelpers
                                     UI::TableSetupColumn("Col1");
                                     UI::TableSetupColumn("Col2");
 
-                                    for (uint index = 0; index < g_functions.Length; index++)
-                                    {
-                                        EditorFunction@ ef = g_functions[index];
-                                        auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
-                                        if (ef.SupportsPresets() && presetItem !is null)
-                                        {
-                                            ef.RenderPresetValues(presetItem.JsonData);
-                                        }
-                                    }
+                                    UI::TableNextRow();
+                                    UI::TableNextColumn();
+                                    UI::TextDisabled("\tAction");
+                                    RenderPresetValues(g_functionsAction, m_presets[m_selectedPresetIndex]);
+                                    UI::TableNextRow();
+                                    UI::TableNextColumn();
+                                    UI::TextDisabled("\tDisplay");
+                                    RenderPresetValues(g_functionsDisplay, m_presets[m_selectedPresetIndex]);
+                                    UI::TableNextRow();
+                                    UI::TableNextColumn();
+                                    UI::TextDisabled("\tBuild");
+                                    RenderPresetValues(g_functionsBuild, m_presets[m_selectedPresetIndex]);
+                                    UI::TableNextRow();
+                                    UI::TableNextColumn();
+                                    UI::TextDisabled("\tInfo");
+                                    RenderPresetValues(g_functionsInfo, m_presets[m_selectedPresetIndex]);
 
                                     UI::EndTable();
                                 }
@@ -428,6 +438,38 @@ namespace EditorHelpers
                     m_presets[i].Key = key;
                     m_signalSave = true;
                     break;
+                }
+            }
+        }
+
+        private void RenderPresetEnables(array<EditorFunction@>@ functions, EditorFunctionPreset@ preset, bool forceValue, bool forceValueFlag)
+        {
+            for (uint index = 0; index < functions.Length; ++index)
+            {
+                EditorFunction@ ef = functions[index];
+                if (ef.SupportsPresets())
+                {
+                    auto@ presetItem = preset.GetItem(ef.Name());
+                    if (presetItem !is null)
+                    {
+                        if (ef.RenderPresetEnables(presetItem.JsonData, forceValue, forceValueFlag))
+                        {
+                            m_signalSave = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void RenderPresetValues(array<EditorFunction@>@ functions, EditorFunctionPreset@ preset)
+        {
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                EditorFunction@ ef = functions[index];
+                auto@ presetItem = preset.GetItem(ef.Name());
+                if (ef.SupportsPresets() && presetItem !is null)
+                {
+                    ef.RenderPresetValues(presetItem.JsonData);
                 }
             }
         }
