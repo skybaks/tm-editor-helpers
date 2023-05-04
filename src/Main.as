@@ -94,7 +94,11 @@ void RenderInterface()
         {
             for (uint index = 0; index < g_functionsAction.Length; index++)
             {
-                g_functionsAction[index].RenderInterface_Action();
+                if (g_functionsAction[index].Enabled())
+                {
+                    g_functionsAction[index].RenderInterface_Action();
+                    UI::Separator();
+                }
             }
         }
 
@@ -102,7 +106,11 @@ void RenderInterface()
         {
             for (uint index = 0; index < g_functionsDisplay.Length; index++)
             {
-                g_functionsDisplay[index].RenderInterface_Display();
+                if (g_functionsDisplay[index].Enabled())
+                {
+                    g_functionsDisplay[index].RenderInterface_Display();
+                    UI::Separator();
+                }
             }
         }
 
@@ -110,7 +118,11 @@ void RenderInterface()
         {
             for (uint index = 0; index < g_functionsBuild.Length; index++)
             {
-                g_functionsBuild[index].RenderInterface_Build();
+                if (g_functionsBuild[index].Enabled())
+                {
+                    g_functionsBuild[index].RenderInterface_Build();
+                    UI::Separator();
+                }
             }
         }
 
@@ -118,7 +130,11 @@ void RenderInterface()
         {
             for (uint index = 0; index < g_functionsInfo.Length; index++)
             {
-                g_functionsInfo[index].RenderInterface_Info();
+                if (g_functionsInfo[index].Enabled())
+                {
+                    g_functionsInfo[index].RenderInterface_Info();
+                    UI::Separator();
+                }
             }
         }
         UI::End();
