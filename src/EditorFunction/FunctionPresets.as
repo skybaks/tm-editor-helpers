@@ -158,7 +158,10 @@ namespace EditorHelpers
             }
 
             UI::SetNextWindowSize(580, 350, UI::Cond::FirstUseEver);
-            UI::Begin(g_windowName + ": " + Name(), Setting_FunctionPresets_WindowVisible);
+            int windowFlags = UI::WindowFlags::NoCollapse | UI::WindowFlags::MenuBar;
+            UI::Begin(g_windowName + ": " + Name(), Setting_FunctionPresets_WindowVisible, windowFlags);
+
+            EditorHelpers::WindowMenuBar::RenderDefaultMenus();
 
             if (settingToolTipsEnabled)
             {
@@ -377,7 +380,7 @@ namespace EditorHelpers
         {
             if (!Enabled()) { return; }
 
-            if (UI::MenuItem(Icons::PuzzlePiece + " " + Name(), selected: Setting_FunctionPresets_WindowVisible))
+            if (UI::MenuItem(Icons::ListAlt + " " + Name(), selected: Setting_FunctionPresets_WindowVisible))
             {
                 Setting_FunctionPresets_WindowVisible = !Setting_FunctionPresets_WindowVisible;
             }

@@ -1,6 +1,6 @@
 
 [Setting category="General" name="Window Visible" hidden]
-bool settingWindowVisible = true;
+bool Setting_WindowVisible = true;
 [Setting category="General" name="Tooltips Enabled" hidden]
 bool settingToolTipsEnabled = true;
 [Setting category="General" name="Debug Logging Enabled" hidden]
@@ -41,7 +41,6 @@ array<EditorHelpers::EditorFunction@> g_functionsInfo =
       EditorHelpers::LocatorCheck()
     , EditorHelpers::PodiumReminder()
     , EditorHelpers::CursorPosition()
-    , EditorHelpers::Links()
 };
 array<EditorHelpers::EditorFunction@> g_functions;
 
@@ -68,15 +67,7 @@ void RenderMenu()
     if (!EditorHelpers::HasPermission()) return;
     if (UI::BeginMenu("\\$2f9" + Icons::PuzzlePiece + "\\$fff Editor Helpers", enabled: !Compatibility::EditorIsNull()))
     {
-        if (UI::MenuItem(Icons::PuzzlePiece + " Main Window", selected: settingWindowVisible))
-        {
-            settingWindowVisible = !settingWindowVisible;
-        }
-
-        for (uint index = 0; index < g_functions.Length; index++)
-        {
-            g_functions[index].RenderInterface_MenuItem();
-        }
+        EditorHelpers::WindowMenuBar::RenderWindowsMenuItems();
         UI::EndMenu();
     }
 }
@@ -86,10 +77,14 @@ void RenderInterface()
     if (!EditorHelpers::HasPermission()) return;
     if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting()) return;
 
-    if (settingWindowVisible)
+    if (Setting_WindowVisible)
     {
         UI::SetNextWindowSize(300, 600, UI::Cond::FirstUseEver);
-        UI::Begin(g_windowName, settingWindowVisible);
+        int windowFlags = UI::WindowFlags::NoCollapse | UI::WindowFlags::MenuBar;
+        UI::Begin(g_windowName, Setting_WindowVisible, windowFlags);
+
+        EditorHelpers::WindowMenuBar::RenderDefaultMenus();
+
         if (UI::CollapsingHeader("Action"))
         {
             for (uint index = 0; index < g_functionsAction.Length; index++)
@@ -144,6 +139,8 @@ void RenderInterface()
     {
         g_functions[index].RenderInterface_ChildWindow();
     }
+
+    EditorHelpers::About::RenderAboutWindow();
 }
 
 [SettingsTab name="Settings"]

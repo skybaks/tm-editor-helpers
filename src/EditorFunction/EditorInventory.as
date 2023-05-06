@@ -160,7 +160,10 @@ namespace EditorHelpers
             }
 
             UI::SetNextWindowSize(580, 350, UI::Cond::FirstUseEver);
-            UI::Begin(g_windowName + ": " + Name(), Setting_EditorInventory_WindowVisible);
+            int windowFlags = UI::WindowFlags::NoCollapse | UI::WindowFlags::MenuBar;
+            UI::Begin(g_windowName + ": " + Name(), Setting_EditorInventory_WindowVisible, windowFlags);
+
+            EditorHelpers::WindowMenuBar::RenderDefaultMenus();
 
             UI::BeginTabBar("CustomPaletteTabBar");
             if (UI::BeginTabItem("Search"))
@@ -339,7 +342,7 @@ namespace EditorHelpers
                 return;
             }
 
-            if (UI::MenuItem(Icons::PuzzlePiece + " " + Name(), selected: Setting_EditorInventory_WindowVisible))
+            if (UI::MenuItem(Icons::Cube + " " + Name(), selected: Setting_EditorInventory_WindowVisible))
             {
                 Setting_EditorInventory_WindowVisible = !Setting_EditorInventory_WindowVisible;
             }
