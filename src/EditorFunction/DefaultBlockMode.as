@@ -161,15 +161,24 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_DefaultBlockMode_Enabled = UI::Checkbox("Enabled", Setting_DefaultBlockMode_Enabled);
             UI::BeginDisabled(!Setting_DefaultBlockMode_Enabled);
-            UI::TextWrapped("This allows you to choose a default mode for block, item, and macroblock modes. That means that when you switch to block, item, or macroblock mode your default will be picked.");
-
+            UI::TextWrapped("This allows you to choose a default mode for block, item, and macroblock modes. That means"
+                " that when you switch to block, item, or macroblock mode your default will be picked.");
             DisplayModeOptions();
-
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Blocks");
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Items");
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Macroblocks");
+            }
+
             UI::PopID();
         }
 
@@ -181,7 +190,7 @@ namespace EditorHelpers
             }
 
             UI::TextDisabled("\tMode Defaults");
-            DisplayModeOptions(true);
+            DisplayModeOptions(true, true);
         }
 
         void Init() override 
@@ -264,13 +273,14 @@ namespace EditorHelpers
             return newSelection;
         }
 
-        private void DisplayModeOptions(bool includeToolTips = false)
+        private void DisplayModeOptions(bool includeToolTips = false, bool allowHighlights = false)
         {
             vec2 spacingOrig = UI::GetStyleVarVec2(UI::StyleVar::ItemSpacing);
             vec2 spacingNew = vec2(1.0, spacingOrig.y);
 
             if (Compatibility::SelectableBlockModes.Length > 1)
             {
+                if (allowHighlights) { EditorHelpers::BeginHighlight("DefaultBlockMode::Blocks"); }
                 if (includeToolTips && settingToolTipsEnabled)
                 {
                     EditorHelpers::HelpMarker("Enable and set the default block mode to use");
@@ -283,10 +293,12 @@ namespace EditorHelpers
                 Setting_DefaultBlockMode_BlockMode = DisplayRadioSelection("Block", Compatibility::SelectableBlockModes, Setting_DefaultBlockMode_BlockMode);
                 UI::EndDisabled();
                 UI::PopStyleVar();
+                if (allowHighlights) { EditorHelpers::EndHighlight(); }
             }
 
             if (Compatibility::SelectableItemModes.Length > 1)
             {
+                if (allowHighlights) { EditorHelpers::BeginHighlight("DefaultBlockMode::Items"); }
                 if (includeToolTips && settingToolTipsEnabled)
                 {
                     EditorHelpers::HelpMarker("Enable and set the default item mode to use");
@@ -299,10 +311,12 @@ namespace EditorHelpers
                 Setting_DefaultBlockMode_ItemMode = DisplayRadioSelection("Item", Compatibility::SelectableItemModes, Setting_DefaultBlockMode_ItemMode);
                 UI::EndDisabled();
                 UI::PopStyleVar();
+                if (allowHighlights) { EditorHelpers::EndHighlight(); }
             }
 
             if (Compatibility::SelectableMacroblockModes.Length > 1)
             {
+                if (allowHighlights) { EditorHelpers::BeginHighlight("DefaultBlockMode::Macroblocks"); }
                 if (includeToolTips && settingToolTipsEnabled)
                 {
                     EditorHelpers::HelpMarker("Enable and set the default macroblock mode to use");
@@ -315,11 +329,13 @@ namespace EditorHelpers
                 Setting_DefaultBlockMode_MacroblockMode = DisplayRadioSelection("Macroblock", Compatibility::SelectableMacroblockModes, Setting_DefaultBlockMode_MacroblockMode);
                 UI::EndDisabled();
                 UI::PopStyleVar();
+                if (allowHighlights) { EditorHelpers::EndHighlight(); }
             }
         }
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["block_mode"] = Setting_DefaultBlockMode_BlockMode;
             json["block_mode_enabled"] = Setting_DefaultBlockMode_ActiveBlock;
             json["item_mode"] = Setting_DefaultBlockMode_ItemMode;
@@ -330,6 +346,7 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_block_mode", Json::Value(true))))
             {
                 Setting_DefaultBlockMode_BlockMode = string(json.Get("block_mode", Json::Value("Normal")));
@@ -349,29 +366,70 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_block_mode", Json::Value(true))))
             {
-                UI::Text("Block Mode: " + string(json.Get("block_mode", Json::Value("Normal"))));
-                UI::Text("Block Mode Active: " + bool(json.Get("block_mode_enabled", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Block Mode");
+                UI::TableNextColumn();
+                UI::Text(string(json.Get("block_mode", Json::Value("Normal"))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Block Mode Active");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("block_mode_enabled", Json::Value(false)))));
             }
             if (bool(json.Get("enable_item_mode", Json::Value(true))))
             {
-                UI::Text("Item Mode: " + string(json.Get("item_mode", Json::Value("Normal"))));
-                UI::Text("Item Mode Active: " + bool(json.Get("item_mode_enabled", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Item Mode");
+                UI::TableNextColumn();
+                UI::Text(string(json.Get("item_mode", Json::Value("Normal"))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Item Mode Active");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("item_mode_enabled", Json::Value(false)))));
             }
             if (bool(json.Get("enable_macroblock_mode", Json::Value(true))))
             {
-                UI::Text("Macroblock Mode: " + string(json.Get("macroblock_mode", Json::Value("Normal"))));
-                UI::Text("Macroblock Mode Active: " + bool(json.Get("macroblock_mode_enabled", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Macroblock Mode");
+                UI::TableNextColumn();
+                UI::Text(string(json.Get("macroblock_mode", Json::Value("Normal"))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Macroblock Mode Active");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("macroblock_mode_enabled", Json::Value(false)))));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_block_mode", "Block mode")) { changed = true; }
-            if (JsonCheckboxChanged(json, "enable_item_mode", "Item mode")) { changed = true; }
-            if (JsonCheckboxChanged(json, "enable_macroblock_mode", "Macroblock mode")) { changed = true; }
+            if (!Enabled()) { return changed; }
+            if (JsonCheckboxChanged(json, "enable_block_mode", "Block mode", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Blocks");
+            }
+            if (JsonCheckboxChanged(json, "enable_item_mode", "Item mode", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Items");
+            }
+            if (JsonCheckboxChanged(json, "enable_macroblock_mode", "Macroblock mode", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("DefaultBlockMode::Macroblocks");
+            }
             return changed;
         }
     }

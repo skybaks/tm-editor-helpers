@@ -1,6 +1,6 @@
 
 [Setting category="General" name="Window Visible" hidden]
-bool settingWindowVisible = true;
+bool Setting_WindowVisible = true;
 [Setting category="General" name="Tooltips Enabled" hidden]
 bool settingToolTipsEnabled = true;
 [Setting category="General" name="Debug Logging Enabled" hidden]
@@ -8,29 +8,41 @@ bool Setting_DebugLoggingEnabled = false;
 
 const string g_windowName = Icons::PuzzlePiece + " Editor Helpers";
 
-array<EditorHelpers::EditorFunction@> functions =
+array<EditorHelpers::EditorFunction@> g_functionsNone =
 {
       EditorHelpers::EventSignals()
-    , EditorHelpers::Quicksave()
-    , EditorHelpers::BlockHelpers()
+    , EditorHelpers::RememberPlacementModes()
+    , EditorHelpers::EditorInventory()
+};
+array<EditorHelpers::EditorFunction@> g_functionsAction =
+{
+      EditorHelpers::Quicksave()
+    , EditorHelpers::Hotkeys()
+    , EditorHelpers::FunctionPresets()
+};
+array<EditorHelpers::EditorFunction@> g_functionsDisplay =
+{
+      EditorHelpers::BlockHelpers()
     , EditorHelpers::BlockCursor()
     , EditorHelpers::PlacementGrid()
-    , EditorHelpers::RememberPlacementModes()
-    , EditorHelpers::CustomItemPlacement()
+    , EditorHelpers::CameraModes()
+};
+array<EditorHelpers::EditorFunction@> g_functionsBuild =
+{
+      EditorHelpers::CustomItemPlacement()
     , EditorHelpers::FreeblockModePreciseRotation()
-    , EditorHelpers::Hotkeys()
     , EditorHelpers::RotationRandomizer()
     , EditorHelpers::FreeblockPlacement()
     , EditorHelpers::DefaultBlockMode()
     , EditorHelpers::MoodChanger()
-    , EditorHelpers::CameraModes()
-    , EditorHelpers::CustomPalette()
-    , EditorHelpers::LocatorCheck()
+};
+array<EditorHelpers::EditorFunction@> g_functionsInfo =
+{
+      EditorHelpers::LocatorCheck()
     , EditorHelpers::PodiumReminder()
     , EditorHelpers::CursorPosition()
-    , EditorHelpers::Links()
-    , EditorHelpers::FunctionPresets()
 };
+array<EditorHelpers::EditorFunction@> g_functions;
 
 namespace Compatibility
 {
@@ -55,15 +67,7 @@ void RenderMenu()
     if (!EditorHelpers::HasPermission()) return;
     if (UI::BeginMenu("\\$2f9" + Icons::PuzzlePiece + "\\$fff Editor Helpers", enabled: !Compatibility::EditorIsNull()))
     {
-        if (UI::MenuItem(Icons::PuzzlePiece + " Main Window", selected: settingWindowVisible))
-        {
-            settingWindowVisible = !settingWindowVisible;
-        }
-
-        for (uint index = 0; index < functions.Length; index++)
-        {
-            functions[index].RenderInterface_MenuItem();
-        }
+        EditorHelpers::WindowMenuBar::RenderWindowsMenuItems();
         UI::EndMenu();
     }
 }
@@ -73,48 +77,70 @@ void RenderInterface()
     if (!EditorHelpers::HasPermission()) return;
     if (Compatibility::EditorIsNull() || Compatibility::IsMapTesting()) return;
 
-    if (settingWindowVisible)
+    if (Setting_WindowVisible)
     {
         UI::SetNextWindowSize(300, 600, UI::Cond::FirstUseEver);
-        UI::Begin(g_windowName, settingWindowVisible);
+        int windowFlags = UI::WindowFlags::NoCollapse | UI::WindowFlags::MenuBar;
+        UI::Begin(g_windowName, Setting_WindowVisible, windowFlags);
+
+        EditorHelpers::WindowMenuBar::RenderDefaultMenus();
+
         if (UI::CollapsingHeader("Action"))
         {
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functionsAction.Length; index++)
             {
-                functions[index].RenderInterface_Action();
+                if (g_functionsAction[index].Enabled())
+                {
+                    g_functionsAction[index].RenderInterface_Action();
+                    UI::Separator();
+                }
             }
         }
 
         if (UI::CollapsingHeader("Display"))
         {
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functionsDisplay.Length; index++)
             {
-                functions[index].RenderInterface_Display();
+                if (g_functionsDisplay[index].Enabled())
+                {
+                    g_functionsDisplay[index].RenderInterface_Display();
+                    UI::Separator();
+                }
             }
         }
 
         if (UI::CollapsingHeader("Build"))
         {
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functionsBuild.Length; index++)
             {
-                functions[index].RenderInterface_Build();
+                if (g_functionsBuild[index].Enabled())
+                {
+                    g_functionsBuild[index].RenderInterface_Build();
+                    UI::Separator();
+                }
             }
         }
 
         if (UI::CollapsingHeader("Info"))
         {
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functionsInfo.Length; index++)
             {
-                functions[index].RenderInterface_Info();
+                if (g_functionsInfo[index].Enabled())
+                {
+                    g_functionsInfo[index].RenderInterface_Info();
+                    UI::Separator();
+                }
             }
         }
         UI::End();
     }
 
-    for (uint index = 0; index < functions.Length; index++)
+    for (uint index = 0; index < g_functions.Length; index++)
     {
-        functions[index].RenderInterface_ChildWindow();
+        g_functions[index].RenderInterface_ChildWindow();
     }
+
+    EditorHelpers::About::RenderAboutWindow();
 }
 
 [SettingsTab name="Settings"]
@@ -124,16 +150,18 @@ void RenderSettingsPage()
     UI::Markdown("# Editor Helpers");
     settingToolTipsEnabled = UI::Checkbox("Show tooltips in the editor helpers window", settingToolTipsEnabled);
     Setting_DebugLoggingEnabled = UI::Checkbox("Enable EXTREMELY VERBOSE logging to Openplanet.log", Setting_DebugLoggingEnabled);
-    UI::TextWrapped("Listed in these settings are each individual function of the editor helpers plugin. You can enable or disable each plugin individually. Disabling a function will remove any UI associated with it and stop it from operating. Turn on and off the things you want to customize your experience with this plugin.");
+    UI::TextWrapped("Listed in these settings are each individual function of the editor helpers plugin. You can"
+        " enable or disable each plugin individually. Disabling a function will remove any UI associated with it and"
+        " stop it from operating. Turn on and off the things you want to customize your experience with this plugin.");
     UI::Dummy(vec2(20.0f, 20.0f));
     UI::PopID();
 
     UI::Separator();
-    for (uint index = 0; index < functions.Length; index++)
+    for (uint index = 0; index < g_functions.Length; index++)
     {
-        if (functions[index].HasSettingsEntry())
+        if (g_functions[index].HasSettingsEntry())
         {
-            functions[index].RenderInterface_Settings();
+            g_functions[index].RenderInterface_Settings();
             UI::Dummy(vec2(10.0f, 10.0f));
             UI::Separator();
         }
@@ -143,14 +171,20 @@ void RenderSettingsPage()
 void OnKeyPress(bool down, VirtualKey key)
 {
     if (!EditorHelpers::HasPermission()) return;
-    for (uint index = 0; index < functions.Length; index++)
+    for (uint index = 0; index < g_functions.Length; index++)
     {
-        functions[index].OnKeyPress(down, key);
+        g_functions[index].OnKeyPress(down, key);
     }
 }
 
 void Main()
 {
+    for (uint i = 0; i < g_functionsNone.Length; ++i) { g_functions.InsertLast(g_functionsNone[i]); }
+    for (uint i = 0; i < g_functionsAction.Length; ++i) { g_functions.InsertLast(g_functionsAction[i]); }
+    for (uint i = 0; i < g_functionsDisplay.Length; ++i) { g_functions.InsertLast(g_functionsDisplay[i]); }
+    for (uint i = 0; i < g_functionsBuild.Length; ++i) { g_functions.InsertLast(g_functionsBuild[i]); }
+    for (uint i = 0; i < g_functionsInfo.Length; ++i) { g_functions.InsertLast(g_functionsInfo[i]); }
+
     int dt = 0;
     float dtSeconds = 0.0;
     int prevFrameTime = Time::Now;
@@ -164,11 +198,11 @@ void Main()
         EditorHelpers::permissionReduceSpamTimer.Update(dtSeconds);
         if (EditorHelpers::HasPermission())
         {
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functions.Length; index++)
             {
-                functions[index].Init();
-                functions[index].Update(dt);
-                functions[index].FirstPass = false;
+                g_functions[index].Init();
+                g_functions[index].Update(dt);
+                g_functions[index].FirstPass = false;
             }
         }
         prevFrameTime = Time::Now;

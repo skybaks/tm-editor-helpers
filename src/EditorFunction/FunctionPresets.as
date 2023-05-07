@@ -38,6 +38,24 @@ namespace EditorHelpers
             Key = VirtualKey::B;
         }
 
+        void Init()
+        {
+            for (uint index = 0; index < g_functions.Length; index++)
+            {
+                EditorFunction@ ef = g_functions[index];
+                if (ef.SupportsPresets())
+                {
+                    auto@ presetItem = GetItem(ef.Name());
+                    if (presetItem is null)
+                    {
+                        @presetItem = EditorFunctionPresetItem(ef.Name());
+                        ef.SerializePresets(presetItem.JsonData);
+                        Functions.InsertLast(presetItem);
+                    }
+                }
+            }
+        }
+
         EditorFunctionPresetItem@ GetItem(const string&in name)
         {
             for (uint i = 0; i < Functions.Length; ++i)
@@ -67,7 +85,7 @@ namespace EditorHelpers
     [Setting category="Functions" name="Function Presets: Enabled" hidden]
     bool Setting_FunctionPresets_Enabled = true;
     [Setting category="Functions" name="Function Presets: Window Visible" hidden]
-    bool Setting_FunctionPresets_WindowVisible = false;
+    bool Setting_FunctionPresets_WindowVisible = true;
     [Setting category="Functions" name="Function Presets: Show Activate Buttons" hidden]
     bool Setting_FunctionPresets_ShowActivateButtons = true;
 
@@ -132,18 +150,6 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface_Display() override
-        {
-            if (!Enabled()) { return; }
-
-            if (settingToolTipsEnabled)
-            {
-                EditorHelpers::HelpMarker("Show or hide the window for managing presets");
-                UI::SameLine();
-            }
-            Setting_FunctionPresets_WindowVisible = UI::Checkbox("Show Presets Window", Setting_FunctionPresets_WindowVisible);
-        }
-
         void RenderInterface_ChildWindow() override
         {
             if (!Enabled() || !Setting_FunctionPresets_WindowVisible)
@@ -152,17 +158,25 @@ namespace EditorHelpers
             }
 
             UI::SetNextWindowSize(580, 350, UI::Cond::FirstUseEver);
-            UI::Begin(g_windowName + ": " + Name(), Setting_FunctionPresets_WindowVisible);
+            int windowFlags = UI::WindowFlags::NoCollapse | UI::WindowFlags::MenuBar;
+            UI::Begin(g_windowName + ": " + Name(), Setting_FunctionPresets_WindowVisible, windowFlags);
+
+            EditorHelpers::WindowMenuBar::RenderDefaultMenus();
 
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Create a new preset");
                 UI::SameLine();
             }
+            bool newPreset = false;
             if (UI::Button(" New Preset"))
             {
-                m_presets.InsertLast(EditorFunctionPreset());
+                auto@ newFunctionPreset = EditorFunctionPreset();
+                newFunctionPreset.Init();
+                m_presets.InsertLast(newFunctionPreset);
                 m_forcePresetIndex = m_presets.Length - 1;
+                newPreset = true;
+                m_signalSave = true;
             }
 
             UI::BeginDisabled(m_deleteConfirm);
@@ -240,55 +254,32 @@ namespace EditorHelpers
                                 UI::SameLine();
                             }
                             UI::Text("Enabled Functions");
+                            UI::Separator();
+
+                            bool forceValueFlag = false;
+                            bool forceValue = true;
+                            if (UI::Button(" Select All") || newPreset)
+                            {
+                                forceValueFlag = true;
+                                forceValue = true;
+                            }
+                            UI::SameLine();
+                            if (UI::Button(" Select None"))
+                            {
+                                forceValueFlag = true;
+                                forceValue = false;
+                            }
+
                             if (UI::BeginChild("FunctionPresetsTabBarTableChildCol1"))
                             {
-                                for (uint index = 0; index < functions.Length; index++)
-                                {
-                                    EditorFunction@ ef = functions[index];
-                                    if (ef.SupportsPresets())
-                                    {
-                                        auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
-                                        ef.PresetConfigMode = UI::Checkbox(ef.Name() + "##" + tostring(index), presetItem !is null);
-
-                                        if (ef.PresetConfigMode && presetItem is null)
-                                        {
-                                            @presetItem = EditorFunctionPresetItem(ef.Name());
-                                            if (presetItem !is null)
-                                            {
-                                                ef.SerializePresets(presetItem.JsonData);
-                                                m_presets[presetIndex].Functions.InsertLast(presetItem);
-                                                m_signalSave = true;
-                                            }
-                                        }
-                                        else if (!ef.PresetConfigMode && presetItem !is null)
-                                        {
-                                            int presetItemIndex = m_presets[presetIndex].Functions.FindByRef(presetItem);
-                                            if (presetItemIndex >= 0)
-                                            {
-                                                m_presets[presetIndex].Functions.RemoveAt(presetItemIndex);
-                                                m_signalSave = true;
-                                            }
-                                        }
-
-                                        if (ef.PresetConfigMode && presetItem !is null)
-                                        {
-                                            // Using table to indent this until API is updated
-                                            // https://github.com/openplanet-nl/issues/issues/297
-                                            if (UI::BeginTable("PresetEnableTable", 2 /* cols */))
-                                            {
-                                                UI::TableSetupColumn("Col1", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 20.0);
-                                                UI::TableSetupColumn("Col2");
-                                                UI::TableNextColumn();
-                                                UI::TableNextColumn();
-                                                if (ef.RenderPresetEnables(presetItem.JsonData))
-                                                {
-                                                    m_signalSave = true;
-                                                }
-                                                UI::EndTable();
-                                            }
-                                        }
-                                    }
-                                }
+                                UI::TextDisabled("\tAction");
+                                RenderPresetEnables(g_functionsAction, m_presets[m_selectedPresetIndex], forceValue, forceValueFlag);
+                                UI::TextDisabled("\tDisplay");
+                                RenderPresetEnables(g_functionsDisplay, m_presets[m_selectedPresetIndex], forceValue, forceValueFlag);
+                                UI::TextDisabled("\tBuild");
+                                RenderPresetEnables(g_functionsBuild, m_presets[m_selectedPresetIndex], forceValue, forceValueFlag);
+                                UI::TextDisabled("\tInfo");
+                                RenderPresetEnables(g_functionsInfo, m_presets[m_selectedPresetIndex], forceValue, forceValueFlag);
                             }
                             UI::EndChild();
 
@@ -319,9 +310,9 @@ namespace EditorHelpers
                             }
                             if (UI::Button("Update Preset Data"))
                             {
-                                for (uint index = 0; index < functions.Length; index++)
+                                for (uint index = 0; index < g_functions.Length; index++)
                                 {
-                                    EditorFunction@ ef = functions[index];
+                                    EditorFunction@ ef = g_functions[index];
                                     auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
                                     if (ef.SupportsPresets() && presetItem !is null)
                                     {
@@ -343,18 +334,29 @@ namespace EditorHelpers
                             }
                             if (UI::BeginChild("FunctionPresetsTabBarTableChildCol2"))
                             {
-                                for (uint index = 0; index < functions.Length; index++)
+                                if (UI::BeginTable("FunctionPresetsRenderPresetValuesTable", 2 /* cols */))
                                 {
-                                    EditorFunction@ ef = functions[index];
-                                    auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
-                                    if (ef.SupportsPresets() && presetItem !is null)
-                                    {
-                                        if (UI::TreeNode(ef.Name() + "##" + presetIndex, UI::TreeNodeFlags::DefaultOpen))
-                                        {
-                                            ef.RenderPresetValues(presetItem.JsonData);
-                                            UI::TreePop();
-                                        }
-                                    }
+                                    UI::TableSetupColumn("Col1");
+                                    UI::TableSetupColumn("Col2");
+
+                                    UI::TableNextRow();
+                                    UI::TableNextColumn();
+                                    UI::TextDisabled("\tAction");
+                                    RenderPresetValues(g_functionsAction, m_presets[m_selectedPresetIndex]);
+                                    UI::TableNextRow();
+                                    UI::TableNextColumn();
+                                    UI::TextDisabled("\tDisplay");
+                                    RenderPresetValues(g_functionsDisplay, m_presets[m_selectedPresetIndex]);
+                                    UI::TableNextRow();
+                                    UI::TableNextColumn();
+                                    UI::TextDisabled("\tBuild");
+                                    RenderPresetValues(g_functionsBuild, m_presets[m_selectedPresetIndex]);
+                                    UI::TableNextRow();
+                                    UI::TableNextColumn();
+                                    UI::TextDisabled("\tInfo");
+                                    RenderPresetValues(g_functionsInfo, m_presets[m_selectedPresetIndex]);
+
+                                    UI::EndTable();
                                 }
                             }
                             UI::EndChild();
@@ -378,7 +380,7 @@ namespace EditorHelpers
         {
             if (!Enabled()) { return; }
 
-            if (UI::MenuItem(Icons::PuzzlePiece + " " + Name(), selected: Setting_FunctionPresets_WindowVisible))
+            if (UI::MenuItem(Icons::ListAlt + " " + Name(), selected: Setting_FunctionPresets_WindowVisible))
             {
                 Setting_FunctionPresets_WindowVisible = !Setting_FunctionPresets_WindowVisible;
             }
@@ -408,9 +410,9 @@ namespace EditorHelpers
 
             Debug("Applying preset data for name " + preset.Name);
 
-            for (uint index = 0; index < functions.Length; index++)
+            for (uint index = 0; index < g_functions.Length; index++)
             {
-                EditorFunction@ ef = functions[index];
+                EditorFunction@ ef = g_functions[index];
                 auto@ presetItem = preset.GetItem(ef.Name());
                 if (ef.SupportsPresets() && presetItem !is null)
                 {
@@ -439,6 +441,38 @@ namespace EditorHelpers
                     m_presets[i].Key = key;
                     m_signalSave = true;
                     break;
+                }
+            }
+        }
+
+        private void RenderPresetEnables(array<EditorFunction@>@ functions, EditorFunctionPreset@ preset, bool forceValue, bool forceValueFlag)
+        {
+            for (uint index = 0; index < functions.Length; ++index)
+            {
+                EditorFunction@ ef = functions[index];
+                if (ef.SupportsPresets())
+                {
+                    auto@ presetItem = preset.GetItem(ef.Name());
+                    if (presetItem !is null)
+                    {
+                        if (ef.RenderPresetEnables(presetItem.JsonData, forceValue, forceValueFlag))
+                        {
+                            m_signalSave = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void RenderPresetValues(array<EditorFunction@>@ functions, EditorFunctionPreset@ preset)
+        {
+            for (uint index = 0; index < functions.Length; index++)
+            {
+                EditorFunction@ ef = functions[index];
+                auto@ presetItem = preset.GetItem(ef.Name());
+                if (ef.SupportsPresets() && presetItem !is null)
+                {
+                    ef.RenderPresetValues(presetItem.JsonData);
                 }
             }
         }
@@ -514,10 +548,11 @@ namespace EditorHelpers
         }
     }
 
-    bool JsonCheckboxChanged(Json::Value@ json, const string&in key, const string&in text, bool defaultValue = true)
+    bool JsonCheckboxChanged(Json::Value@ json, const string&in key, const string&in text, bool defaultValue, bool forceValue)
     {
         bool beforeVal = bool(json.Get(key, Json::Value(defaultValue)));
         bool afterVal = UI::Checkbox(text, beforeVal);
+        if (forceValue) { afterVal = defaultValue; }
         json[key] = afterVal;
         return beforeVal != afterVal;
     }

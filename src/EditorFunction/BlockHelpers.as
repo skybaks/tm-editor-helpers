@@ -45,6 +45,8 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_BlockHelpers_Enabled = UI::Checkbox("Enabled", Setting_BlockHelpers_Enabled);
@@ -52,6 +54,12 @@ namespace EditorHelpers
             UI::TextWrapped("Enables hiding/showing the clip helpers on placed blocks in the editor.");
             Setting_BlockHelpers_BlockHelpersOff = UI::Checkbox("Block Helpers Off", Setting_BlockHelpers_BlockHelpersOff);
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("BlockHelpers::HelpersOff");
+            }
+
             UI::PopID();
         }
 
@@ -67,12 +75,14 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
 
+            EditorHelpers::BeginHighlight("BlockHelpers::HelpersOff");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Hide/Show block clip helpers");
                 UI::SameLine();
             }
             Setting_BlockHelpers_BlockHelpersOff = UI::Checkbox("Block Helpers Off", Setting_BlockHelpers_BlockHelpersOff);
+            EditorHelpers::EndHighlight();
         }
 
         void Update(float) override
@@ -91,11 +101,13 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["helpers_off"] = Setting_BlockHelpers_BlockHelpersOff;
         }
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_helpers_off", Json::Value(true))))
             {
                 Setting_BlockHelpers_BlockHelpersOff = bool(json.Get("helpers_off", Json::Value(false)));
@@ -104,16 +116,26 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_helpers_off", Json::Value(true))))
             {
-                UI::Text("Block Helpers Off: " + bool(json.Get("helpers_off", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Block Helpers Off");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("helpers_off", Json::Value(false)))));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_helpers_off", "Helpers Off")) { changed = true; }
+            if (!Enabled()) { return changed; }
+            if (JsonCheckboxChanged(json, "enable_helpers_off", "Helpers Off", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("BlockHelpers::HelpersOff");
+            }
             return changed;
         }
     }

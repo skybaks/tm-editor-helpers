@@ -1,5 +1,7 @@
 # Editor Helpers
-This plugin extends the capabilities of the Trackmania map editor by providing a user interface to some currently unexposed APIs. Over time the number of features and functions in the plugin has grown to be quite numerous, and is constantly expanding as new ideas are proposed. Some notable features include:
+This plugin extends the capabilities of the Trackmania map editor by providing a user interface to some currently
+unexposed APIs. Over time the number of features and functions in the plugin has grown to be quite numerous, and is
+constantly expanding as new ideas are proposed. Some notable features include:
 
 * Persistant Show/Hide Block Helpers
 * Exact rotation angle control of Items and Freeblocks
@@ -9,6 +11,7 @@ This plugin extends the capabilities of the Trackmania map editor by providing a
 
 
 ## Source
-This plugin is open sourced on github. Write up a github issue or open a pull request if you have a proposal for a feature to add.
+This plugin is open sourced on github. Write up a github issue or open a pull request if you have a proposal for a
+feature to add.
 
 https://github.com/skybaks/tm-editor-helpers

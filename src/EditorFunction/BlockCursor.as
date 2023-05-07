@@ -33,13 +33,22 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_BlockCursor_Enabled = UI::Checkbox("Enabled", Setting_BlockCursor_Enabled);
             UI::BeginDisabled(!Setting_BlockCursor_Enabled);
-            UI::TextWrapped("Enables hiding/showing the colored box that surrounds the current block or item in your cursor.");
+            UI::TextWrapped("Enables hiding/showing the colored box that surrounds the current block or item in your"
+                " cursor.");
             Setting_BlockCursor_HideBlockCursor = UI::Checkbox("Block Cursor Hidden", Setting_BlockCursor_HideBlockCursor);
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("BlockCursor::HideCursor");
+            }
+
             UI::PopID();
         }
 
@@ -55,12 +64,14 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
 
+            EditorHelpers::BeginHighlight("BlockCursor::HideCursor");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Hide/Show block cursor box");
                 UI::SameLine();
             }
             Setting_BlockCursor_HideBlockCursor = UI::Checkbox("Block Cursor Hidden", Setting_BlockCursor_HideBlockCursor);
+            EditorHelpers::EndHighlight();
         }
 
         void Update(float) override
@@ -81,11 +92,13 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["cursor_hidden"] = Setting_BlockCursor_HideBlockCursor;
         }
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_cursor_hidden", Json::Value(true))))
             {
                 Setting_BlockCursor_HideBlockCursor = bool(json.Get("cursor_hidden", Json::Value(false)));
@@ -94,16 +107,26 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_cursor_hidden", Json::Value(true))))
             {
-                UI::Text("Block Cursor Hidden: " + bool(json.Get("cursor_hidden", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Block Cursor Hidden");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("cursor_hidden", Json::Value(false)))));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_cursor_hidden", "Cursor Hidden")) { changed = true; }
+            if (!Enabled()) { return changed; }
+            if (JsonCheckboxChanged(json, "enable_cursor_hidden", "Cursor Hidden", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("BlockCursor::HideCursor");
+            }
             return changed;
         }
     }

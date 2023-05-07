@@ -43,12 +43,23 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_RotationRandomizer_Enabled = UI::Checkbox("Enabled", Setting_RotationRandomizer_Enabled);
             UI::BeginDisabled(!Setting_RotationRandomizer_Enabled);
-            UI::TextWrapped("Provides an interface which allows you to activate and customize the limits of the rotation randomizer. When the randomizer is turned on a random rotation within the defined limits will be chosen for each selected axis after you place a block or item.");
+            UI::TextWrapped("Provides an interface which allows you to activate and customize the limits of the"
+                " rotation randomizer. When the randomizer is turned on a random rotation within the defined limits"
+                " will be chosen for each selected axis after you place a block or item.");
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("RotationRandomizer::Mode");
+                EditorHelpers::SetHighlightId("RotationRandomizer::AxesLimitsSteps");
+            }
+
             UI::PopID();
         }
 
@@ -72,8 +83,9 @@ namespace EditorHelpers
         void RenderInterface_Build() override
         {
             if (!Enabled()) return;
-
             UI::PushID("RotationRandomizer::RenderInterface_Build");
+
+            EditorHelpers::BeginHighlight("RotationRandomizer::Mode");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Randomize rotation after click\n\nRANDOM - Randomize selected axis's within defined limits\nFIXED_STEP - Increment selected axis's by fixed step");
@@ -95,7 +107,9 @@ namespace EditorHelpers
                 }
                 UI::EndCombo();
             }
+            EditorHelpers::EndHighlight();
 
+            EditorHelpers::BeginHighlight("RotationRandomizer::AxesLimitsSteps");
             int columnCount = 3;
             if (selectedMode == RotationRandomizerMode::FIXED_STEP)
             {
@@ -186,6 +200,7 @@ namespace EditorHelpers
 
                 UI::EndTable();
             }
+            EditorHelpers::EndHighlight();
 
             UI::PopID();
         }
@@ -409,6 +424,7 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["randomizer_mode"] = tostring(selectedMode);
             json["axis_x"] = axisX;
             json["axis_y"] = axisY;
@@ -426,6 +442,7 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_randomizer_mode", Json::Value(true))))
             {
                 string mode = string(json.Get("randomizer_mode", Json::Value("OFF")));
@@ -467,40 +484,119 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_randomizer_mode", Json::Value(true))))
             {
-                UI::Text("Randomizer Mode: " + string(json.Get("randomizer_mode", Json::Value("OFF"))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Randomizer Mode");
+                UI::TableNextColumn();
+                UI::Text(string(json.Get("randomizer_mode", Json::Value("OFF"))));
             }
             if (bool(json.Get("enable_axes", Json::Value(true))))
             {
-                UI::Text("Enable X Axis: " + bool(json.Get("axis_x", Json::Value(false))));
-                UI::Text("Enable Y Axis: " + bool(json.Get("axis_y", Json::Value(false))));
-                UI::Text("Enable Z Axis: " + bool(json.Get("axis_z", Json::Value(false))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Enable X Axis");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("axis_x", Json::Value(false)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Enable Y Axis");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("axis_y", Json::Value(false)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Enable Z Axis");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("axis_z", Json::Value(false)))));
             }
             if (bool(json.Get("enable_axis_limits", Json::Value(true))))
             {
-                UI::Text("Y Limit (Min): " + float(json.Get("y_lim_min", Json::Value(0.0f))));
-                UI::Text("Y Limit (Max): " + float(json.Get("y_lim_max", Json::Value(0.0f))));
-                UI::Text("X Limit (Min): " + float(json.Get("x_lim_min", Json::Value(0.0f))));
-                UI::Text("X Limit (Max): " + float(json.Get("x_lim_max", Json::Value(0.0f))));
-                UI::Text("Z Limit (Min): " + float(json.Get("z_lim_min", Json::Value(0.0f))));
-                UI::Text("Z Limit (Max): " + float(json.Get("z_lim_max", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Y Limit (Min)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("y_lim_min", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Y Limit (Max)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("y_lim_max", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("X Limit (Min)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("x_lim_min", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("X Limit (Max)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("x_lim_max", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Z Limit (Min)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("z_lim_min", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Z Limit (Max)");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("z_lim_max", Json::Value(0.0f)))));
             }
             if (bool(json.Get("enable_axis_steps", Json::Value(true))))
             {
-                UI::Text("Step Y: " + float(json.Get("step_y", Json::Value(0.0f))));
-                UI::Text("Step X: " + float(json.Get("step_x", Json::Value(0.0f))));
-                UI::Text("Step Z: " + float(json.Get("step_z", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Step Y");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("step_y", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Step X");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("step_x", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Step Z");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("step_z", Json::Value(0.0f)))));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_randomizer_mode", "Randomizer Mode")) { changed = true; }
-            if (JsonCheckboxChanged(json, "enable_axes", "Enable Axes")) { changed = true; }
-            if (JsonCheckboxChanged(json, "enable_axis_limits", "Axis Limits")) { changed = true; }
-            if (JsonCheckboxChanged(json, "enable_axis_steps", "Axis Steps")) { changed = true; }
+            if (!Enabled()) { return changed; }
+            if (JsonCheckboxChanged(json, "enable_randomizer_mode", "Randomizer Mode", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("RotationRandomizer::Mode");
+            }
+            if (JsonCheckboxChanged(json, "enable_axes", "Enable Axes", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("RotationRandomizer::AxesLimitsSteps");
+            }
+            if (JsonCheckboxChanged(json, "enable_axis_limits", "Axis Limits", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("RotationRandomizer::AxesLimitsSteps");
+            }
+            if (JsonCheckboxChanged(json, "enable_axis_steps", "Axis Steps", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("RotationRandomizer::AxesLimitsSteps");
+            }
             return changed;
         }
     }

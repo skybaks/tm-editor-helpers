@@ -82,6 +82,8 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Setting_FreeblockPlacement_Enabled = UI::Checkbox("Enabled", Setting_FreeblockPlacement_Enabled);
@@ -90,6 +92,13 @@ namespace EditorHelpers
             Setting_FreeblockPlacement_PersistGrid = UI::Checkbox("Persist Force Freeblock Grid selection between editor sessions", Setting_FreeblockPlacement_PersistGrid);
             Setting_FreeblockPlacement_PersistTranslate = UI::Checkbox("Persist Force Freeblock Translate selection between editor sessions", Setting_FreeblockPlacement_PersistTranslate);
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockPlacement::Grid");
+                EditorHelpers::SetHighlightId("FreeblockPlacement::Translate");
+            }
+
             UI::PopID();
         }
 
@@ -121,6 +130,7 @@ namespace EditorHelpers
             UI::PushID("FreeblockPlacement::RenderInterface");
 
             UI::TextDisabled("\tFree Block Placement");
+            EditorHelpers::BeginHighlight("FreeblockPlacement::Grid");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Sets the placement grid of blocks in free mode. Does not work for numbers < 1.0");
@@ -129,7 +139,9 @@ namespace EditorHelpers
             Setting_FreeblockPlacement_ApplyGrid = UI::Checkbox("Apply Grid to Freeblocks", Setting_FreeblockPlacement_ApplyGrid);
             m_HStep = Math::Max(UI::InputFloat("Horizontal Grid", m_HStep), 0.0f);
             m_VStep = Math::Max(UI::InputFloat("Vertical Grid", m_VStep), 0.0f);
+            EditorHelpers::EndHighlight();
 
+            EditorHelpers::BeginHighlight("FreeblockPlacement::Translate");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Apply a placement offset to blocks in free mode. Use this place freeblocks between the 1m grid");
@@ -139,6 +151,7 @@ namespace EditorHelpers
             m_XTranslate = UI::InputFloat("X Translation", m_XTranslate);
             m_YTranslate = UI::InputFloat("Y Translation", m_YTranslate);
             m_ZTranslate = UI::InputFloat("Z Translation", m_ZTranslate);
+            EditorHelpers::EndHighlight();
 
             UI::PopID();
         }
@@ -175,6 +188,7 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["apply_grid"] = Setting_FreeblockPlacement_ApplyGrid;
             json["horizontal_grid"] = m_HStep;
             json["vertical_grid"] = m_VStep;
@@ -186,6 +200,7 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_grid", Json::Value(true))))
             {
                 Setting_FreeblockPlacement_ApplyGrid = bool(json.Get("apply_grid", Json::Value(false)));
@@ -203,26 +218,69 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_grid", Json::Value(true))))
             {
-                UI::Text("Apply Freeblock Grid: " + bool(json.Get("apply_grid", Json::Value(false))));
-                UI::Text("Horizontal Grid: " + float(json.Get("horizontal_grid", Json::Value(0.0f))));
-                UI::Text("Vertical Grid: " + float(json.Get("vertical_grid", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Apply Freeblock Grid");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("apply_grid", Json::Value(false)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Horizontal Grid");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("horizontal_grid", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Vertical Grid");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("vertical_grid", Json::Value(0.0f)))));
             }
             if (bool(json.Get("enable_translate", Json::Value(true))))
             {
-                UI::Text("Apply Freeblock Translation: " + bool(json.Get("apply_translation", Json::Value(false))));
-                UI::Text("X Translation: " + float(json.Get("x_translation", Json::Value(0.0f))));
-                UI::Text("Y Translation: " + float(json.Get("y_translation", Json::Value(0.0f))));
-                UI::Text("Z Translation: " + float(json.Get("z_translation", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Apply Freeblock Translation");
+                UI::TableNextColumn();
+                UI::Text(tostring(bool(json.Get("apply_translation", Json::Value(false)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("X Translation");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("x_translation", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Y Translation");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("y_translation", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Z Translation");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("z_translation", Json::Value(0.0f)))));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_grid", "Freeblock Grid")) { changed = true; }
-            if (JsonCheckboxChanged(json, "enable_translate", "Freeblock Translation")) { changed = true; }
+            if (!Enabled()) { return changed; }
+            if (JsonCheckboxChanged(json, "enable_grid", "Freeblock Grid", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockPlacement::Grid");
+            }
+            if (JsonCheckboxChanged(json, "enable_translate", "Freeblock Translation", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockPlacement::Translate");
+            }
             return changed;
         }
     }

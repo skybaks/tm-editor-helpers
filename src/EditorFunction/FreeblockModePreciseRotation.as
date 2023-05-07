@@ -44,13 +44,23 @@ namespace EditorHelpers
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
+
+            UI::BeginGroup();
             UI::Markdown("**" + Name() + "**");
             UI::SameLine();
             Settings_FreeblockModePreciseRotation_Enabled = UI::Checkbox("Enabled", Settings_FreeblockModePreciseRotation_Enabled);
             UI::BeginDisabled(!Settings_FreeblockModePreciseRotation_Enabled);
-            UI::TextWrapped("Provides an interface to set any rotation angle in degrees. Also includes step presets for Nadeo slope angles.");
+            UI::TextWrapped("Provides an interface to set any rotation angle in degrees. Also includes step presets"
+                " for Nadeo slope angles.");
             Setting_FreeblockModePreciseRotation_PersistStep = UI::Checkbox("Persist angle step size selection between editor sessions", Setting_FreeblockModePreciseRotation_PersistStep);
             UI::EndDisabled();
+            UI::EndGroup();
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::StepSize");
+                EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::PitchRoll");
+            }
+
             UI::PopID();
         }
 
@@ -101,6 +111,7 @@ namespace EditorHelpers
             UI::PushID("FreeblockModePreciseRotation::RenderInterface");
 
             UI::TextDisabled("\tRotation");
+            EditorHelpers::BeginHighlight("FreeblockModePreciseRotation::StepSize");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Sets the rotational step size of the pitch and roll inputs to a game slope.");
@@ -147,7 +158,9 @@ namespace EditorHelpers
                 UI::SameLine();
             }
             UI::Text("Current Step: " + tostring(stepSize) + " deg");
+            EditorHelpers::EndHighlight();
 
+            EditorHelpers::BeginHighlight("FreeblockModePreciseRotation::PitchRoll");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Pitch of the block in degrees. Use the +/- to increment or enter any value.");
@@ -171,6 +184,7 @@ namespace EditorHelpers
                 inputRoll = inputRollResult;
                 newInputToApply = true;
             }
+            EditorHelpers::EndHighlight();
             UI::PopID();
         }
 
@@ -192,6 +206,7 @@ namespace EditorHelpers
 
         void SerializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             json["step_size"] = Setting_FreeblockModePreciseRotation_StepSizeName;
             json["pitch"] = inputPitch;
             json["roll"] = inputRoll;
@@ -199,6 +214,7 @@ namespace EditorHelpers
 
         void DeserializePresets(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_step_size", Json::Value(true))))
             {
                 Setting_FreeblockModePreciseRotation_StepSizeName = string(json.Get("step_size", Json::Value("Default")));
@@ -213,22 +229,45 @@ namespace EditorHelpers
 
         void RenderPresetValues(Json::Value@ json) override
         {
+            if (!Enabled()) { return; }
             if (bool(json.Get("enable_step_size", Json::Value(true))))
             {
-                UI::Text("Step Size: " + string(json.Get("step_size", Json::Value("Default"))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Step Size");
+                UI::TableNextColumn();
+                UI::Text(string(json.Get("step_size", Json::Value("Default"))));
             }
             if (bool(json.Get("enable_pitch_roll", Json::Value(true))))
             {
-                UI::Text("Pitch: " + float(json.Get("pitch", Json::Value(0.0f))));
-                UI::Text("Roll: " + float(json.Get("roll", Json::Value(0.0f))));
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Pitch");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("pitch", Json::Value(0.0f)))));
+
+                UI::TableNextRow();
+                UI::TableNextColumn();
+                UI::Text("Roll");
+                UI::TableNextColumn();
+                UI::Text(tostring(float(json.Get("roll", Json::Value(0.0f)))));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json) override
+        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
         {
             bool changed = false;
-            if (JsonCheckboxChanged(json, "enable_step_size", "Step Size")) { changed = true; }
-            if (JsonCheckboxChanged(json, "enable_pitch_roll", "Pitch/Roll")) { changed = true; }
+            if (!Enabled()) { return changed; }
+            if (JsonCheckboxChanged(json, "enable_step_size", "Step Size", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::StepSize");
+            }
+            if (JsonCheckboxChanged(json, "enable_pitch_roll", "Pitch/Roll", defaultValue, forceValue)) { changed = true; }
+            if (UI::IsItemHovered())
+            {
+                EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::PitchRoll");
+            }
             return changed;
         }
     }
