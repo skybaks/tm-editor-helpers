@@ -143,6 +143,21 @@ void RenderInterface()
     EditorHelpers::About::RenderAboutWindow();
 }
 
+void RenderSettingsSubsection(const string&in name, array<EditorHelpers::EditorFunction@>@ collection)
+{
+    UI::Markdown("# " + name);
+    for (uint index = 0; index < collection.Length; index++)
+    {
+        if (collection[index].HasSettingsEntry())
+        {
+            collection[index].RenderInterface_Settings();
+            UI::Dummy(vec2(10.0f, 10.0f));
+            UI::Separator();
+        }
+    }
+    UI::Dummy(vec2(20.0f, 20.0f));
+}
+
 [SettingsTab name="Settings"]
 void RenderSettingsPage()
 {
@@ -156,16 +171,11 @@ void RenderSettingsPage()
     UI::Dummy(vec2(20.0f, 20.0f));
     UI::PopID();
 
-    UI::Separator();
-    for (uint index = 0; index < g_functions.Length; index++)
-    {
-        if (g_functions[index].HasSettingsEntry())
-        {
-            g_functions[index].RenderInterface_Settings();
-            UI::Dummy(vec2(10.0f, 10.0f));
-            UI::Separator();
-        }
-    }
+    RenderSettingsSubsection("Action", g_functionsAction);
+    RenderSettingsSubsection("Display", g_functionsDisplay);
+    RenderSettingsSubsection("Build", g_functionsBuild);
+    RenderSettingsSubsection("Info", g_functionsInfo);
+    RenderSettingsSubsection("Other", g_functionsNone);
 }
 
 void OnKeyPress(bool down, VirtualKey key)
