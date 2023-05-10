@@ -11,10 +11,12 @@
     * Add separators between each specific function to add clarity and visible grouping to the UI
     * Add highlighting to function UI when hovering over settings for that function
     * Reorganize settings page to group by UI section
+  * Create wiki on Github: https://github.com/skybaks/tm-editor-helpers/wiki
 * Bugfixes
   * Slight improvement to wording of freeblock placement tooltips
   * Fix bug where entering editor does not update podium status
   * Fix bug where tab wouldnt autoselect when creating a new palette
+  * Backend code cleanup for EditorFunction base class
 
 
 ## 5.15
