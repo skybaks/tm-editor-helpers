@@ -10,6 +10,7 @@
     * Move toggle for Editor Inventory window from Display to "Windows" menu in each window's menu bar
     * Add separators between each specific function to add clarity and visible grouping to the UI
     * Add highlighting to function UI when hovering over settings for that function
+    * Reorganize settings page to group by UI section
 * Bugfixes
   * Slight improvement to wording of freeblock placement tooltips
   * Fix bug where entering editor does not update podium status
