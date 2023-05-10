@@ -182,7 +182,7 @@ namespace EditorHelpers
             UI::PopID();
         }
 
-        void RenderInterface_Build() override
+        void RenderInterface_MainWindow() override
         {
             if (!Enabled() || Editor is null)
             {

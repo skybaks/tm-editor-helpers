@@ -72,6 +72,21 @@ void RenderMenu()
     }
 }
 
+void RenderMainWindowSubsection(const string&in name, array<EditorHelpers::EditorFunction@>@ collection)
+{
+    if (UI::CollapsingHeader(name))
+    {
+        for (uint index = 0; index < collection.Length; index++)
+        {
+            if (collection[index].Enabled())
+            {
+                collection[index].RenderInterface_MainWindow();
+                UI::Separator();
+            }
+        }
+    }
+}
+
 void RenderInterface()
 {
     if (!EditorHelpers::HasPermission()) return;
@@ -85,53 +100,11 @@ void RenderInterface()
 
         EditorHelpers::WindowMenuBar::RenderDefaultMenus();
 
-        if (UI::CollapsingHeader("Action"))
-        {
-            for (uint index = 0; index < g_functionsAction.Length; index++)
-            {
-                if (g_functionsAction[index].Enabled())
-                {
-                    g_functionsAction[index].RenderInterface_Action();
-                    UI::Separator();
-                }
-            }
-        }
+        RenderMainWindowSubsection("Action", g_functionsAction);
+        RenderMainWindowSubsection("Display", g_functionsDisplay);
+        RenderMainWindowSubsection("Build", g_functionsBuild);
+        RenderMainWindowSubsection("Info", g_functionsInfo);
 
-        if (UI::CollapsingHeader("Display"))
-        {
-            for (uint index = 0; index < g_functionsDisplay.Length; index++)
-            {
-                if (g_functionsDisplay[index].Enabled())
-                {
-                    g_functionsDisplay[index].RenderInterface_Display();
-                    UI::Separator();
-                }
-            }
-        }
-
-        if (UI::CollapsingHeader("Build"))
-        {
-            for (uint index = 0; index < g_functionsBuild.Length; index++)
-            {
-                if (g_functionsBuild[index].Enabled())
-                {
-                    g_functionsBuild[index].RenderInterface_Build();
-                    UI::Separator();
-                }
-            }
-        }
-
-        if (UI::CollapsingHeader("Info"))
-        {
-            for (uint index = 0; index < g_functionsInfo.Length; index++)
-            {
-                if (g_functionsInfo[index].Enabled())
-                {
-                    g_functionsInfo[index].RenderInterface_Info();
-                    UI::Separator();
-                }
-            }
-        }
         UI::End();
     }
 

@@ -64,7 +64,7 @@ namespace EditorHelpers
             UI::PopID();
         }
 
-        void RenderInterface_Display() override
+        void RenderInterface_MainWindow() override
         {
             if (!Enabled()) return;
 
