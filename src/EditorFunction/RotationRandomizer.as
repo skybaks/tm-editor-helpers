@@ -80,10 +80,10 @@ namespace EditorHelpers
             }
         }
 
-        void RenderInterface_Build() override
+        void RenderInterface_MainWindow() override
         {
             if (!Enabled()) return;
-            UI::PushID("RotationRandomizer::RenderInterface_Build");
+            UI::PushID("RotationRandomizer::RenderInterface_MainWindow");
 
             EditorHelpers::BeginHighlight("RotationRandomizer::Mode");
             if (settingToolTipsEnabled)

@@ -12,10 +12,7 @@ namespace EditorHelpers
         bool HasSettingsEntry() { return true; }
         bool SupportsPresets() { return false; }
         void Init(){}
-        void RenderInterface_Action(){}
-        void RenderInterface_Display(){}
-        void RenderInterface_Build(){}
-        void RenderInterface_Info(){}
+        void RenderInterface_MainWindow(){}
         void RenderInterface_Settings(){}
         void RenderInterface_ChildWindow(){}
         void RenderInterface_MenuItem(){}

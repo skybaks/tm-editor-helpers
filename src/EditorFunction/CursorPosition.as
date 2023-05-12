@@ -80,7 +80,7 @@ namespace EditorHelpers
             Compatibility::UpdateFreePosition(Editor, m_position);
         }
 
-        void RenderInterface_Info() override
+        void RenderInterface_MainWindow() override
         {
             if (!Enabled() || Editor is null) return;
 

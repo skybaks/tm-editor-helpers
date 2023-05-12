@@ -126,7 +126,7 @@ namespace EditorHelpers
             Debug_LeaveMethod();
         }
 
-        void RenderInterface_Info() override
+        void RenderInterface_MainWindow() override
         {
             if (!Enabled()) return;
 
