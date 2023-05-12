@@ -3,6 +3,18 @@ namespace EditorHelpers
 {
     namespace Compatibility
     {
+        bool BuiltinHotkeysEnabled()
+        {
+#if TMNEXT
+            return true;
+#else
+            Setting_Hotkeys_AirBlockHotKeyEnabled = false;
+            Setting_Hotkeys_ToggleColorsHotKeyEnabled = false;
+            Setting_Hotkeys_FlipCursor180HotKeyEnabled = false;
+            return false;
+#endif
+        }
+
         void ToggleAirBlockMode(CGameCtnEditorFree@ Editor)
         {
 #if TMNEXT
@@ -30,15 +42,6 @@ namespace EditorHelpers
 #elif MP4
 #endif
             return elemColor;
-        }
-
-        bool EnableHotkeysFunction()
-        {
-#if TMNEXT
-#elif MP4
-            Setting_Hotkeys_Enabled = false;
-#endif
-            return Setting_Hotkeys_Enabled;
         }
     }
 
@@ -141,7 +144,7 @@ namespace EditorHelpers
         private string m_rebindKeyName = "";
 
         string Name() override { return "Hotkeys"; }
-        bool Enabled() override { return Compatibility::EnableHotkeysFunction(); }
+        bool Enabled() override { return Setting_Hotkeys_Enabled; }
 
         void RenderInterface_Settings() override
         {
@@ -160,9 +163,11 @@ namespace EditorHelpers
                 UI::TableSetupColumn("");
                 UI::TableHeadersRow();
 
+                UI::BeginDisabled(!Compatibility::BuiltinHotkeysEnabled());
                 HotkeySettingsTableRow("Toggle AirBlock Mode", "AirBlockHotkey", Setting_Hotkeys_AirBlockHotKey, Setting_Hotkeys_AirBlockHotKeyEnabled, Setting_Hotkeys_AirBlockHotKeyEnabled);
                 HotkeySettingsTableRow("Quickswitch To Last Color", "ToggleColors", Setting_Hotkeys_ToggleColorsHotKey, Setting_Hotkeys_ToggleColorsHotKeyEnabled, Setting_Hotkeys_ToggleColorsHotKeyEnabled);
                 HotkeySettingsTableRow("Flip Block 180 deg", "FlipCursor180", Setting_Hotkeys_FlipCursor180HotKey, Setting_Hotkeys_FlipCursor180HotKeyEnabled, Setting_Hotkeys_FlipCursor180HotKeyEnabled);
+                UI::EndDisabled();
 
                 UI::BeginDisabled(!HotkeyInterface::Enabled_BlockCursor());
                 HotkeySettingsTableRow("Toggle Hide Block Cursor", "BlockCursorToggleHide", Setting_Hotkeys_BlockCursorToggleHideHotKey, Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled, Setting_Hotkeys_BlockCursorToggleHideHotKeyEnabled);
@@ -224,6 +229,8 @@ namespace EditorHelpers
                 m_mapElemColorPrev = 0;
                 m_mapElemColorPrevPrev = 0;
             }
+
+            Compatibility::BuiltinHotkeysEnabled();
 
             if (m_presetsFunctionRef is null)
             {
