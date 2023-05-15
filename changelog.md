@@ -1,4 +1,4 @@
-## 5.16.0
+## 6.0.0
 * Features
   * Add Presets feature
     * Access Presets from **Windows | Presets**
@@ -17,6 +17,7 @@
   * Fix bug where entering editor does not update podium status
   * Fix bug where tab wouldnt autoselect when creating a new palette
   * Backend code cleanup for EditorFunction base class
+  * Fix hotkeys not being enabled for MP4
 
 
 ## 5.15
