@@ -26,6 +26,7 @@ namespace EditorHelpers
     {
         private EditorHelpers::CountdownTimer timerQuicksave;
         private bool m_triggerSave;
+        private bool m_functionalityDisabled;
 
         string Name() override { return "Quicksave"; }
         bool Enabled() override { return Setting_Quicksave_Enabled; }
@@ -68,6 +69,7 @@ namespace EditorHelpers
         {
             if (!Enabled() || Editor is null) return;
 
+            UI::BeginDisabled(m_functionalityDisabled);
             EditorHelpers::BeginHighlight("Quicksave::Display");
             if (settingToolTipsEnabled)
             {
@@ -80,14 +82,27 @@ namespace EditorHelpers
                 m_triggerSave = true;
             }
             UI::EndDisabled();
-            UI::SameLine();
-            UI::Text(Editor.PluginMapType.MapFileName);
+            if (Editor.PluginMapType !is null)
+            {
+                UI::SameLine();
+                UI::Text(Editor.PluginMapType.MapFileName);
+            }
             EditorHelpers::EndHighlight();
+            UI::EndDisabled();
         }
 
         void Update(float dt) override
         {
-            if (!Enabled() || Editor is null) return;
+            if (!Enabled() || Editor is null || Editor.PluginMapType is null)
+            {
+                m_functionalityDisabled = true;
+                return;
+            }
+            else
+            {
+                m_functionalityDisabled = false;
+            }
+
             float dtSeconds = dt / 1000.0f;
             timerQuicksave.Update(dtSeconds);
 

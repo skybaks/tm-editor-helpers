@@ -14,26 +14,29 @@ namespace EditorHelpers
         {
             PlaceModeCategory placeMode = PlaceModeCategory::Undefined;
 
-            if (editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block
-                || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::GhostBlock
+            if (editor !is null && editor.PluginMapType !is null)
+            {
+                if (editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block
+                    || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::GhostBlock
 #if TMNEXT
-                || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeBlock
+                    || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeBlock
 #endif
-                )
-            {
-                placeMode = PlaceModeCategory::Block;
-            }
-            else if (editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item)
-            {
-                placeMode = PlaceModeCategory::Item;
-            }
-            else if (editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Macroblock
+                    )
+                {
+                    placeMode = PlaceModeCategory::Block;
+                }
+                else if (editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item)
+                {
+                    placeMode = PlaceModeCategory::Item;
+                }
+                else if (editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Macroblock
 #if TMNEXT
-                || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeMacroblock
+                    || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeMacroblock
 #endif
-                )
-            {
-                placeMode = PlaceModeCategory::Macroblock;
+                    )
+                {
+                    placeMode = PlaceModeCategory::Macroblock;
+                }
             }
 
             return placeMode;
@@ -44,7 +47,9 @@ namespace EditorHelpers
 #if TMNEXT
             editor.ButtonNormalBlockModeOnClick();
 #else
-            if (editor.PluginMapType.PlaceMode != CGameEditorPluginMap::EPlaceMode::Block)
+            if (editor !is null
+                && editor.PluginMapType !is null
+                && editor.PluginMapType.PlaceMode != CGameEditorPluginMap::EPlaceMode::Block)
             {
                 editor.PluginMapType.PlaceMode = CGameEditorPluginMap::EPlaceMode::Block;
             }
@@ -153,6 +158,7 @@ namespace EditorHelpers
     class DefaultBlockMode : EditorHelpers::EditorFunction
     {
         private PlaceModeCategory m_lastPlaceModeCategory;
+        private bool m_functionalityDisabled;
 
         string Name() override { return "Default Block Mode"; }
         bool Enabled() override { return Setting_DefaultBlockMode_Enabled; }
@@ -189,8 +195,10 @@ namespace EditorHelpers
                 return;
             }
 
+            UI::BeginDisabled(m_functionalityDisabled);
             UI::TextDisabled("\tMode Defaults");
             DisplayModeOptions(true, true);
+            UI::EndDisabled();
         }
 
         void Init() override 
@@ -203,7 +211,15 @@ namespace EditorHelpers
 
         void Update(float) override
         {
-            if (!Enabled() || Editor is null) return;
+            if (!Enabled() || Editor is null || Editor.PluginMapType is null)
+            {
+                m_functionalityDisabled = true;
+                return;
+            }
+            else
+            {
+                m_functionalityDisabled = false;
+            }
 
             PlaceModeCategory currentPlaceModeCategory = Compatibility::GetCurrentPlaceModeCategory(Editor);
             if (m_lastPlaceModeCategory != currentPlaceModeCategory)

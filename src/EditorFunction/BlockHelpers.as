@@ -8,7 +8,10 @@ namespace EditorHelpers
 #if TMNEXT
             editor.HideBlockHelpers = setValue;
 #elif MP4
-            editor.PluginMapType.HideBlockHelpers = setValue;
+            if (editor !is null && editor.PluginMapType !is null)
+            {
+                editor.PluginMapType.HideBlockHelpers = setValue;
+            }
 #endif
         }
     }
@@ -37,6 +40,7 @@ namespace EditorHelpers
     class BlockHelpers : EditorHelpers::EditorFunction
     {
         private bool lastBlockHelpersOff;
+        private bool m_functionalityDisabled;
 
         string Name() override { return "Block Helpers"; }
         bool Enabled() override { return Setting_BlockHelpers_Enabled; }
@@ -75,6 +79,7 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
 
+            UI::BeginDisabled(m_functionalityDisabled);
             EditorHelpers::BeginHighlight("BlockHelpers::HelpersOff");
             if (settingToolTipsEnabled)
             {
@@ -83,11 +88,21 @@ namespace EditorHelpers
             }
             Setting_BlockHelpers_BlockHelpersOff = UI::Checkbox("Block Helpers Off", Setting_BlockHelpers_BlockHelpersOff);
             EditorHelpers::EndHighlight();
+            UI::EndDisabled();
         }
 
         void Update(float) override
         {
-            if (!Enabled() || Editor is null) return;
+            if (!Enabled() || Editor is null || Editor.PluginMapType is null)
+            {
+                m_functionalityDisabled = true;
+                return;
+            }
+            else
+            {
+                m_functionalityDisabled = false;
+            }
+
             if (Setting_BlockHelpers_BlockHelpersOff)
             {
                 Compatibility::SetHideBlockHelpers(Editor, true);

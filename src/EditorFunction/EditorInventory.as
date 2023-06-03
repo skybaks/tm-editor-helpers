@@ -359,14 +359,20 @@ namespace EditorHelpers
         void Update(float) override
         {
             Debug_EnterMethod("Update");
-            if (!Enabled() || Editor is null)
+            if (!Enabled() || Editor is null || Editor.PluginMapType is null)
             {
                 Debug_LeaveMethod();
                 return;
             }
+            else
+            {
+            }
 
             if (!m_loadingInventory && (Signal_EnteredEditor() || m_loadedInventoryArticleCount != GetArticleCount()))
             {
+                m_loadingInventory = true;
+                m_loadedInventoryArticleCount = GetArticleCount();
+
                 // COROUTINE USAGE!
                 startnew(CoroutineFunc(IndexInventory));
             }
@@ -522,9 +528,6 @@ namespace EditorHelpers
         private void IndexInventory()
         {
             Debug_EnterMethod("IndexInventory");
-
-            m_loadingInventory = true;
-            m_loadedInventoryArticleCount = GetArticleCount();
 
             if (m_articles.Length > 0)
             {

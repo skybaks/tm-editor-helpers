@@ -38,6 +38,8 @@ namespace EditorHelpers
         bool Enabled() override { return Setting_PlacementGrid_Enabled; }
         bool SupportsPresets() override { return true; }
 
+        private bool m_functionalityDisabled = false;
+
         void RenderInterface_Settings() override
         {
             UI::PushID(Name() + "SettingsPage");
@@ -68,6 +70,7 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
 
+            UI::BeginDisabled(m_functionalityDisabled);
             EditorHelpers::BeginHighlight("PlacementGrid::GridOn");
             if (settingToolTipsEnabled)
             {
@@ -81,11 +84,21 @@ namespace EditorHelpers
             EditorHelpers::BeginHighlight("PlacementGrid::Transparent");
             Setting_PlacementGrid_PlacementGridTransparent = UI::Checkbox("Transparent", Setting_PlacementGrid_PlacementGridTransparent);
             EditorHelpers::EndHighlight();
+            UI::EndDisabled();
         }
 
         void Update(float) override
         {
-            if (!Enabled() || Editor is null) return;
+            if (!Enabled() || Editor is null || Editor.PluginMapType is null)
+            {
+                m_functionalityDisabled = true;
+                return;
+            }
+            else
+            {
+                m_functionalityDisabled = false;
+            }
+
             if (Setting_PlacementGrid_PlacementGridOn != Editor.PluginMapType.ShowPlacementGrid)
             {
                 Editor.ButtonHelper1OnClick();

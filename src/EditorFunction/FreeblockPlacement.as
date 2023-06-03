@@ -7,7 +7,11 @@ namespace EditorHelpers
         bool FreeblockPlacementShouldBeActive(CGameCtnEditorFree@ editor)
         {
 #if TMNEXT
-            return editor.Cursor.UseFreePos || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item;
+            return editor.Cursor.UseFreePos
+                || (
+                    editor.PluginMapType !is null
+                    && editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item
+                );
 #else
             return false;
 #endif
