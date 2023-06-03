@@ -115,6 +115,8 @@ namespace EditorHelpers
         private bool m_deleteConfirm;
         private PaletteRandomizerMode m_paletteRandomize;
         private uint64 m_parallelLoadYieldTime; // This signal is used yield the IndexInventory coroutine at reasonable times
+        private uint m_loadedInventoryArticleCount;
+        private bool m_loadingInventory;
 
         string Name() override { return "Editor Inventory"; }
         bool Enabled() override { return Compatibility::EnableEditorInventoryFunction(); }
@@ -149,6 +151,8 @@ namespace EditorHelpers
                 m_forcePaletteIndex = -1;
                 m_deleteConfirm = false;
                 m_paletteRandomize = PaletteRandomizerMode::NONE;
+                m_loadedInventoryArticleCount = 0;
+                m_loadingInventory = false;
             }
         }
 
@@ -357,7 +361,7 @@ namespace EditorHelpers
                 return;
             }
 
-            if (Signal_EnteredEditor())
+            if (!m_loadingInventory && (Signal_EnteredEditor() || m_loadedInventoryArticleCount != GetArticleCount()))
             {
                 // COROUTINE USAGE!
                 startnew(CoroutineFunc(IndexInventory));
@@ -417,7 +421,7 @@ namespace EditorHelpers
         // PARALLEL METHODS BEGIN
         // - Be careful about calling these methods from the main thread. They
         //      are designed to yield at specific intervals and calling them
-        //      from the main thread could impact behavior of classes.
+        //      from the main thread could impact behavior of other classes.
 
         private bool VerifyInventoryItem(CGameCtnArticleNode@ rootNode, const string&in check)
         {
@@ -482,7 +486,6 @@ namespace EditorHelpers
                                 if (splitPath.Length > 0)
                                 {
                                     articleName = name + "/" + splitPath[splitPath.Length-1];
-                                    Debug("Split node name results in: " + tostring(articleName));
                                 }
                             }
 
@@ -492,7 +495,6 @@ namespace EditorHelpers
                                 @currentSisterArt = null;
                             }
 
-                            Debug("Add " + articleName);
                             m_articles.InsertLast(EditorInventoryArticle(articleName, currentArt, currentSisterArt, placeMode));
                         }
                     }
@@ -505,6 +507,9 @@ namespace EditorHelpers
         private void IndexInventory()
         {
             Debug_EnterMethod("IndexInventory");
+
+            m_loadingInventory = true;
+            m_loadedInventoryArticleCount = GetArticleCount();
 
             if (m_articles.Length > 0)
             {
@@ -562,6 +567,8 @@ namespace EditorHelpers
 
             UpdateFilteredList();
             LoadPalettes();
+
+            m_loadingInventory = false;
 
             Debug_LeaveMethod();
         }
@@ -713,27 +720,34 @@ namespace EditorHelpers
 
         private void DisplayInventoryArticlesTable(const string&in id, const EditorInventoryArticle@[]&in articles)
         {
-            auto tableFlags = UI::TableFlags(int(UI::TableFlags::ScrollY));
-            if (UI::BeginTable("CustomPaletteTable" + id, 1 /*cols*/, tableFlags))
+            if (!m_loadingInventory)
             {
-                CGameCtnArticleNodeArticle@ selectedArticle = cast<CGameCtnArticleNodeArticle>(Editor.PluginMapType.Inventory.CurrentSelectedNode);
-
-                UI::ListClipper clipper(articles.Length);
-                while (clipper.Step())
+                auto tableFlags = UI::TableFlags(int(UI::TableFlags::ScrollY));
+                if (UI::BeginTable("CustomPaletteTable" + id, 1 /*cols*/, tableFlags))
                 {
-                    int filterOffset = 0;
-                    for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
-                    {
-                        UI::TableNextRow();
+                    CGameCtnArticleNodeArticle@ selectedArticle = cast<CGameCtnArticleNodeArticle>(Editor.PluginMapType.Inventory.CurrentSelectedNode);
 
-                        UI::TableNextColumn();
-                        if (UI::Selectable(articles[i].DisplayName + "##" + tostring(i), articles[i].Article is selectedArticle))
+                    UI::ListClipper clipper(articles.Length);
+                    while (clipper.Step())
+                    {
+                        int filterOffset = 0;
+                        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
                         {
-                            SetCurrentArticle(articles[i]);
+                            UI::TableNextRow();
+
+                            UI::TableNextColumn();
+                            if (UI::Selectable(articles[i].DisplayName + "##" + tostring(i), articles[i].Article is selectedArticle))
+                            {
+                                SetCurrentArticle(articles[i]);
+                            }
                         }
                     }
+                    UI::EndTable();
                 }
-                UI::EndTable();
+            }
+            else
+            {
+                UI::Text(Icons::Hourglass + " Loading...");
             }
         }
 
@@ -801,6 +815,17 @@ namespace EditorHelpers
 
             json["palettes"] = palettes;
             Json::ToFile(IO::FromStorageFolder("EditorFunction_EditorInventory.json"), json);
+        }
+
+        private uint GetArticleCount()
+        {
+            uint count = 0;
+            auto chapters = GetApp().GlobalCatalog.Chapters;
+            if (chapters.Length > 3)
+            {
+                count = chapters[3].Articles.Length;
+            }
+            return count;
         }
     }
 }

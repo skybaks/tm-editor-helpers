@@ -1,3 +1,8 @@
+## 6.0.1
+* Bugfixes
+  * Fix issue where cached inventory could become unstable when creating/deleting articles
+
+
 ## 6.0.0
 * Features
   * Add Presets feature
