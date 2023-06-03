@@ -100,6 +100,9 @@ namespace EditorHelpers
     [Setting category="Functions" name="EditorInventory: Article History Max" hidden]
     uint Setting_EditorInventory_ArticleHistoryMax = 10;
 
+    [Setting category="Functions" name="EditorInventory: Persist Palette Index" hidden]
+    uint Setting_EditorInventory_PersistPaletteIndex = 0;
+
     class EditorInventory : EditorHelpers::EditorFunction
     {
         private EditorInventoryArticle@[] m_articles;
@@ -117,6 +120,7 @@ namespace EditorHelpers
         private uint64 m_parallelLoadYieldTime; // This signal is used yield the IndexInventory coroutine at reasonable times
         private uint m_loadedInventoryArticleCount;
         private bool m_loadingInventory;
+        private bool m_loadingInventoryPrev;
 
         string Name() override { return "Editor Inventory"; }
         bool Enabled() override { return Compatibility::EnableEditorInventoryFunction(); }
@@ -413,6 +417,17 @@ namespace EditorHelpers
                 SetCurrentArticle(m_articlesHistory[1]);
             }
             HotkeyInterface::g_EditorInventory_QuickswitchPreviousTrigger = false;
+
+            if (!m_loadingInventory && m_loadingInventoryPrev)
+            {
+                m_forcePaletteIndex = Setting_EditorInventory_PersistPaletteIndex;
+                Debug("Force palette to persist number: " + tostring(m_forcePaletteIndex));
+            }
+            else if (!m_loadingInventory)
+            {
+                Setting_EditorInventory_PersistPaletteIndex = m_selectedPaletteIndex;
+            }
+            m_loadingInventoryPrev = m_loadingInventory;
 
             Debug_LeaveMethod();
         }
