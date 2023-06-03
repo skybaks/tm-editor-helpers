@@ -5,11 +5,23 @@ namespace EditorHelpers
     {
         bool FreeblockModePreciseRotationShouldBeActive(CGameCtnEditorFree@ editor)
         {
+            bool allowed = false;
 #if TMNEXT
-            return editor.Cursor.UseFreePos || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item;
+            allowed =
+                editor.Cursor.UseFreePos
+                || (
+                    editor.PluginMapType !is null /* Allow rotations even when PluginMapType is null */
+                    || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item
+                );
 #else
-            return editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item;
+            allowed =
+                editor !is null
+                && (
+                    editor.PluginMapType is null /* Allow rotations even when PluginMapType is null */
+                    || editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Item
+                );
 #endif
+            return allowed;
         }
 
         string FreeblockModePreciseRotationName()

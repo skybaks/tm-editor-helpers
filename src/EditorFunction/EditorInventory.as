@@ -359,10 +359,13 @@ namespace EditorHelpers
         void Update(float) override
         {
             Debug_EnterMethod("Update");
-            if (!Enabled() || Editor is null)
+            if (!Enabled() || Editor is null || Editor.PluginMapType is null)
             {
                 Debug_LeaveMethod();
                 return;
+            }
+            else
+            {
             }
 
             if (!m_loadingInventory && (Signal_EnteredEditor() || m_loadedInventoryArticleCount != GetArticleCount()))

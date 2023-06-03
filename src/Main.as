@@ -57,7 +57,7 @@ namespace Compatibility
         return GetApp().CurrentPlayground !is null;
 #else
         CGameCtnEditorFree@ editor = cast<CGameCtnEditorFree>(GetApp().Editor);
-        return editor !is null && editor.PluginMapType.IsSwitchedToPlayground;
+        return editor !is null && editor.PluginMapType !is null && editor.PluginMapType.IsSwitchedToPlayground;
 #endif
     }
 }

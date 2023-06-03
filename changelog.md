@@ -2,6 +2,7 @@
 * Bugfixes
   * Fix issue where cached inventory could become unstable when creating/deleting articles
   * Fix inventory not remembering the selected custom palette between reloads
+  * Fix script exceptions in some MP4 titlepacks
 
 
 ## 6.0.0

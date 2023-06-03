@@ -7,7 +7,10 @@ namespace EditorHelpers
         {
             uint count = 0;
 #if TMNEXT
-            count = editor.PluginMapType.GhostBlocks.Length;
+            if (editor !is null && editor.PluginMapType !is null)
+            {
+                count = editor.PluginMapType.GhostBlocks.Length;
+            }
 #endif
             return count;
         }

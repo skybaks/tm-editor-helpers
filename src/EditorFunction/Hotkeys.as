@@ -18,9 +18,11 @@ namespace EditorHelpers
         void ToggleAirBlockMode(CGameCtnEditorFree@ Editor)
         {
 #if TMNEXT
-            if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block
-                || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::GhostBlock
-                || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeBlock)
+            if (Editor.PluginMapType !is null
+                && (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block
+                    || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::GhostBlock
+                    || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::FreeBlock
+                ))
             {
                 Editor.ButtonAirBlockModeOnClick();
             }
@@ -30,7 +32,10 @@ namespace EditorHelpers
         void SetNextMapElemColor(CGameCtnEditorFree@ Editor, int color)
         {
 #if TMNEXT
-            Editor.PluginMapType.NextMapElemColor = CGameEditorPluginMap::EMapElemColor(color);
+            if (Editor.PluginMapType !is null)
+            {
+                Editor.PluginMapType.NextMapElemColor = CGameEditorPluginMap::EMapElemColor(color);
+            }
 #endif
         }
 
@@ -38,7 +43,10 @@ namespace EditorHelpers
         {
             int elemColor = 0;
 #if TMNEXT
-            elemColor = int(Editor.PluginMapType.NextMapElemColor);
+            if (Editor.PluginMapType !is null)
+            {
+                elemColor = int(Editor.PluginMapType.NextMapElemColor);
+            }
 #elif MP4
 #endif
             return elemColor;

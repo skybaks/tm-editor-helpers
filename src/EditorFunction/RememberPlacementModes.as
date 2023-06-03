@@ -8,7 +8,9 @@ namespace EditorHelpers
 #if TMNEXT
             editor.ButtonNormalBlockModeOnClick();
 #else
-            if (editor.PluginMapType.PlaceMode != CGameEditorPluginMap::EPlaceMode::Block)
+            if (editor !is null
+                && editor.PluginMapType !is null
+                && editor.PluginMapType.PlaceMode != CGameEditorPluginMap::EPlaceMode::Block)
             {
                 editor.PluginMapType.PlaceMode = CGameEditorPluginMap::EPlaceMode::Block;
             }
@@ -56,6 +58,7 @@ namespace EditorHelpers
         private CGameEditorPluginMap::EditMode lastSelectionEditMode;
         private bool lastSelectionModeAddSub;
         private string lastPlaceModeCategoryBeforeTest;
+        private bool m_functionalityDisabled;
 
         string Name() override { return "Remember Placement Modes"; }
         bool Enabled() override { return Setting_RememberPlacementModes_Enabled; }
@@ -87,7 +90,16 @@ namespace EditorHelpers
 
         void Update(float) override
         {
-            if (!Enabled() || Editor is null) return;
+            if (!Enabled() || Editor is null || Editor.PluginMapType is null)
+            {
+                m_functionalityDisabled = true;
+                return;
+            }
+            else
+            {
+                m_functionalityDisabled = false;
+            }
+
             string currentPlaceModeCategory = "Undefined";
             if (Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::Block
             || Editor.PluginMapType.PlaceMode == CGameEditorPluginMap::EPlaceMode::GhostBlock
