@@ -1,4 +1,6 @@
-## 6.0.1
+## 6.1.0
+* Features
+  * Added several "How To" guides on the Wiki: https://github.com/skybaks/tm-editor-helpers/wiki
 * Bugfixes
   * Fix issue where cached inventory could become unstable when creating/deleting articles
   * Fix inventory not remembering the selected custom palette between reloads
