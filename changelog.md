@@ -1,3 +1,10 @@
+## 6.2.0
+* Features
+  * Add new option to Quicksave function to create a backup copy of the map each time it is saved
+* Bugfixes
+  * Fix mixed usage of path separators
+
+
 ## 6.1.0
 * Features
   * Added several "How To" guides on the Wiki: https://github.com/skybaks/tm-editor-helpers/wiki
