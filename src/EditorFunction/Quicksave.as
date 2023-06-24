@@ -30,6 +30,8 @@ namespace EditorHelpers
         private EditorHelpers::CountdownTimer timerQuicksave;
         private bool m_triggerSave;
         private bool m_functionalityDisabled;
+        private int m_lastSaveCopyCount;
+        private string m_lastSaveCopyName;
 
         string Name() override { return "Quicksave"; }
         bool Enabled() override { return Setting_Quicksave_Enabled; }
@@ -70,6 +72,8 @@ namespace EditorHelpers
             {
                 m_triggerSave = false;
                 HotkeyInterface::g_Quicksave_Activate = false;
+                m_lastSaveCopyCount = -1;
+                m_lastSaveCopyName = "";
             }
         }
 
@@ -150,20 +154,27 @@ namespace EditorHelpers
                 IO::CreateFolder(autosaveFolderPath);
             }
 
-            int largestExisting = 0;
-            array<string> existingFiles = IO::IndexFolder(autosaveFolderPath, false);
-            for (uint i = 0; i < existingFiles.Length; ++i)
+            if (targetCopyName != m_lastSaveCopyName)
             {
-                string filename = GetFilename(existingFiles[i]);
-                if (filename.StartsWith(targetCopyName))
+                int largestExisting = 0;
+                array<string> existingFiles = IO::IndexFolder(autosaveFolderPath, false);
+                for (uint i = 0; i < existingFiles.Length; ++i)
                 {
-                    array<string> splitFile = SplitExtension(filename).Split("_");
-                    int count = Text::ParseInt(splitFile[splitFile.Length - 1]);
-                    largestExisting = Math::Max(largestExisting, count);
+                    string filename = GetFilename(existingFiles[i]);
+                    if (filename.StartsWith(targetCopyName))
+                    {
+                        array<string> splitFile = SplitExtension(filename).Split("_");
+                        int count = Text::ParseInt(splitFile[splitFile.Length - 1]);
+                        largestExisting = Math::Max(largestExisting, count);
+                    }
                 }
+                Debug("largestExisting is " + tostring(largestExisting));
+                m_lastSaveCopyCount = largestExisting;
             }
-            Debug("largestExisting is " + tostring(largestExisting));
-            string targetFileName = targetCopyName + "_" + Text::Format("%06d", largestExisting + 1) + ".Map.Gbx";
+            m_lastSaveCopyCount += 1;
+            m_lastSaveCopyName = targetCopyName;
+
+            string targetFileName = targetCopyName + "_" + Text::Format("%06d", m_lastSaveCopyCount) + ".Map.Gbx";
 
             IO::File fs(currentMapFilePath, IO::FileMode::Read);
             MemoryBuffer@ data = fs.Read(fs.Size());
