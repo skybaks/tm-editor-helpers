@@ -10,7 +10,6 @@ namespace EditorHelpers
         string Name() { return ""; }
         bool Enabled(){ return false; }
         bool HasSettingsEntry() { return true; }
-        bool SupportsPresets() { return false; }
         void Init(){}
         void RenderInterface_MainWindow(){}
         void RenderInterface_Settings(){}
@@ -18,10 +17,6 @@ namespace EditorHelpers
         void RenderInterface_MenuItem(){}
         void Update(float){}
         void OnKeyPress(bool down, VirtualKey key) {}
-        void SerializePresets(Json::Value@ json) {}
-        void DeserializePresets(Json::Value@ json) {}
-        void RenderPresetValues(Json::Value@ json) {}
-        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) { return false; }
 
         void Debug_EnterMethod(const string&in methodName)
         {

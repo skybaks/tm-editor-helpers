@@ -2,6 +2,51 @@
 
 namespace EditorHelpers
 {
+    class FreeblockPlacementPreset : EditorFunctionPresetBase
+    {
+        bool EnableGrid;
+        bool ApplyGrid;
+        float HorizontalGrid;
+        float VerticalGrid;
+        bool EnableTranslate;
+        bool ApplyTranslation;
+        float X_Translation;
+        float Y_Translation;
+        float Z_Translation;
+
+        FreeblockPlacementPreset()
+        {
+            super("Freeblock Placement");
+        }
+
+        Json::Value@ ToJson() const override
+        {
+            m_json["enable_grid"] = EnableGrid;
+            m_json["apply_grid"] = ApplyGrid;
+            m_json["horizontal_grid"] = HorizontalGrid;
+            m_json["vertical_grid"] = VertialGrid;
+            m_json["enable_translate"] = EnableTranslate;
+            m_json["apply_translation"] = ApplyTranslation;
+            m_json["x_translation"] = X_Translation;
+            m_json["y_translation"] = Y_Translation;
+            m_json["z_translation"] = Z_Translation;
+            return m_json;
+        }
+
+        void FromJson(const Json::Value@ json) override
+        {
+            EnableGrid = json.Get("enable_grid", Json::Value(true));
+            ApplyGrid = json.Get("apply_grid", Json::Value(false));
+            HorizontalGrid = json.Get("horizontal_grid", Json::Value(0.0f));
+            VerticalGrid = json.Get("vertical_grid", Json::Value(0.0f));
+            EnableTranslate = json.Get("enable_translate", Json::Value(true));
+            ApplyTranslation = json.Get("apply_translation", Json::Value(false));
+            X_Translation = json.Get("x_translation", Json::Value(0.0f));
+            Y_Translation = json.Get("y_translation", Json::Value(0.0f));
+            Z_Translation = json.Get("z_translation", Json::Value(0.0f));
+        }
+    }
+
     namespace Compatibility
     {
         bool FreeblockPlacementShouldBeActive(CGameCtnEditorFree@ editor)
@@ -69,7 +114,7 @@ namespace EditorHelpers
     [Setting category="Functions" hidden]
     bool Setting_FreeblockPlacement_ApplyTranslate = false;
 
-    class FreeblockPlacement : EditorHelpers::EditorFunction
+    class FreeblockPlacement : EditorHelpers::EditorFunction, EditorFunctionPresetInterface
     {
         private float m_HStep;
         private float m_VStep;
@@ -81,7 +126,6 @@ namespace EditorHelpers
 
         string Name() override { return "Freeblock Placement"; }
         bool Enabled() override { return Compatibility::EnableFreeblockPlacementFunction(); }
-        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -190,97 +234,108 @@ namespace EditorHelpers
             }
         }
 
-        void SerializePresets(Json::Value@ json) override
+        // EditorFunctionPresetInterface
+        EditorFunctionPresetBase@ CreatePreset() override { return FreeblockPlacementPreset(); }
+
+        void UpdatePreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            json["apply_grid"] = Setting_FreeblockPlacement_ApplyGrid;
-            json["horizontal_grid"] = m_HStep;
-            json["vertical_grid"] = m_VStep;
-            json["apply_translation"] = Setting_FreeblockPlacement_ApplyTranslate;
-            json["x_translation"] = m_XTranslate;
-            json["y_translation"] = m_YTranslate;
-            json["z_translation"] = m_ZTranslate;
+            FreeblockPlacementPreset@ preset = cast<FreeblockPlacementPreset>(data);
+            if (preset is null) { return; }
+            preset.ApplyGrid = Setting_FreeblockPlacement_ApplyGrid;
+            preset.HorizontalGrid = m_HStep;
+            preset.VerticalGrid = m_VStep;
+            preset.ApplyTranslation = Setting_FreeblockPlacement_ApplyTranslate;
+            preset.X_Translation = m_XTranslate;
+            preset.Y_Translation = m_YTranslate;
+            preset.Z_Translation = m_ZTranslate;
         }
 
-        void DeserializePresets(Json::Value@ json) override
+        void ApplyPreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_grid", Json::Value(true))))
+            FreeblockPlacementPreset@ preset = cast<FreeblockPlacementPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableGrid)
             {
-                Setting_FreeblockPlacement_ApplyGrid = bool(json.Get("apply_grid", Json::Value(false)));
-                m_HStep = float(json.Get("horizontal_grid", Json::Value(0.0f)));
-                m_VStep = float(json.Get("vertical_grid", Json::Value(0.0f)));
+                Setting_FreeblockPlacement_ApplyGrid = preset.ApplyGrid;
+                m_HStep = preset.HorizontalGrid;
+                m_VStep = preset.VerticalGrid;
             }
-            if (bool(json.Get("enable_translate", Json::Value(true))))
+            if (preset.EnableTranslate)
             {
-                Setting_FreeblockPlacement_ApplyTranslate = bool(json.Get("apply_translation", Json::Value(false)));
-                m_XTranslate = float(json.Get("x_translation", Json::Value(0.0f)));
-                m_YTranslate = float(json.Get("y_translation", Json::Value(0.0f)));
-                m_ZTranslate = float(json.Get("z_translation", Json::Value(0.0f)));
+                Setting_FreeblockPlacement_ApplyTranslate = preset.ApplyTranslation;
+                m_XTranslate = preset.X_Translation;
+                m_YTranslate = preset.Y_Translation;
+                m_ZTranslate = preset.Z_Translation;
             }
         }
 
-        void RenderPresetValues(Json::Value@ json) override
+        void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_grid", Json::Value(true))))
+            FreeblockPlacementPreset@ preset = cast<FreeblockPlacementPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableGrid)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Apply Freeblock Grid");
                 UI::TableNextColumn();
-                UI::Text(tostring(bool(json.Get("apply_grid", Json::Value(false)))));
+                UI::Text(tostring(preset.ApplyGrid));
 
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Horizontal Grid");
                 UI::TableNextColumn();
-                UI::Text(tostring(float(json.Get("horizontal_grid", Json::Value(0.0f)))));
+                UI::Text(tostring(preset.HorizontalGrid));
 
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Vertical Grid");
                 UI::TableNextColumn();
-                UI::Text(tostring(float(json.Get("vertical_grid", Json::Value(0.0f)))));
+                UI::Text(tostring(preset.VerticalGrid));
             }
-            if (bool(json.Get("enable_translate", Json::Value(true))))
+            if (preset.EnableTranslate)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Apply Freeblock Translation");
                 UI::TableNextColumn();
-                UI::Text(tostring(bool(json.Get("apply_translation", Json::Value(false)))));
+                UI::Text(tostring(preset.ApplyTranslation));
 
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("X Translation");
                 UI::TableNextColumn();
-                UI::Text(tostring(float(json.Get("x_translation", Json::Value(0.0f)))));
+                UI::Text(tostring(preset.X_Translation));
 
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Y Translation");
                 UI::TableNextColumn();
-                UI::Text(tostring(float(json.Get("y_translation", Json::Value(0.0f)))));
+                UI::Text(tostring(preset.Y_Translation));
 
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Z Translation");
                 UI::TableNextColumn();
-                UI::Text(tostring(float(json.Get("z_translation", Json::Value(0.0f)))));
+                UI::Text(tostring(preset.Z_Translation));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
+        bool RenderPresetEnables(EditorFunctionPresetBase@ data, bool defaultValue, bool forceValue) override
         {
+            if (!Enabled()) { return false; }
+            FreeblockPlacementPreset@ preset = cast<FreeblockPlacementPreset>(data);
+            if (preset is null) { return false; }
             bool changed = false;
-            if (!Enabled()) { return changed; }
-            if (JsonCheckboxChanged(json, "enable_grid", "Freeblock Grid", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableGrid, preset.EnableGrid, "Freeblock Grid", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("FreeblockPlacement::Grid");
             }
-            if (JsonCheckboxChanged(json, "enable_translate", "Freeblock Translation", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableTranslate, preset.EnableTranslate, "Freeblock Translation", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("FreeblockPlacement::Translate");

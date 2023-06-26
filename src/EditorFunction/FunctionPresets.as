@@ -1,31 +1,31 @@
 
 namespace EditorHelpers
 {
-    class EditorFunctionPresetItem
+    class EditorFunctionPresetBase
     {
-        EditorFunctionPresetItem(const string&in name)
+        private string m_name;
+        protected Json::Value@ m_json;
+
+        EditorFunctionPresetBase(const string&in name)
         {
-            Name = name;
+            m_name = name;
+            m_json = Json::Object();
         }
 
-        Json::Value@ JsonData
-        {
-            get
-            {
-                if (json is null)
-                {
-                    @json = Json::Object();
-                }
-                return json;
-            }
-            set
-            {
-                @json = value;
-            }
-        }
+        string get_Name() const { return m_name; }
+        Json::Value@ ToJson() const { return Json::Value(); }
+        void FromJson(const Json::Value@ json) {}
+    }
 
-        string Name = "Invalid";
-        private Json::Value@ json = null;
+    interface EditorFunctionPresetInterface
+    {
+        EditorFunctionPresetBase@ CreatePreset();
+        void UpdatePreset(EditorFunctionPresetBase@ data);
+        void ApplyPreset(EditorFunctionPresetBase@ data);
+        void RenderPresetValues(EditorFunctionPresetBase@ data);
+        bool RenderPresetEnables(EditorFunctionPresetBase@ data, bool defaultValue, bool forceValue);
+        string Name();
+        bool Enabled();
     }
 
     class EditorFunctionPreset
@@ -42,21 +42,21 @@ namespace EditorHelpers
         {
             for (uint index = 0; index < g_functions.Length; index++)
             {
-                EditorFunction@ ef = g_functions[index];
-                if (ef.SupportsPresets())
+                EditorFunctionPresetInterface@ ef = cast<EditorFunctionPresetInterface>(g_functions[index]);
+                if (ef !is null)
                 {
-                    auto@ presetItem = GetItem(ef.Name());
+                    EditorFunctionPresetBase@ presetItem = GetItem(ef.Name());
                     if (presetItem is null)
                     {
-                        @presetItem = EditorFunctionPresetItem(ef.Name());
-                        ef.SerializePresets(presetItem.JsonData);
+                        @presetItem = ef.CreatePreset();
+                        ef.UpdatePreset(presetItem);
                         Functions.InsertLast(presetItem);
                     }
                 }
             }
         }
 
-        EditorFunctionPresetItem@ GetItem(const string&in name)
+        EditorFunctionPresetBase@ GetItem(const string&in name)
         {
             for (uint i = 0; i < Functions.Length; ++i)
             {
@@ -69,7 +69,7 @@ namespace EditorHelpers
         }
 
         string Name;
-        array<EditorFunctionPresetItem@> Functions;
+        array<EditorFunctionPresetBase@> Functions;
         bool HotkeyEnabled;
         VirtualKey Key;
     }
@@ -548,12 +548,12 @@ namespace EditorHelpers
         }
     }
 
-    bool JsonCheckboxChanged(Json::Value@ json, const string&in key, const string&in text, bool defaultValue, bool forceValue)
+    bool ForcedCheckbox(bool&in inVal, bool&out outVal, const string&in text, bool defaultVal, bool forceVal)
     {
-        bool beforeVal = bool(json.Get(key, Json::Value(defaultValue)));
+        bool beforeVal = inVal;
         bool afterVal = UI::Checkbox(text, beforeVal);
-        if (forceValue) { afterVal = defaultValue; }
-        json[key] = afterVal;
+        if (forceVal) { afterVal = defaultVal; }
+        outVal = afterVal;
         return beforeVal != afterVal;
     }
 }

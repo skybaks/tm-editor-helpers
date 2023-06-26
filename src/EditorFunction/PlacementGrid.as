@@ -1,6 +1,36 @@
 
 namespace EditorHelpers
 {
+    class PlacementGridPreset : EditorFunctionPresetBase
+    {
+        bool EnableGridOn;
+        bool GridOn;
+        bool EnableGridTransparent;
+        bool Transparent;
+
+        PlacementGridPreset()
+        {
+            super("Placement Grid");
+        }
+
+        Json::Value@ ToJson() const override
+        {
+            m_json["enable_grid_on"] = EnableGridOn;
+            m_json["grid_on"] = GridOn;
+            m_json["enable_grid_transparent"] = EnableGridTransparent;
+            m_json["transparent"] = Transparent;
+            return m_json;
+        }
+
+        void FromJson(const Json::Value@ json) override
+        {
+            EnableGridOn = json.Get("enable_grid_on", Json::Value(true));
+            GridOn = json.Get("grid_on", Json::Value(false));
+            EnableGridTransparent = json.Get("enable_grid_transparent", Json::Value(true));
+            Transparent = json.Get("transparent", Json::Value(false));
+        }
+    }
+
     namespace HotkeyInterface
     {
         bool Enabled_PlacementGrid()
@@ -32,11 +62,10 @@ namespace EditorHelpers
     [Setting category="Functions" name="PlacementGrid: Placement Grid Transparent" hidden]
     bool Setting_PlacementGrid_PlacementGridTransparent = true;
 
-    class PlacementGrid : EditorHelpers::EditorFunction
+    class PlacementGrid : EditorHelpers::EditorFunction, EditorFunctionPresetInterface
     {
         string Name() override { return "Placement Grid"; }
         bool Enabled() override { return Setting_PlacementGrid_Enabled; }
-        bool SupportsPresets() override { return true; }
 
         private bool m_functionalityDisabled = false;
 
@@ -113,57 +142,68 @@ namespace EditorHelpers
             }
         }
 
-        void SerializePresets(Json::Value@ json) override
+        // EditorFunctionPresetInterface
+        EditorFunctionPresetBase@ CreatePreset() override { return PlacementGridPreset(); }
+
+        void UpdatePreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            json["grid_on"] = Setting_PlacementGrid_PlacementGridOn;
-            json["transparent"] = Setting_PlacementGrid_PlacementGridTransparent;
+            PlacementGridPreset@ preset = cast<PlacementGridPreset>(data);
+            if (preset is null) { return; }
+            preset.GridOn = Setting_PlacementGrid_PlacementGridOn;
+            preset.Transparent = Setting_PlacementGrid_PlacementGridTransparent;
         }
 
-        void DeserializePresets(Json::Value@ json) override
+        void ApplyPreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_grid_on", Json::Value(true))))
+            PlacementGridPreset@ preset = cast<PlacementGridPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableGridOn)
             {
-                Setting_PlacementGrid_PlacementGridOn = bool(json.Get("grid_on", Json::Value(false)));
+                Setting_PlacementGrid_PlacementGridOn = preset.GridOn;
             }
-            if (bool(json.Get("enable_grid_transparent", Json::Value(true))))
+            if (preset.EnableGridTransparent)
             {
-                Setting_PlacementGrid_PlacementGridTransparent = bool(json.Get("transparent", Json::Value(false)));
+                Setting_PlacementGrid_PlacementGridTransparent = preset.Transparent;
             }
         }
 
-        void RenderPresetValues(Json::Value@ json) override
+        void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_grid_on", Json::Value(true))))
+            PlacementGridPreset@ preset = cast<PlacementGridPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableGridOn)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Placement Grid On");
                 UI::TableNextColumn();
-                UI::Text(tostring(bool(json.Get("grid_on", Json::Value(false)))));
+                UI::Text(tostring(preset.GridOn));
             }
-            if (bool(json.Get("enable_grid_transparent", Json::Value(true))))
+            if (preset.EnableGridTransparent)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Placement Grid Transparent");
                 UI::TableNextColumn();
-                UI::Text(tostring(bool(json.Get("transparent", Json::Value(false)))));
+                UI::Text(tostring(preset.Transparent));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
+        bool RenderPresetEnables(EditorFunctionPresetBase@ data, bool defaultValue, bool forceValue) override
         {
+            if (!Enabled()) { return false; }
+            PlacementGridPreset@ preset = cast<PlacementGridPreset>(data);
+            if (preset is null) { return false; }
             bool changed = false;
-            if (!Enabled()) { return changed; }
-            if (JsonCheckboxChanged(json, "enable_grid_on", "Grid On", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableGridOn, preset.EnableGridOn, "Grid On", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("PlacementGrid::GridOn");
             }
-            if (JsonCheckboxChanged(json, "enable_grid_transparent", "Grid Transparent", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableGridTransparent, preset.EnableGridTransparent, "Grid Transparent", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("PlacementGrid::Transparent");

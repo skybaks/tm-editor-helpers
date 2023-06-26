@@ -1,5 +1,29 @@
 namespace EditorHelpers
 {
+    class MoodChangerFunctionPreset : EditorFunctionPresetBase
+    {
+        bool EnableTime;
+        string Time;
+
+        MoodChangerFunctionPreset()
+        {
+            super("Mood Changer");
+        }
+
+        Json::Value@ ToJson() const override
+        {
+            m_json["enable_time"] = EnableTime;
+            m_json["time"] = Time;
+            return m_json;
+        }
+
+        void FromJson(const Json::Value@ json) override
+        {
+            EnableTime = json.Get("enable_time", Json::Value(true));
+            Time = Json.Get("time", Json::Value("12:06:00"));
+        }
+    }
+
     namespace Compatibility
     {
         class MoodChangerPreset
@@ -135,7 +159,7 @@ namespace EditorHelpers
     [Setting category="Functions" name="Mood Changer: Enabled" hidden]
     bool Setting_MoodChanger_Enabled = true;
 
-    class MoodChanger : EditorHelpers::EditorFunction
+    class MoodChanger : EditorHelpers::EditorFunction, EditorFunctionPresetInterface
     {
         private string m_setTime;
         private bool m_settingChanged;
@@ -150,7 +174,6 @@ namespace EditorHelpers
 
         string Name() override { return "Mood Changer"; }
         bool Enabled() override { return Setting_MoodChanger_Enabled; }
-        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -283,40 +306,51 @@ namespace EditorHelpers
             EditorHelpers::EndHighlight();
         }
 
-        void SerializePresets(Json::Value@ json) override
+        // EditorFunctionPresetInterface
+        EditorFunctionPresetBase@ CreatePreset() override { return MoodChangerFunctionPreset(); }
+
+        void UpdatePreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            json["time"] = Editor.MoodTimeOfDayStr;
+            MoodChangerFunctionPreset@ preset = cast<MoodChangerFunctionPreset>(data);
+            if (preset is null) { return; }
+            preset.Time = Editor.MoodTimeOfDayStr;
         }
 
-        void DeserializePresets(Json::Value@ json) override
+        void ApplyPreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_time", Json::Value(true))))
+            MoodChangerFunctionPreset@ preset = cast<MoodChangerFunctionPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableTime)
             {
-                m_setTime = string(json.Get("time", Json::Value("12:06:00")));
+                m_setTime = preset.Time;
                 m_settingChanged = true;
             }
         }
 
-        void RenderPresetValues(Json::Value@ json) override
+        void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_time", Json::Value(true))))
+            MoodChangerFunctionPreset@ preset = cast<MoodChangerFunctionPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableTime)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Time");
                 UI::TableNextColumn();
-                UI::Text(string(json.Get("time", Json::Value("12:06:00"))));
+                UI::Text(preset.Time);
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
+        bool RenderPresetEnables(EditorFunctionPresetBase@ data, bool defaultValue, bool forceValue) override
         {
+            if (!Enabled()) { return false; }
+            MoodChangerFunctionPreset@ preset = cast<MoodChangerFunctionPreset>(data);
+            if (preset is null) { return false; }
             bool changed = false;
-            if (!Enabled()) { return changed; }
-            if (JsonCheckboxChanged(json, "enable_time", "Time", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableTime, preset.EnableTime, "Time", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("MoodChanger::CurrentTime");

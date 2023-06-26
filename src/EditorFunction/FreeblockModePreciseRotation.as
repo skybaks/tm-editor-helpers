@@ -1,6 +1,40 @@
 
 namespace EditorHelpers
 {
+    class FreeblockModePreciseRotationPreset : EditorFunctionPresetBase
+    {
+        bool EnableStepSize;
+        string StepSize;
+        bool EnablePitchRoll;
+        float Pitch;
+        float Roll;
+
+        FreeblockModePreciseRotationPreset()
+        {
+            super(Compatibility::FreeblockModePreciseRotationName());
+        }
+
+        Json::Value@ ToJson() const override
+        {
+            m_json["enable_step_size"] = EnableStepSize;
+            m_json["step_size"] = StepSize;
+            m_json["enable_pitch_roll"] = EnablePitchRoll;
+            m_json["pitch"] = Pitch;
+            m_json["roll"] = Roll;
+            return m_json;
+        }
+
+        void FromJson(const Json::Value@ json) override
+        {
+            EnableStepSize = json.Get("enable_step_size", Json::Value(true));
+            StepSize = json.Get("step_size", Json::Value("Default"));
+            EnablePitchRoll = json.Get("enable_pitch_roll", Json::Value(true));
+            Pitch = json.Get("pitch", Json::Value(0.0f));
+            Roll = json.Get("roll", Json::Value(0.0f));
+        }
+
+    }
+
     namespace Compatibility
     {
         bool FreeblockModePreciseRotationShouldBeActive(CGameCtnEditorFree@ editor)
@@ -27,9 +61,9 @@ namespace EditorHelpers
         string FreeblockModePreciseRotationName()
         {
 #if TMNEXT
-            return "";
+            return "Precise Rotation";
 #else
-            return "Item ";
+            return "Item Precise Rotation";
 #endif
         }
     }
@@ -42,16 +76,15 @@ namespace EditorHelpers
     [Setting category="Functions" hidden]
     string Setting_FreeblockModePreciseRotation_StepSizeName = "Default";
 
-    class FreeblockModePreciseRotation : EditorHelpers::EditorFunction
+    class FreeblockModePreciseRotation : EditorHelpers::EditorFunction, EditorFunctionPresetInterface
     {
         float inputPitch = 0.0f;
         float inputRoll = 0.0f;
         float stepSize = 15.0f;
         bool newInputToApply = false;
 
-        string Name() override { return Compatibility::FreeblockModePreciseRotationName() + "Precise Rotation"; }
+        string Name() override { return Compatibility::FreeblockModePreciseRotationName(); }
         bool Enabled() override { return Settings_FreeblockModePreciseRotation_Enabled; }
-        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -216,66 +249,77 @@ namespace EditorHelpers
             }
         }
 
-        void SerializePresets(Json::Value@ json) override
+        // EditorFunctionPresetInterface
+        EditorFunctionPresetBase@ CreatePreset() override { return FreeblockModePreciseRotationPreset(); }
+
+        void UpdatePreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            json["step_size"] = Setting_FreeblockModePreciseRotation_StepSizeName;
-            json["pitch"] = inputPitch;
-            json["roll"] = inputRoll;
+            FreeblockModePreciseRotationPreset@ preset = cast<FreeblockModePreciseRotationPreset>(data);
+            if (preset is null) { return; }
+            preset.StepSize = Setting_FreeblockModePreciseRotation_StepSizeName;
+            preset.Pitch = inputPitch;
+            preset.Roll = inputRoll;
         }
 
-        void DeserializePresets(Json::Value@ json) override
+        void ApplyPreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_step_size", Json::Value(true))))
+            FreeblockModePreciseRotationPreset@ preset = cast<FreeblockModePreciseRotationPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableStepSize)
             {
-                Setting_FreeblockModePreciseRotation_StepSizeName = string(json.Get("step_size", Json::Value("Default")));
+                Setting_FreeblockModePreciseRotation_StepSizeName = preset.StepSize;
             }
-            if (bool(json.Get("enable_pitch_roll", Json::Value(true))))
+            if (preset.EnablePitchRoll)
             {
-                inputPitch = float(json.Get("pitch", Json::Value(0.0f)));
-                inputRoll = float(json.Get("roll", Json::Value(0.0f)));
+                inputPitch = preset.Pitch;
+                inputRoll = preset.Roll;
                 newInputToApply = true;
             }
         }
 
-        void RenderPresetValues(Json::Value@ json) override
+        void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_step_size", Json::Value(true))))
+            FreeblockModePreciseRotationPreset@ preset = cast<FreeblockModePreciseRotationPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableStepSize)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Step Size");
                 UI::TableNextColumn();
-                UI::Text(string(json.Get("step_size", Json::Value("Default"))));
+                UI::Text(preset.StepSize);
             }
-            if (bool(json.Get("enable_pitch_roll", Json::Value(true))))
+            if (preset.EnablePitchRoll)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Pitch");
                 UI::TableNextColumn();
-                UI::Text(tostring(float(json.Get("pitch", Json::Value(0.0f)))));
+                UI::Text(tostring(preset.Pitch));
 
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Roll");
                 UI::TableNextColumn();
-                UI::Text(tostring(float(json.Get("roll", Json::Value(0.0f)))));
+                UI::Text(tostring(preset.Roll));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
+        bool RenderPresetEnables(EditorFunctionPresetBase@ data, bool defaultValue, bool forceValue) override
         {
+            if (!Enabled()) { return false; }
+            FreeblockModePreciseRotationPreset@ preset = cast<FreeblockModePreciseRotationPreset>(data);
+            if (preset is null) { return false; }
             bool changed = false;
-            if (!Enabled()) { return changed; }
-            if (JsonCheckboxChanged(json, "enable_step_size", "Step Size", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableStepSize, preset.EnableStepSize, "Step Size", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::StepSize");
             }
-            if (JsonCheckboxChanged(json, "enable_pitch_roll", "Pitch/Roll", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnablePitchRoll, preset.EnablePitchRoll, "Pitch/Roll", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("FreeblockModePreciseRotation::PitchRoll");
