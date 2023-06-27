@@ -1,7 +1,7 @@
 
 namespace EditorHelpers
 {
-    class EditorFunctionPresetBase
+    abstract class EditorFunctionPresetBase
     {
         private string m_name;
         protected Json::Value@ m_json;
@@ -561,7 +561,7 @@ namespace EditorHelpers
                 for (uint presetItemIndex = 0; presetItemIndex < m_presets[presetIndex].FunctionDatas.Length; ++presetItemIndex)
                 {
                     auto@ presetItem = m_presets[presetIndex].FunctionDatas[presetItemIndex];
-                    preset["functions"][presetItem.Name] = presetItem;
+                    preset["functions"][presetItem.Name] = presetItem.ToJson();
                 }
 
                 presets.Add(preset);
