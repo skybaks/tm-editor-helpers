@@ -24,7 +24,7 @@ namespace EditorHelpers
             m_json["enable_grid"] = EnableGrid;
             m_json["apply_grid"] = ApplyGrid;
             m_json["horizontal_grid"] = HorizontalGrid;
-            m_json["vertical_grid"] = VertialGrid;
+            m_json["vertical_grid"] = VerticalGrid;
             m_json["enable_translate"] = EnableTranslate;
             m_json["apply_translation"] = ApplyTranslation;
             m_json["x_translation"] = X_Translation;

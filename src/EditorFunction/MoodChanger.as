@@ -20,7 +20,7 @@ namespace EditorHelpers
         void FromJson(const Json::Value@ json) override
         {
             EnableTime = json.Get("enable_time", Json::Value(true));
-            Time = Json.Get("time", Json::Value("12:06:00"));
+            Time = json.Get("time", Json::Value("12:06:00"));
         }
     }
 

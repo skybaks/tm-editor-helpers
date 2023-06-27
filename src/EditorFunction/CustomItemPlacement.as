@@ -36,6 +36,7 @@ namespace EditorHelpers
             m_json["pivot_x"] = PivotX;
             m_json["pivot_y"] = PivotY;
             m_json["pivot_z"] = PivotZ;
+            return m_json;
         }
 
         void FromJson(const Json::Value@ json) override

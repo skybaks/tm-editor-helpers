@@ -2,7 +2,7 @@ namespace EditorHelpers
 {
     class CameraModesPreset : EditorFunctionPresetBase
     {
-        string EnableCamera;
+        bool EnableCamera;
         string Camera;
 
         CameraModesPreset()
@@ -162,7 +162,7 @@ namespace EditorHelpers
             CameraModesPreset@ preset = cast<CameraModesPreset>(data);
             if (preset is null) { return false; }
             bool changed = false;
-            if (JsonCheckboxChanged(preset.EnableCamera, preset.EnableCamera, "Camera", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableCamera, preset.EnableCamera, "Camera", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("CameraModes::CameraMode");
