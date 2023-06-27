@@ -11,7 +11,7 @@ namespace EditorHelpers
             super("Block Cursor");
         }
 
-        Json::Value@ ToJson() const override
+        Json::Value@ ToJson() override
         {
             m_json["enable_cursor_hidden"] = EnableCursorHidden;
             m_json["cursor_hidden"] = CursorHidden;

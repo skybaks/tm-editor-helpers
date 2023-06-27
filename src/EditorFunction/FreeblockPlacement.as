@@ -19,7 +19,7 @@ namespace EditorHelpers
             super("Freeblock Placement");
         }
 
-        Json::Value@ ToJson() const override
+        Json::Value@ ToJson() override
         {
             m_json["enable_grid"] = EnableGrid;
             m_json["apply_grid"] = ApplyGrid;

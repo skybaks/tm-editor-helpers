@@ -26,7 +26,7 @@ namespace EditorHelpers
             super("Rotation Randomizer");
         }
 
-        Json::Value@ ToJson() const override
+        Json::Value@ ToJson() override
         {
             m_json["enable_randomizer_mode"] = EnableRandomizerMode;
             m_json["randomizer_mode"] = RandomizerMode;

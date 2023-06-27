@@ -14,7 +14,7 @@ namespace EditorHelpers
             super(Compatibility::FreeblockModePreciseRotationName());
         }
 
-        Json::Value@ ToJson() const override
+        Json::Value@ ToJson() override
         {
             m_json["enable_step_size"] = EnableStepSize;
             m_json["step_size"] = StepSize;

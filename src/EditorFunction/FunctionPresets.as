@@ -13,7 +13,7 @@ namespace EditorHelpers
         }
 
         string get_Name() const { return m_name; }
-        Json::Value@ ToJson() const { return Json::Value(); }
+        Json::Value@ ToJson() { return null; }
         void FromJson(const Json::Value@ json) {}
     }
 

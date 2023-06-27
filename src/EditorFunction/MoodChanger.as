@@ -10,7 +10,7 @@ namespace EditorHelpers
             super("Mood Changer");
         }
 
-        Json::Value@ ToJson() const override
+        Json::Value@ ToJson() override
         {
             m_json["enable_time"] = EnableTime;
             m_json["time"] = Time;

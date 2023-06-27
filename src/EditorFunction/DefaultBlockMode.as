@@ -17,7 +17,7 @@ namespace EditorHelpers
             super("Default Block Mode");
         }
 
-        Json::Value@ ToJson() const override
+        Json::Value@ ToJson() override
         {
             m_json["enable_block_mode"] = EnableBlockMode;
             m_json["block_mode"] = BlockMode;

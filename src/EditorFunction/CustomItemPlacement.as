@@ -21,7 +21,7 @@ namespace EditorHelpers
             super("Custom Item Placement");
         }
 
-        Json::Value@ ToJson() const override
+        Json::Value@ ToJson() override
         {
             m_json["enable_ghost_mode"] = EnableGhostMode;
             m_json["ghost_mode"] = GhostMode;

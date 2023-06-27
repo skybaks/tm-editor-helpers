@@ -13,7 +13,7 @@ namespace EditorHelpers
             super("Placement Grid");
         }
 
-        Json::Value@ ToJson() const override
+        Json::Value@ ToJson() override
         {
             m_json["enable_grid_on"] = EnableGridOn;
             m_json["grid_on"] = GridOn;

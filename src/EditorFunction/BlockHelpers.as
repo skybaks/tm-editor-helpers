@@ -11,7 +11,7 @@ namespace EditorHelpers
             super("Block Helpers");
         }
 
-        Json::Value@ ToJson() const override
+        Json::Value@ ToJson() override
         {
             m_json["enable_helpers_off"] = EnableHelpersOff;
             m_json["helpers_off"] = HelpersOff;

@@ -10,7 +10,7 @@ namespace EditorHelpers
             super("Camera Modes");
         }
 
-        Json::Value@ ToJson() const override
+        Json::Value@ ToJson() override
         {
             m_json["enable_camera"] = EnableCamera;
             m_json["camera"] = Camera;
