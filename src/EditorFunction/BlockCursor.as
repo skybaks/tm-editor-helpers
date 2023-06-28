@@ -3,8 +3,8 @@ namespace EditorHelpers
 {
     class BlockCursorPreset : EditorFunctionPresetBase
     {
-        bool EnableCursorHidden = true;
-        bool CursorHidden = false;
+        bool EnableCursorHidden;
+        bool CursorHidden;
 
         BlockCursorPreset()
         {

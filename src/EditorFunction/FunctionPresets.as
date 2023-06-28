@@ -38,7 +38,7 @@ namespace EditorHelpers
             Key = VirtualKey::B;
         }
 
-        void Init(bool autoUpdate = true)
+        void Init(bool autoUpdate)
         {
             for (uint index = 0; index < g_functions.Length; index++)
             {
@@ -96,11 +96,12 @@ namespace EditorHelpers
     {
         private array<EditorFunctionPresetInterface@> m_supportedFunctions;
         private array<EditorFunctionPreset@> m_presets;
-        private uint m_selectedPresetIndex;
-        private int m_forcePresetIndex;
-        private string m_presetNewName;
-        private bool m_deleteConfirm;
-        private bool m_signalSave;
+        private uint m_selectedPresetIndex = 0;
+        private int m_forcePresetIndex = -1;
+        private string m_presetNewName = "";
+        private bool m_deleteConfirm = false;
+        private bool m_signalSave = false;
+        private int m_newPreset = -1;
 
         string Name() override { return "Presets"; }
         bool Enabled() override { return Setting_FunctionPresets_Enabled; }
@@ -184,15 +185,15 @@ namespace EditorHelpers
                 EditorHelpers::HelpMarker("Create a new preset");
                 UI::SameLine();
             }
-            bool newPreset = false;
             if (UI::Button(" New Preset"))
             {
                 auto@ newFunctionPreset = EditorFunctionPreset();
-                newFunctionPreset.Init();
+                newFunctionPreset.Init(autoUpdate: true);
                 m_presets.InsertLast(newFunctionPreset);
                 m_forcePresetIndex = m_presets.Length - 1;
-                newPreset = true;
+                m_newPreset = m_presets.Length - 1;
                 m_signalSave = true;
+                Debug("m_newPreset:" + tostring(m_newPreset) + " m_forcePresetIndex:" + tostring(m_forcePresetIndex));
             }
 
             UI::BeginDisabled(m_deleteConfirm);
@@ -274,8 +275,10 @@ namespace EditorHelpers
 
                             bool forceValueFlag = false;
                             bool forceValue = true;
-                            if (UI::Button(" Select All") || newPreset)
+                            if (UI::Button(" Select All")
+                                || (m_newPreset == int(presetIndex)))
                             {
+                                m_newPreset = -1;
                                 forceValueFlag = true;
                                 forceValue = true;
                             }
