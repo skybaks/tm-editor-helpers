@@ -279,6 +279,24 @@ namespace EditorHelpers
             }
         }
 
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            FreeblockModePreciseRotationPreset@ preset = cast<FreeblockModePreciseRotationPreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableStepSize)
+            {
+                if (Setting_FreeblockModePreciseRotation_StepSizeName != preset.StepSize) { areSame = false; }
+            }
+            if (preset.EnablePitchRoll)
+            {
+                if (inputPitch != preset.Pitch
+                    || inputRoll != preset.Roll) { areSame = false; }
+            }
+            return areSame;
+        }
+
         void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }

@@ -641,6 +641,36 @@ namespace EditorHelpers
             }
         }
 
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            CustomItemPlacementPreset@ preset = cast<CustomItemPlacementPreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableGhostMode)
+            {
+                if (Setting_CustomItemPlacement_ApplyGhost != preset.GhostMode) { areSame = false; }
+            }
+            if (preset.EnableAutorotation)
+            {
+                if (Setting_CustomItemPlacement_ApplyAutoRotation != preset.Autorotation) { areSame = false; }
+            }
+            if (preset.EnableItemGrid)
+            {
+                if (Setting_CustomItemPlacement_ApplyGrid != preset.ApplyGrid
+                    || Setting_CustomItemPlacement_GridSizeHoriz != preset.GridHorizontal
+                    || Setting_CustomItemPlacement_GridSizeVerti != preset.GridVertical) { areSame = false; }
+            }
+            if (preset.EnableItemPivot)
+            {
+                if (Setting_CustomItemPlacement_ApplyPivot != preset.ApplyPivot
+                    || Setting_CustomItemPlacement_ItemPivot.x != preset.PivotX
+                    || Setting_CustomItemPlacement_ItemPivot.y != preset.PivotY
+                    || Setting_CustomItemPlacement_ItemPivot.z != preset.PivotZ) { areSame = false; }
+            }
+            return areSame;
+        }
+
         void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }

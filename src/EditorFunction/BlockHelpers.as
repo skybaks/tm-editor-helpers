@@ -159,6 +159,19 @@ namespace EditorHelpers
             }
         }
 
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            BlockHelpersPreset@ preset = cast<BlockHelpersPreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableHelpersOff)
+            {
+                if (Setting_BlockHelpers_BlockHelpersOff != preset.HelpersOff) { areSame = false; }
+            }
+            return areSame;
+        }
+
         void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }

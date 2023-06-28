@@ -135,6 +135,19 @@ namespace EditorHelpers
             }
         }
 
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            BlockCursorPreset@ preset = cast<BlockCursorPreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableCursorHidden)
+            {
+                if (Setting_BlockCursor_HideBlockCursor != preset.CursorHidden) { areSame = false; }
+            }
+            return areSame;
+        }
+
         void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }

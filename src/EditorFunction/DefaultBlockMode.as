@@ -431,6 +431,30 @@ namespace EditorHelpers
             }
         }
 
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            DefaultBlockModePreset@ preset = cast<DefaultBlockModePreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableBlockMode)
+            {
+                if (Setting_DefaultBlockMode_BlockMode != preset.BlockMode
+                    || Setting_DefaultBlockMode_ActiveBlock != preset.BlockModeEnabled) { areSame = false; }
+            }
+            if (preset.EnableItemMode)
+            {
+                if (Setting_DefaultBlockMode_ItemMode != preset.ItemMode
+                    || Setting_DefaultBlockMode_ActiveItem != preset.ItemModeEnabled) { areSame = false; }
+            }
+            if (preset.EnableMacroblockMode)
+            {
+                if (Setting_DefaultBlockMode_MacroblockMode != preset.MacroblockMode
+                    || Setting_DefaultBlockMode_ActiveMacroblock != preset.MacroblockModeEnabled) { areSame = false; }
+            }
+            return areSame;
+        }
+
         void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }

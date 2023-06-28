@@ -568,6 +568,45 @@ namespace EditorHelpers
             }
         }
 
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            RotationRandomizerPreset@ preset = cast<RotationRandomizerPreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableRandomizerMode)
+            {
+                if (!((preset.RandomizerMode == "RANDOM" && selectedMode == RotationRandomizerMode::RANDOM)
+                    || (preset.RandomizerMode == "FIXED_STEP" && selectedMode == RotationRandomizerMode::FIXED_STEP)
+                    || (preset.RandomizerMode == "OFF" && selectedMode == RotationRandomizerMode::OFF)))
+                {
+                    areSame = false;
+                }
+            }
+            if (preset.EnableAxes)
+            {
+                if (axisX != preset.AxisX
+                    || axisY != preset.AxisY
+                    || axisZ != preset.AxisZ) { areSame = false; }
+            }
+            if (preset.EnableAxisLimits)
+            {
+                if (limitsY.x != preset.Y_LimitMin
+                    || limitsY.y != preset.Y_LimitMax
+                    || limitsX.x != preset.X_LimitMin
+                    || limitsX.y != preset.X_LimitMax
+                    || limitsZ.x != preset.Z_LimitMin
+                    || limitsZ.y != preset.Z_LimitMax) { areSame = false; }
+            }
+            if (preset.EnableAxisSteps)
+            {
+                if (stepY != preset.StepY
+                    || stepX != preset.StepX
+                    || stepZ != preset.StepZ) { areSame = false; }
+            }
+            return areSame;
+        }
+
         void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }

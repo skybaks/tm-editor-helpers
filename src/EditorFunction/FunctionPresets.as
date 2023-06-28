@@ -22,6 +22,7 @@ namespace EditorHelpers
         EditorFunctionPresetBase@ CreatePreset();
         void UpdatePreset(EditorFunctionPresetBase@ data);
         void ApplyPreset(EditorFunctionPresetBase@ data);
+        bool CheckPreset(EditorFunctionPresetBase@ data);
         void RenderPresetValues(EditorFunctionPresetBase@ data);
         bool RenderPresetEnables(EditorFunctionPresetBase@ data, bool defaultValue, bool forceValue);
         string Name();
@@ -322,11 +323,23 @@ namespace EditorHelpers
                             UI::Text(hotkeyText);
                             UI::Separator();
 
+                            bool differences = false;
+                            for (uint index = 0; index < m_supportedFunctions.Length; index++)
+                            {
+                                EditorFunctionPresetInterface@ ef = m_supportedFunctions[index];
+                                auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
+                                if (presetItem !is null && !ef.CheckPreset(presetItem))
+                                {
+                                    differences = true;
+                                }
+                            }
+
                             if (settingToolTipsEnabled)
                             {
                                 EditorHelpers::HelpMarker("Update this preset's data based on what is currently entered in the Editor Helpers window(s) and save");
                                 UI::SameLine();
                             }
+                            UI::BeginDisabled(!differences);
                             if (UI::Button("Update Preset Data"))
                             {
                                 for (uint index = 0; index < m_supportedFunctions.Length; index++)
@@ -341,16 +354,19 @@ namespace EditorHelpers
 
                                 m_signalSave = true;
                             }
+                            UI::EndDisabled(/*!differences*/);
                             UI::SameLine();
                             if (settingToolTipsEnabled)
                             {
                                 EditorHelpers::HelpMarker("Apply the data saved in this preset to the Editor Helpers window(s)");
                                 UI::SameLine();
                             }
+                            UI::BeginDisabled(!differences);
                             if (UI::Button("Apply Preset"))
                             {
                                 ApplyPreset(m_presets[m_selectedPresetIndex]);
                             }
+                            UI::EndDisabled(/*!differences*/);
                             if (UI::BeginChild("FunctionPresetsTabBarTableChildCol2"))
                             {
                                 if (UI::BeginTable("FunctionPresetsRenderPresetValuesTable", 2 /* cols */))

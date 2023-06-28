@@ -141,6 +141,19 @@ namespace EditorHelpers
             }
         }
 
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            CameraModesPreset@ preset = cast<CameraModesPreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableCamera)
+            {
+                if (Setting_CameraMode_CurrentMode != preset.Camera) { areSame = false; }
+            }
+            return areSame;
+        }
+
         void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }

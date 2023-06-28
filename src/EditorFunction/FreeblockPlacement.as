@@ -271,6 +271,28 @@ namespace EditorHelpers
             }
         }
 
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            FreeblockPlacementPreset@ preset = cast<FreeblockPlacementPreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableGrid)
+            {
+                if (Setting_FreeblockPlacement_ApplyGrid != preset.ApplyGrid
+                    || m_HStep != preset.HorizontalGrid
+                    || m_VStep != preset.VerticalGrid) { areSame = false; }
+            }
+            if (preset.EnableTranslate)
+            {
+                if (Setting_FreeblockPlacement_ApplyTranslate != preset.ApplyTranslation
+                    || m_XTranslate != preset.X_Translation
+                    || m_YTranslate != preset.Y_Translation
+                    || m_ZTranslate != preset.Z_Translation) { areSame = false; }
+            }
+            return areSame;
+        }
+
         void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
