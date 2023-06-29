@@ -39,6 +39,7 @@ namespace EditorHelpers
             FunctionDatas = {};
             HotkeyEnabled = false;
             Key = VirtualKey::B;
+            ChangesToApply = true;
         }
 
         void Init(bool autoUpdate, array<EditorFunctionPresetInterface@>@ functions)
@@ -60,9 +61,17 @@ namespace EditorHelpers
             }
         }
 
-        void Update()
+        void UpdateChangesToApply(array<EditorFunctionPresetInterface@>@ functions)
         {
-            // TODO: Update boolean caching preset differences
+            ChangesToApply = false;
+            for (uint index = 0; index < FunctionDatas.Length; ++index)
+            {
+                EditorFunctionPresetBase@ presetItem = FunctionDatas[index];
+                if (!presetItem.AssociatedFunction.CheckPreset(presetItem))
+                {
+                    ChangesToApply = true;
+                }
+            }
         }
 
         EditorFunctionPresetBase@ GetItem(const string&in name)
@@ -81,6 +90,7 @@ namespace EditorHelpers
         array<EditorFunctionPresetBase@> FunctionDatas;
         bool HotkeyEnabled;
         VirtualKey Key;
+        bool ChangesToApply;
     }
 
     namespace HotkeyInterface
@@ -165,10 +175,12 @@ namespace EditorHelpers
                         EditorHelpers::HelpMarker(helperText);
                         UI::SameLine();
                     }
+                    UI::BeginDisabled(!m_presets[i].ChangesToApply);
                     if (UI::Button("Preset: " + m_presets[i].Name))
                     {
                         ApplyPreset(m_presets[i]);
                     }
+                    UI::EndDisabled(/*!m_presets[i].ChangesToApply*/);
                 }
             }
         }
@@ -328,22 +340,12 @@ namespace EditorHelpers
                             UI::Text(hotkeyText);
                             UI::Separator();
 
-                            bool differences = false;
-                            for (uint index = 0; index < m_presets[m_selectedPresetIndex].FunctionDatas.Length; ++index)
-                            {
-                                EditorFunctionPresetBase@ presetItem = m_presets[m_selectedPresetIndex].FunctionDatas[index];
-                                if (!presetItem.AssociatedFunction.CheckPreset(presetItem))
-                                {
-                                    differences = true;
-                                }
-                            }
-
                             if (settingToolTipsEnabled)
                             {
                                 EditorHelpers::HelpMarker("Update this preset's data based on what is currently entered in the Editor Helpers window(s) and save");
                                 UI::SameLine();
                             }
-                            UI::BeginDisabled(!differences);
+                            UI::BeginDisabled(!m_presets[m_selectedPresetIndex].ChangesToApply);
                             if (UI::Button("Update Preset Data"))
                             {
                                 for (uint index = 0; index < m_presets[m_selectedPresetIndex].FunctionDatas.Length; ++index)
@@ -357,19 +359,19 @@ namespace EditorHelpers
 
                                 m_signalSave = true;
                             }
-                            UI::EndDisabled(/*!differences*/);
+                            UI::EndDisabled(/*!m_presets[m_selectedPresetIndex].ChangesToApply*/);
                             UI::SameLine();
                             if (settingToolTipsEnabled)
                             {
                                 EditorHelpers::HelpMarker("Apply the data saved in this preset to the Editor Helpers window(s)");
                                 UI::SameLine();
                             }
-                            UI::BeginDisabled(!differences);
+                            UI::BeginDisabled(!m_presets[m_selectedPresetIndex].ChangesToApply);
                             if (UI::Button("Apply Preset"))
                             {
                                 ApplyPreset(m_presets[m_selectedPresetIndex]);
                             }
-                            UI::EndDisabled(/*!differences*/);
+                            UI::EndDisabled(/*!m_presets[m_selectedPresetIndex].ChangesToApply*/);
                             if (UI::BeginChild("FunctionPresetsTabBarTableChildCol2"))
                             {
                                 if (UI::BeginTable("FunctionPresetsRenderPresetValuesTable", 2 /* cols */))
@@ -438,6 +440,11 @@ namespace EditorHelpers
                 SavePresets();
             }
             m_signalSave = false;
+
+            for (uint i = 0; i < m_presets.Length; ++i)
+            {
+                m_presets[i].UpdateChangesToApply(m_supportedFunctions);
+            }
         }
 
         array<EditorFunctionPreset@>@ GetPresets() { return m_presets; }
