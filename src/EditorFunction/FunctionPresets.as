@@ -150,6 +150,17 @@ namespace EditorHelpers
             {
                 for (uint i = 0; i < m_presets.Length; ++i)
                 {
+                    bool differences = false;
+                    for (uint index = 0; index < m_supportedFunctions.Length; index++)
+                    {
+                        EditorFunctionPresetInterface@ ef = m_supportedFunctions[index];
+                        auto@ presetItem = m_presets[i].GetItem(ef.Name());
+                        if (presetItem !is null && !ef.CheckPreset(presetItem))
+                        {
+                            differences = true;
+                        }
+                    }
+
                     if (settingToolTipsEnabled)
                     {
                         string helperText = "Click this button to activate the " + m_presets[i].Name + " preset";
@@ -160,10 +171,12 @@ namespace EditorHelpers
                         EditorHelpers::HelpMarker(helperText);
                         UI::SameLine();
                     }
+                    UI::BeginDisabled(!differences);
                     if (UI::Button("Preset: " + m_presets[i].Name))
                     {
                         ApplyPreset(m_presets[i]);
                     }
+                    UI::EndDisabled(/*!differences*/);
                 }
             }
         }
