@@ -1,31 +1,34 @@
 
 namespace EditorHelpers
 {
-    class EditorFunctionPresetItem
+    abstract class EditorFunctionPresetBase
     {
-        EditorFunctionPresetItem(const string&in name)
+        EditorFunctionPresetInterface@ AssociatedFunction;
+        private string m_name;
+        protected Json::Value@ m_json;
+
+        EditorFunctionPresetBase(const string&in name)
         {
-            Name = name;
+            @AssociatedFunction = null;
+            m_name = name;
+            @m_json = Json::Object();
         }
 
-        Json::Value@ JsonData
-        {
-            get
-            {
-                if (json is null)
-                {
-                    @json = Json::Object();
-                }
-                return json;
-            }
-            set
-            {
-                @json = value;
-            }
-        }
+        string get_Name() const { return m_name; }
+        Json::Value@ ToJson() { return null; }
+        void FromJson(const Json::Value@ json) {}
+    }
 
-        string Name = "Invalid";
-        private Json::Value@ json = null;
+    interface EditorFunctionPresetInterface
+    {
+        EditorFunctionPresetBase@ CreatePreset();
+        void UpdatePreset(EditorFunctionPresetBase@ data);
+        void ApplyPreset(EditorFunctionPresetBase@ data);
+        bool CheckPreset(EditorFunctionPresetBase@ data);
+        void RenderPresetValues(EditorFunctionPresetBase@ data);
+        bool RenderPresetEnables(EditorFunctionPresetBase@ data, bool defaultValue, bool forceValue);
+        string Name();
+        bool Enabled();
     }
 
     class EditorFunctionPreset
@@ -33,45 +36,61 @@ namespace EditorHelpers
         EditorFunctionPreset()
         {
             Name = "Preset";
-            Functions = {};
+            FunctionDatas = {};
             HotkeyEnabled = false;
             Key = VirtualKey::B;
+            ChangesToApply = true;
         }
 
-        void Init()
+        void Init(bool autoUpdate, array<EditorFunctionPresetInterface@>@ functions)
         {
-            for (uint index = 0; index < g_functions.Length; index++)
+            for (uint index = 0; index < functions.Length; index++)
             {
-                EditorFunction@ ef = g_functions[index];
-                if (ef.SupportsPresets())
+                EditorFunctionPresetInterface@ ef = functions[index];
+                EditorFunctionPresetBase@ presetItem = GetItem(ef.Name());
+                if (presetItem is null)
                 {
-                    auto@ presetItem = GetItem(ef.Name());
-                    if (presetItem is null)
+                    @presetItem = ef.CreatePreset();
+                    if (autoUpdate)
                     {
-                        @presetItem = EditorFunctionPresetItem(ef.Name());
-                        ef.SerializePresets(presetItem.JsonData);
-                        Functions.InsertLast(presetItem);
+                        ef.UpdatePreset(presetItem);
                     }
+                    FunctionDatas.InsertLast(presetItem);
+                }
+                @presetItem.AssociatedFunction = ef;
+            }
+        }
+
+        void UpdateChangesToApply(array<EditorFunctionPresetInterface@>@ functions)
+        {
+            ChangesToApply = false;
+            for (uint index = 0; index < FunctionDatas.Length; ++index)
+            {
+                EditorFunctionPresetBase@ presetItem = FunctionDatas[index];
+                if (!presetItem.AssociatedFunction.CheckPreset(presetItem))
+                {
+                    ChangesToApply = true;
                 }
             }
         }
 
-        EditorFunctionPresetItem@ GetItem(const string&in name)
+        EditorFunctionPresetBase@ GetItem(const string&in name)
         {
-            for (uint i = 0; i < Functions.Length; ++i)
+            for (uint i = 0; i < FunctionDatas.Length; ++i)
             {
-                if (Functions[i].Name == name)
+                if (FunctionDatas[i].Name == name)
                 {
-                    return Functions[i];
+                    return FunctionDatas[i];
                 }
             }
             return null;
         }
 
         string Name;
-        array<EditorFunctionPresetItem@> Functions;
+        array<EditorFunctionPresetBase@> FunctionDatas;
         bool HotkeyEnabled;
         VirtualKey Key;
+        bool ChangesToApply;
     }
 
     namespace HotkeyInterface
@@ -91,12 +110,15 @@ namespace EditorHelpers
 
     class FunctionPresets : EditorHelpers::EditorFunction
     {
+        private array<EditorFunctionPresetInterface@> m_supportedFunctions;
         private array<EditorFunctionPreset@> m_presets;
-        private uint m_selectedPresetIndex;
-        private int m_forcePresetIndex;
-        private string m_presetNewName;
-        private bool m_deleteConfirm;
-        private bool m_signalSave;
+        private uint m_selectedPresetIndex = 0;
+        private int m_forcePresetIndex = -1;
+        private string m_presetNewName = "";
+        private bool m_deleteConfirm = false;
+        private bool m_signalSave = false;
+        private int m_newPreset = -1;
+        private uint m_lastUpdatedPreset = 0;
 
         string Name() override { return "Presets"; }
         bool Enabled() override { return Setting_FunctionPresets_Enabled; }
@@ -104,6 +126,18 @@ namespace EditorHelpers
         void Init() override
         {
             if (!Enabled()) { return; }
+
+            if (m_supportedFunctions.IsEmpty())
+            {
+                for (uint i = 0; i < g_functions.Length; ++i)
+                {
+                    EditorFunctionPresetInterface@ iface = cast<EditorFunctionPresetInterface>(g_functions[i]);
+                    if (iface !is null)
+                    {
+                        m_supportedFunctions.InsertLast(iface);
+                    }
+                }
+            }
         }
 
         void RenderInterface_Settings() override
@@ -142,10 +176,12 @@ namespace EditorHelpers
                         EditorHelpers::HelpMarker(helperText);
                         UI::SameLine();
                     }
+                    UI::BeginDisabled(!m_presets[i].ChangesToApply);
                     if (UI::Button("Preset: " + m_presets[i].Name))
                     {
                         ApplyPreset(m_presets[i]);
                     }
+                    UI::EndDisabled(/*!m_presets[i].ChangesToApply*/);
                 }
             }
         }
@@ -168,15 +204,15 @@ namespace EditorHelpers
                 EditorHelpers::HelpMarker("Create a new preset");
                 UI::SameLine();
             }
-            bool newPreset = false;
             if (UI::Button(" New Preset"))
             {
                 auto@ newFunctionPreset = EditorFunctionPreset();
-                newFunctionPreset.Init();
+                newFunctionPreset.Init(autoUpdate: true, functions: m_supportedFunctions);
                 m_presets.InsertLast(newFunctionPreset);
                 m_forcePresetIndex = m_presets.Length - 1;
-                newPreset = true;
+                m_newPreset = m_presets.Length - 1;
                 m_signalSave = true;
+                Debug("m_newPreset:" + tostring(m_newPreset) + " m_forcePresetIndex:" + tostring(m_forcePresetIndex));
             }
 
             UI::BeginDisabled(m_deleteConfirm);
@@ -258,8 +294,10 @@ namespace EditorHelpers
 
                             bool forceValueFlag = false;
                             bool forceValue = true;
-                            if (UI::Button(" Select All") || newPreset)
+                            if (UI::Button(" Select All")
+                                || (m_newPreset == int(presetIndex)))
                             {
+                                m_newPreset = -1;
                                 forceValueFlag = true;
                                 forceValue = true;
                             }
@@ -284,7 +322,7 @@ namespace EditorHelpers
                             UI::EndChild();
 
                             UI::TableNextColumn();
-                            UI::BeginDisabled(m_presets[m_selectedPresetIndex].Functions.IsEmpty());
+                            UI::BeginDisabled(m_presets[m_selectedPresetIndex].FunctionDatas.IsEmpty());
 
                             if (settingToolTipsEnabled)
                             {
@@ -308,30 +346,33 @@ namespace EditorHelpers
                                 EditorHelpers::HelpMarker("Update this preset's data based on what is currently entered in the Editor Helpers window(s) and save");
                                 UI::SameLine();
                             }
+                            UI::BeginDisabled(!m_presets[m_selectedPresetIndex].ChangesToApply);
                             if (UI::Button("Update Preset Data"))
                             {
-                                for (uint index = 0; index < g_functions.Length; index++)
+                                for (uint index = 0; index < m_presets[m_selectedPresetIndex].FunctionDatas.Length; ++index)
                                 {
-                                    EditorFunction@ ef = g_functions[index];
-                                    auto@ presetItem = m_presets[presetIndex].GetItem(ef.Name());
-                                    if (ef.SupportsPresets() && presetItem !is null)
+                                    EditorFunctionPresetBase@ presetItem = m_presets[m_selectedPresetIndex].FunctionDatas[index];
+                                    if (presetItem !is null)
                                     {
-                                        ef.SerializePresets(presetItem.JsonData);
+                                        presetItem.AssociatedFunction.UpdatePreset(presetItem);
                                     }
                                 }
 
                                 m_signalSave = true;
                             }
+                            UI::EndDisabled(/*!m_presets[m_selectedPresetIndex].ChangesToApply*/);
                             UI::SameLine();
                             if (settingToolTipsEnabled)
                             {
                                 EditorHelpers::HelpMarker("Apply the data saved in this preset to the Editor Helpers window(s)");
                                 UI::SameLine();
                             }
+                            UI::BeginDisabled(!m_presets[m_selectedPresetIndex].ChangesToApply);
                             if (UI::Button("Apply Preset"))
                             {
                                 ApplyPreset(m_presets[m_selectedPresetIndex]);
                             }
+                            UI::EndDisabled(/*!m_presets[m_selectedPresetIndex].ChangesToApply*/);
                             if (UI::BeginChild("FunctionPresetsTabBarTableChildCol2"))
                             {
                                 if (UI::BeginTable("FunctionPresetsRenderPresetValuesTable", 2 /* cols */))
@@ -400,6 +441,16 @@ namespace EditorHelpers
                 SavePresets();
             }
             m_signalSave = false;
+
+            if (m_lastUpdatedPreset >= m_presets.Length)
+            {
+                m_lastUpdatedPreset = 0;
+            }
+            if (m_lastUpdatedPreset < m_presets.Length)
+            {
+                m_presets[m_lastUpdatedPreset].UpdateChangesToApply(m_supportedFunctions);
+                m_lastUpdatedPreset += 1;
+            }
         }
 
         array<EditorFunctionPreset@>@ GetPresets() { return m_presets; }
@@ -410,13 +461,12 @@ namespace EditorHelpers
 
             Debug("Applying preset data for name " + preset.Name);
 
-            for (uint index = 0; index < g_functions.Length; index++)
+            for (uint index = 0; index < preset.FunctionDatas.Length; ++index)
             {
-                EditorFunction@ ef = g_functions[index];
-                auto@ presetItem = preset.GetItem(ef.Name());
-                if (ef.SupportsPresets() && presetItem !is null)
+                EditorFunctionPresetBase@ presetItem = preset.FunctionDatas[index];
+                if (presetItem !is null)
                 {
-                    ef.DeserializePresets(presetItem.JsonData);
+                    presetItem.AssociatedFunction.ApplyPreset(presetItem);
                 }
             }
 
@@ -449,13 +499,13 @@ namespace EditorHelpers
         {
             for (uint index = 0; index < functions.Length; ++index)
             {
-                EditorFunction@ ef = functions[index];
-                if (ef.SupportsPresets())
+                EditorFunctionPresetInterface@ ef = cast<EditorFunctionPresetInterface>(functions[index]);
+                if (ef !is null)
                 {
                     auto@ presetItem = preset.GetItem(ef.Name());
                     if (presetItem !is null)
                     {
-                        if (ef.RenderPresetEnables(presetItem.JsonData, forceValue, forceValueFlag))
+                        if (ef.RenderPresetEnables(presetItem, forceValue, forceValueFlag))
                         {
                             m_signalSave = true;
                         }
@@ -468,11 +518,14 @@ namespace EditorHelpers
         {
             for (uint index = 0; index < functions.Length; index++)
             {
-                EditorFunction@ ef = functions[index];
-                auto@ presetItem = preset.GetItem(ef.Name());
-                if (ef.SupportsPresets() && presetItem !is null)
+                EditorFunctionPresetInterface@ ef = cast<EditorFunctionPresetInterface>(functions[index]);
+                if (ef !is null)
                 {
-                    ef.RenderPresetValues(presetItem.JsonData);
+                    auto@ presetItem = preset.GetItem(ef.Name());
+                    if (presetItem !is null)
+                    {
+                        ef.RenderPresetValues(presetItem);
+                    }
                 }
             }
         }
@@ -496,15 +549,22 @@ namespace EditorHelpers
                 newPreset.Name = presets[presetIndex].Get("name", Json::Value("Preset"));
                 newPreset.HotkeyEnabled = presets[presetIndex].Get("hotkey_enabled", Json::Value(false));
                 newPreset.Key = VirtualKey(int(presets[presetIndex].Get("hotkey", Json::Value(66))));
+                newPreset.Init(autoUpdate: false, functions: m_supportedFunctions);
 
                 auto functions = presets[presetIndex].Get("functions", Json::Object());
                 array<string>@ functionKeys = functions.GetKeys();
                 for (uint functionIndex = 0; functionIndex < functionKeys.Length; ++functionIndex)
                 {
                     string name = functionKeys[functionIndex];
-                    auto newFunction = EditorFunctionPresetItem(name);
-                    newFunction.JsonData = functions.Get(name, Json::Object());
-                    newPreset.Functions.InsertLast(newFunction);
+                    auto@ presetItem = newPreset.GetItem(name);
+                    if (presetItem !is null)
+                    {
+                        presetItem.FromJson(functions.Get(name, Json::Object()));
+                    }
+                    else
+                    {
+                        Debug("Unexpected section in json file. No matching function with name: " + name);
+                    }
                 }
 
                 m_presets.InsertLast(newPreset);
@@ -532,10 +592,10 @@ namespace EditorHelpers
                 preset["hotkey_enabled"] = m_presets[presetIndex].HotkeyEnabled;
                 preset["hotkey"] = int(m_presets[presetIndex].Key);
 
-                for (uint presetItemIndex = 0; presetItemIndex < m_presets[presetIndex].Functions.Length; ++presetItemIndex)
+                for (uint presetItemIndex = 0; presetItemIndex < m_presets[presetIndex].FunctionDatas.Length; ++presetItemIndex)
                 {
-                    auto@ presetItem = m_presets[presetIndex].Functions[presetItemIndex];
-                    preset["functions"][presetItem.Name] = presetItem.JsonData;
+                    auto@ presetItem = m_presets[presetIndex].FunctionDatas[presetItemIndex];
+                    preset["functions"][presetItem.Name] = presetItem.ToJson();
                 }
 
                 presets.Add(preset);
@@ -548,12 +608,12 @@ namespace EditorHelpers
         }
     }
 
-    bool JsonCheckboxChanged(Json::Value@ json, const string&in key, const string&in text, bool defaultValue, bool forceValue)
+    bool ForcedCheckbox(bool&in inVal, bool&out outVal, const string&in text, bool defaultVal, bool forceVal)
     {
-        bool beforeVal = bool(json.Get(key, Json::Value(defaultValue)));
+        bool beforeVal = inVal;
         bool afterVal = UI::Checkbox(text, beforeVal);
-        if (forceValue) { afterVal = defaultValue; }
-        json[key] = afterVal;
+        if (forceVal) { afterVal = defaultVal; }
+        outVal = afterVal;
         return beforeVal != afterVal;
     }
 }

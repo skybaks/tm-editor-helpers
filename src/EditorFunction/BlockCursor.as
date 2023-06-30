@@ -1,6 +1,30 @@
 
 namespace EditorHelpers
 {
+    class BlockCursorPreset : EditorFunctionPresetBase
+    {
+        bool EnableCursorHidden;
+        bool CursorHidden;
+
+        BlockCursorPreset()
+        {
+            super("Block Cursor");
+        }
+
+        Json::Value@ ToJson() override
+        {
+            m_json["enable_cursor_hidden"] = EnableCursorHidden;
+            m_json["cursor_hidden"] = CursorHidden;
+            return m_json;
+        }
+
+        void FromJson(const Json::Value@ json) override
+        {
+            EnableCursorHidden = json.Get("enable_cursor_hidden", Json::Value(true));
+            CursorHidden = json.Get("cursor_hidden", Json::Value(false));
+        }
+    }
+
     namespace HotkeyInterface
     {
         bool Enabled_BlockCursor()
@@ -22,13 +46,12 @@ namespace EditorHelpers
     [Setting category="Functions" name="BlockCursor: Hide Block Cursor" hidden]
     bool Setting_BlockCursor_HideBlockCursor = false;
 
-    class BlockCursor : EditorHelpers::EditorFunction
+    class BlockCursor : EditorHelpers::EditorFunction, EditorFunctionPresetInterface
     {
         private bool lastBlockCursorOff;
 
         string Name() override { return "Block Cursor"; }
         bool Enabled() override { return Setting_BlockCursor_Enabled; }
-        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -90,39 +113,64 @@ namespace EditorHelpers
             lastBlockCursorOff = Setting_BlockCursor_HideBlockCursor;
         }
 
-        void SerializePresets(Json::Value@ json) override
+        // EditorFunctionPresetInterface
+        EditorFunctionPresetBase@ CreatePreset() override { return BlockCursorPreset(); }
+
+        void UpdatePreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            json["cursor_hidden"] = Setting_BlockCursor_HideBlockCursor;
+            BlockCursorPreset@ preset = cast<BlockCursorPreset>(data);
+            if (preset is null) { return; }
+            preset.CursorHidden = Setting_BlockCursor_HideBlockCursor;
         }
 
-        void DeserializePresets(Json::Value@ json) override
+        void ApplyPreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_cursor_hidden", Json::Value(true))))
+            BlockCursorPreset@ preset = cast<BlockCursorPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableCursorHidden)
             {
-                Setting_BlockCursor_HideBlockCursor = bool(json.Get("cursor_hidden", Json::Value(false)));
+                Setting_BlockCursor_HideBlockCursor = preset.CursorHidden;
             }
         }
 
-        void RenderPresetValues(Json::Value@ json) override
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            BlockCursorPreset@ preset = cast<BlockCursorPreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableCursorHidden)
+            {
+                if (Setting_BlockCursor_HideBlockCursor != preset.CursorHidden) { areSame = false; }
+            }
+            return areSame;
+        }
+
+        void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_cursor_hidden", Json::Value(true))))
+            BlockCursorPreset@ preset = cast<BlockCursorPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableCursorHidden)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Block Cursor Hidden");
                 UI::TableNextColumn();
-                UI::Text(tostring(bool(json.Get("cursor_hidden", Json::Value(false)))));
+                UI::Text(tostring(preset.CursorHidden));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
+        bool RenderPresetEnables(EditorFunctionPresetBase@ data, bool defaultValue, bool forceValue) override
         {
+            if (!Enabled()) { return false; }
+            BlockCursorPreset@ preset = cast<BlockCursorPreset>(data);
+            if (preset is null) { return false; }
+
             bool changed = false;
-            if (!Enabled()) { return changed; }
-            if (JsonCheckboxChanged(json, "enable_cursor_hidden", "Cursor Hidden", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableCursorHidden, preset.EnableCursorHidden, "Cursor Hidden", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("BlockCursor::HideCursor");

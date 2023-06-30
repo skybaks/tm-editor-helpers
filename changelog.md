@@ -1,8 +1,11 @@
 ## 6.2.0
 * Features
   * Add new option to Quicksave function to create a backup copy of the map each time it is saved
+  * Improve backend implementation of presets
+  * Preset buttons now show as disabled when there are no changes to apply
 * Bugfixes
   * Fix mixed usage of path separators
+  * Fix issue where previously selected preset was affected by creating a new preset
 
 
 ## 6.1.0

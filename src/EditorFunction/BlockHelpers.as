@@ -1,6 +1,30 @@
 
 namespace EditorHelpers
 {
+    class BlockHelpersPreset : EditorFunctionPresetBase
+    {
+        bool EnableHelpersOff;
+        bool HelpersOff;
+
+        BlockHelpersPreset()
+        {
+            super("Block Helpers");
+        }
+
+        Json::Value@ ToJson() override
+        {
+            m_json["enable_helpers_off"] = EnableHelpersOff;
+            m_json["helpers_off"] = HelpersOff;
+            return m_json;
+        }
+
+        void FromJson(const Json::Value@ json) override
+        {
+            EnableHelpersOff = json.Get("enable_helpers_off", Json::Value(true));
+            HelpersOff = json.Get("helpers_off", Json::Value(false));
+        }
+    }
+
     namespace Compatibility
     {
         void SetHideBlockHelpers(CGameCtnEditorFree@ editor, bool setValue)
@@ -37,14 +61,13 @@ namespace EditorHelpers
     [Setting category="Functions" name="BlockHelpers: Block Helpers Off" hidden]
     bool Setting_BlockHelpers_BlockHelpersOff = false;
 
-    class BlockHelpers : EditorHelpers::EditorFunction
+    class BlockHelpers : EditorHelpers::EditorFunction, EditorFunctionPresetInterface
     {
         private bool lastBlockHelpersOff;
         private bool m_functionalityDisabled;
 
         string Name() override { return "Block Helpers"; }
         bool Enabled() override { return Setting_BlockHelpers_Enabled; }
-        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -114,39 +137,63 @@ namespace EditorHelpers
             lastBlockHelpersOff = Setting_BlockHelpers_BlockHelpersOff;
         }
 
-        void SerializePresets(Json::Value@ json) override
+        // EditorFunctionPresetInterface
+        EditorFunctionPresetBase@ CreatePreset() override { return BlockHelpersPreset(); }
+
+        void UpdatePreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            json["helpers_off"] = Setting_BlockHelpers_BlockHelpersOff;
+            BlockHelpersPreset@ preset = cast<BlockHelpersPreset>(data);
+            if (preset is null) { return; }
+            preset.HelpersOff = Setting_BlockHelpers_BlockHelpersOff;
         }
 
-        void DeserializePresets(Json::Value@ json) override
+        void ApplyPreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_helpers_off", Json::Value(true))))
+            BlockHelpersPreset@ preset = cast<BlockHelpersPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableHelpersOff)
             {
-                Setting_BlockHelpers_BlockHelpersOff = bool(json.Get("helpers_off", Json::Value(false)));
+                Setting_BlockHelpers_BlockHelpersOff = preset.HelpersOff;
             }
         }
 
-        void RenderPresetValues(Json::Value@ json) override
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            BlockHelpersPreset@ preset = cast<BlockHelpersPreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableHelpersOff)
+            {
+                if (Setting_BlockHelpers_BlockHelpersOff != preset.HelpersOff) { areSame = false; }
+            }
+            return areSame;
+        }
+
+        void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_helpers_off", Json::Value(true))))
+            BlockHelpersPreset@ preset = cast<BlockHelpersPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableHelpersOff)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Block Helpers Off");
                 UI::TableNextColumn();
-                UI::Text(tostring(bool(json.Get("helpers_off", Json::Value(false)))));
+                UI::Text(tostring(preset.HelpersOff));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
+        bool RenderPresetEnables(EditorFunctionPresetBase@ data, bool defaultValue, bool forceValue) override
         {
+            if (!Enabled()) { return false; }
+            BlockHelpersPreset@ preset = cast<BlockHelpersPreset>(data);
+            if (preset is null) { return false; }
             bool changed = false;
-            if (!Enabled()) { return changed; }
-            if (JsonCheckboxChanged(json, "enable_helpers_off", "Helpers Off", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableHelpersOff, preset.EnableHelpersOff, "Helpers Off", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("BlockHelpers::HelpersOff");

@@ -1,5 +1,29 @@
 namespace EditorHelpers
 {
+    class CameraModesPreset : EditorFunctionPresetBase
+    {
+        bool EnableCamera;
+        string Camera;
+
+        CameraModesPreset()
+        {
+            super("Camera Modes");
+        }
+
+        Json::Value@ ToJson() override
+        {
+            m_json["enable_camera"] = EnableCamera;
+            m_json["camera"] = Camera;
+            return m_json;
+        }
+
+        void FromJson(const Json::Value@ json) override
+        {
+            EnableCamera = json.Get("enable_camera", Json::Value(true));
+            Camera = json.Get("camera", Json::Value("Orbital"));
+        }
+    }
+
     namespace Compatibility
     {
         void SetCamMode(CGameCtnEditorFree@ editor, const string&in camMode)
@@ -29,14 +53,13 @@ namespace EditorHelpers
     [Setting category="Functions" name="Camera Modes: Enable" hidden]
     bool Setting_CameraMode_Enabled = true;
 
-    class CameraModes : EditorHelpers::EditorFunction
+    class CameraModes : EditorHelpers::EditorFunction, EditorFunctionPresetInterface
     {
         private bool SettingUpdated = false;
         private string Setting_CameraMode_CurrentMode = "Orbital";
 
         string Name() override { return "Camera Modes"; }
         bool Enabled() override { return Setting_CameraMode_Enabled; }
-        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -95,40 +118,64 @@ namespace EditorHelpers
             EditorHelpers::EndHighlight();
         }
 
-        void SerializePresets(Json::Value@ json) override
+        // EditorFunctionPresetInterface
+        EditorFunctionPresetBase@ CreatePreset() override { return CameraModesPreset(); }
+
+        void UpdatePreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            json["camera"] = Setting_CameraMode_CurrentMode;
+            CameraModesPreset@ preset = cast<CameraModesPreset>(data);
+            if (preset is null) { return; }
+            preset.Camera = Setting_CameraMode_CurrentMode;
         }
 
-        void DeserializePresets(Json::Value@ json) override
+        void ApplyPreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_camera", Json::Value(true))))
+            CameraModesPreset@ preset = cast<CameraModesPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableCamera)
             {
-                Setting_CameraMode_CurrentMode = string(json.Get("camera", Json::Value("Orbital")));
+                Setting_CameraMode_CurrentMode = preset.Camera;
                 SettingUpdated = true;
             }
         }
 
-        void RenderPresetValues(Json::Value@ json) override
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            CameraModesPreset@ preset = cast<CameraModesPreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableCamera)
+            {
+                if (Setting_CameraMode_CurrentMode != preset.Camera) { areSame = false; }
+            }
+            return areSame;
+        }
+
+        void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_camera", Json::Value(true))))
+            CameraModesPreset@ preset = cast<CameraModesPreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableCamera)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Camera Mode");
                 UI::TableNextColumn();
-                UI::Text(tostring(string(json.Get("camera", Json::Value("Orbital")))));
+                UI::Text(preset.Camera);
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
+        bool RenderPresetEnables(EditorFunctionPresetBase@ data, bool defaultValue, bool forceValue) override
         {
+            if (!Enabled()) { return false; }
+            CameraModesPreset@ preset = cast<CameraModesPreset>(data);
+            if (preset is null) { return false; }
             bool changed = false;
-            if (!Enabled()) { return changed; }
-            if (JsonCheckboxChanged(json, "enable_camera", "Camera", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableCamera, preset.EnableCamera, "Camera", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("CameraModes::CameraMode");

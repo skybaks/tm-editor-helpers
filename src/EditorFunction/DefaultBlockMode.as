@@ -1,5 +1,50 @@
 namespace EditorHelpers
 {
+    class DefaultBlockModePreset : EditorFunctionPresetBase
+    {
+        bool EnableBlockMode;
+        string BlockMode;
+        bool BlockModeEnabled;
+        bool EnableItemMode;
+        string ItemMode;
+        bool ItemModeEnabled;
+        bool EnableMacroblockMode;
+        string MacroblockMode;
+        bool MacroblockModeEnabled;
+
+        DefaultBlockModePreset()
+        {
+            super("Default Block Mode");
+        }
+
+        Json::Value@ ToJson() override
+        {
+            m_json["enable_block_mode"] = EnableBlockMode;
+            m_json["block_mode"] = BlockMode;
+            m_json["block_mode_enabled"] = BlockModeEnabled;
+            m_json["enable_item_mode"] = EnableItemMode;
+            m_json["item_mode"] = ItemMode;
+            m_json["item_mode_enabled"] = ItemModeEnabled;
+            m_json["enable_macroblock_mode"] = EnableMacroblockMode;
+            m_json["macroblock_mode"] = MacroblockMode;
+            m_json["macroblock_mode_enabled"] = MacroblockModeEnabled;
+            return m_json;
+        }
+
+        void FromJson(const Json::Value@ json) override
+        {
+            EnableBlockMode = json.Get("enable_block_mode", Json::Value(true));
+            BlockMode = json.Get("block_mode", Json::Value("Normal"));
+            BlockModeEnabled = json.Get("block_mode_enabled", Json::Value(false));
+            EnableItemMode = json.Get("enable_item_mode", Json::Value(true));
+            ItemMode = json.Get("item_mode", Json::Value("Normal"));
+            ItemModeEnabled = json.Get("item_mode_enabled", Json::Value(false));
+            EnableMacroblockMode = json.Get("enable_macroblock_mode", Json::Value(true));
+            MacroblockMode = json.Get("macroblock_mode", Json::Value("Normal"));
+            MacroblockModeEnabled = json.Get("macroblock_mode_enabled", Json::Value(false));
+        }
+    }
+
     enum PlaceModeCategory
     {
         Block,
@@ -155,14 +200,13 @@ namespace EditorHelpers
     [Setting category="Functions" name="DefaultBlockMode: Macroblock Mode Active" hidden]
     bool Setting_DefaultBlockMode_ActiveMacroblock = false;
 
-    class DefaultBlockMode : EditorHelpers::EditorFunction
+    class DefaultBlockMode : EditorHelpers::EditorFunction, EditorFunctionPresetInterface
     {
         private PlaceModeCategory m_lastPlaceModeCategory;
         private bool m_functionalityDisabled;
 
         string Name() override { return "Default Block Mode"; }
         bool Enabled() override { return Setting_DefaultBlockMode_Enabled; }
-        bool SupportsPresets() override { return true; }
 
         void RenderInterface_Settings() override
         {
@@ -349,99 +393,134 @@ namespace EditorHelpers
             }
         }
 
-        void SerializePresets(Json::Value@ json) override
+        // EditorFunctionPresetInterface
+        EditorFunctionPresetBase@ CreatePreset() override { return DefaultBlockModePreset(); }
+
+        void UpdatePreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            json["block_mode"] = Setting_DefaultBlockMode_BlockMode;
-            json["block_mode_enabled"] = Setting_DefaultBlockMode_ActiveBlock;
-            json["item_mode"] = Setting_DefaultBlockMode_ItemMode;
-            json["item_mode_enabled"] = Setting_DefaultBlockMode_ActiveItem;
-            json["macroblock_mode"] = Setting_DefaultBlockMode_MacroblockMode;
-            json["macroblock_mode_enabled"] = Setting_DefaultBlockMode_ActiveMacroblock;
+            DefaultBlockModePreset@ preset = cast<DefaultBlockModePreset>(data);
+            if (preset is null) { return; }
+            preset.BlockMode = Setting_DefaultBlockMode_BlockMode;
+            preset.BlockModeEnabled = Setting_DefaultBlockMode_ActiveBlock;
+            preset.ItemMode = Setting_DefaultBlockMode_ItemMode;
+            preset.ItemModeEnabled = Setting_DefaultBlockMode_ActiveItem;
+            preset.MacroblockMode = Setting_DefaultBlockMode_MacroblockMode;
+            preset.MacroblockModeEnabled = Setting_DefaultBlockMode_ActiveMacroblock;
         }
 
-        void DeserializePresets(Json::Value@ json) override
+        void ApplyPreset(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_block_mode", Json::Value(true))))
+            DefaultBlockModePreset@ preset = cast<DefaultBlockModePreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableBlockMode)
             {
-                Setting_DefaultBlockMode_BlockMode = string(json.Get("block_mode", Json::Value("Normal")));
-                Setting_DefaultBlockMode_ActiveBlock = bool(json.Get("block_mode_enabled", Json::Value(false)));
+                Setting_DefaultBlockMode_BlockMode = preset.BlockMode;
+                Setting_DefaultBlockMode_ActiveBlock = preset.BlockModeEnabled;
             }
-            if (bool(json.Get("enable_item_mode", Json::Value(true))))
+            if (preset.EnableItemMode)
             {
-                Setting_DefaultBlockMode_ItemMode = string(json.Get("item_mode", Json::Value("Normal")));
-                Setting_DefaultBlockMode_ActiveItem = bool(json.Get("item_mode_enabled", Json::Value(false)));
+                Setting_DefaultBlockMode_ItemMode = preset.ItemMode;
+                Setting_DefaultBlockMode_ActiveItem = preset.ItemModeEnabled;
             }
-            if (bool(json.Get("enable_macroblock_mode", Json::Value(true))))
+            if (preset.EnableMacroblockMode)
             {
-                Setting_DefaultBlockMode_MacroblockMode = string(json.Get("macroblock_mode", Json::Value("Normal")));
-                Setting_DefaultBlockMode_ActiveMacroblock = bool(json.Get("macroblock_mode_enabled", Json::Value(false)));
+                Setting_DefaultBlockMode_MacroblockMode = preset.MacroblockMode;
+                Setting_DefaultBlockMode_ActiveMacroblock = preset.MacroblockModeEnabled;
             }
         }
 
-        void RenderPresetValues(Json::Value@ json) override
+        bool CheckPreset(EditorFunctionPresetBase@ data) override
+        {
+            bool areSame = true;
+            if (!Enabled()) { return areSame; }
+            DefaultBlockModePreset@ preset = cast<DefaultBlockModePreset>(data);
+            if (preset is null) { return areSame; }
+            if (preset.EnableBlockMode)
+            {
+                if (Setting_DefaultBlockMode_BlockMode != preset.BlockMode
+                    || Setting_DefaultBlockMode_ActiveBlock != preset.BlockModeEnabled) { areSame = false; }
+            }
+            if (preset.EnableItemMode)
+            {
+                if (Setting_DefaultBlockMode_ItemMode != preset.ItemMode
+                    || Setting_DefaultBlockMode_ActiveItem != preset.ItemModeEnabled) { areSame = false; }
+            }
+            if (preset.EnableMacroblockMode)
+            {
+                if (Setting_DefaultBlockMode_MacroblockMode != preset.MacroblockMode
+                    || Setting_DefaultBlockMode_ActiveMacroblock != preset.MacroblockModeEnabled) { areSame = false; }
+            }
+            return areSame;
+        }
+
+        void RenderPresetValues(EditorFunctionPresetBase@ data) override
         {
             if (!Enabled()) { return; }
-            if (bool(json.Get("enable_block_mode", Json::Value(true))))
+            DefaultBlockModePreset@ preset = cast<DefaultBlockModePreset>(data);
+            if (preset is null) { return; }
+            if (preset.EnableBlockMode)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Block Mode");
                 UI::TableNextColumn();
-                UI::Text(string(json.Get("block_mode", Json::Value("Normal"))));
+                UI::Text(preset.BlockMode);
 
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Block Mode Active");
                 UI::TableNextColumn();
-                UI::Text(tostring(bool(json.Get("block_mode_enabled", Json::Value(false)))));
+                UI::Text(tostring(preset.BlockModeEnabled));
             }
-            if (bool(json.Get("enable_item_mode", Json::Value(true))))
+            if (preset.EnableItemMode)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Item Mode");
                 UI::TableNextColumn();
-                UI::Text(string(json.Get("item_mode", Json::Value("Normal"))));
+                UI::Text(preset.ItemMode);
 
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Item Mode Active");
                 UI::TableNextColumn();
-                UI::Text(tostring(bool(json.Get("item_mode_enabled", Json::Value(false)))));
+                UI::Text(tostring(preset.ItemModeEnabled));
             }
-            if (bool(json.Get("enable_macroblock_mode", Json::Value(true))))
+            if (preset.EnableMacroblockMode)
             {
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Macroblock Mode");
                 UI::TableNextColumn();
-                UI::Text(string(json.Get("macroblock_mode", Json::Value("Normal"))));
+                UI::Text(preset.MacroblockMode);
 
                 UI::TableNextRow();
                 UI::TableNextColumn();
                 UI::Text("Macroblock Mode Active");
                 UI::TableNextColumn();
-                UI::Text(tostring(bool(json.Get("macroblock_mode_enabled", Json::Value(false)))));
+                UI::Text(tostring(preset.MacroblockModeEnabled));
             }
         }
 
-        bool RenderPresetEnables(Json::Value@ json, bool defaultValue, bool forceValue) override
+        bool RenderPresetEnables(EditorFunctionPresetBase@ data, bool defaultValue, bool forceValue) override
         {
+            if (!Enabled()) { return false; }
+            DefaultBlockModePreset@ preset = cast<DefaultBlockModePreset>(data);
+            if (preset is null) { return false; }
             bool changed = false;
-            if (!Enabled()) { return changed; }
-            if (JsonCheckboxChanged(json, "enable_block_mode", "Block mode", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableBlockMode, preset.EnableBlockMode, "Block mode", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("DefaultBlockMode::Blocks");
             }
-            if (JsonCheckboxChanged(json, "enable_item_mode", "Item mode", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableItemMode, preset.EnableItemMode, "Item mode", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("DefaultBlockMode::Items");
             }
-            if (JsonCheckboxChanged(json, "enable_macroblock_mode", "Macroblock mode", defaultValue, forceValue)) { changed = true; }
+            if (ForcedCheckbox(preset.EnableMacroblockMode, preset.EnableMacroblockMode, "Macroblock mode", defaultValue, forceValue)) { changed = true; }
             if (UI::IsItemHovered())
             {
                 EditorHelpers::SetHighlightId("DefaultBlockMode::Macroblocks");
