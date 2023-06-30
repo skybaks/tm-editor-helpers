@@ -43,6 +43,39 @@ namespace EditorHelpers
             return false;
 #endif
         }
+
+        bool GetForceMacroblockColor(CGameCtnEditorFree@ editor)
+        {
+            bool value = false;
+#if TMNEXT
+            if (editor.PluginMapType !is null)
+            {
+                value = editor.PluginMapType.ForceMacroblockColor;
+            }
+#else
+#endif
+            return value;
+        }
+
+        void SetForceMacroblockColor(CGameCtnEditorFree@ editor, bool setValue)
+        {
+#if TMNEXT
+            if (editor.PluginMapType !is null)
+            {
+                editor.PluginMapType.ForceMacroblockColor = setValue;
+            }
+#else
+#endif
+        }
+
+        bool BlockColorEnabled()
+        {
+#if TMNEXT
+            return true;
+#else
+            return false;
+#endif
+        }
     }
 
     [Setting category="Functions" name="RememberPlacementModes: Enabled" hidden]
@@ -51,6 +84,12 @@ namespace EditorHelpers
     bool Setting_RememberPlacementModes_MaintainBlockModeAfterTest = true;
     [Setting category="Functions" name="RememberPlacementModes: Maintain Selection Mode" hidden]
     bool Setting_RememberPlacementModes_MaintainSelectionMode = true;
+    [Setting category="Functions" name="RememberPlacementModes: Maintain Next Block Color" hidden]
+    bool Setting_RememberPlacementModes_NextBlockColorEnabled = true;
+    [Setting category="Functions" name="RememberPlacementModes: Maintain Next Block Color Last Color" hidden]
+    int Setting_RememberPlacementModes_LastSetNextBlockColor = 0;
+    [Setting category="Functions" name="RememberPlacementModes: Maintain Last Force Macroblock Color" hidden]
+    bool Setting_RememberPlacementModes_LastForceMacroblockColor = false;
 
     class RememberPlacementModes : EditorHelpers::EditorFunction
     {
@@ -70,9 +109,23 @@ namespace EditorHelpers
             UI::SameLine();
             Setting_RememberPlacementModes_Enabled = UI::Checkbox("Enabled", Setting_RememberPlacementModes_Enabled);
             UI::BeginDisabled(!Setting_RememberPlacementModes_Enabled);
-            UI::TextWrapped("This function will remember the placement mode you were using before testing your map and switch you back to it afterwards. For example, if you were in Item or Macroblock modes prior to entering test mode then this can switch you back to those modes instead of always to block mode. This works best when you use the ESC or CTRL keys to leave test mode (when the car is in your cursor). Additionally, the option to remember add or remove selection modes between camera usage covers the case where you are using remove selection mode and you move the camera. In that case the plugin will return you to remove selection mode instead of the default behavior to always return you to add selection mode.");
+            UI::TextWrapped("This function will remember the placement mode you were using before testing your map and"
+                " switch you back to it afterwards. For example, if you were in Item or Macroblock modes prior to"
+                " entering test mode then this can switch you back to those modes instead of always to block mode. This"
+                " works best when you use the ESC or CTRL keys to leave test mode (when the car is in your cursor)."
+                " Additionally, the option to remember add or remove selection modes between camera usage covers the"
+                " case where you are using remove selection mode and you move the camera. In that case the plugin will"
+                " return you to remove selection mode instead of the default behavior to always return you to add"
+                " selection mode.");
             Setting_RememberPlacementModes_MaintainBlockModeAfterTest = UI::Checkbox("Remember placement mode after exiting test mode", Setting_RememberPlacementModes_MaintainBlockModeAfterTest);
             Setting_RememberPlacementModes_MaintainSelectionMode = UI::Checkbox("Remember selection add/remove mode after using camera", Setting_RememberPlacementModes_MaintainSelectionMode);
+            if (Compatibility::BlockColorEnabled())
+            {
+                UI::TextWrapped("The following setting controls whether your selections on the \"Next block color\" and"
+                    " the \"Force macroblock colors\" widgets will be persisted through editor sessions and game"
+                    " restarts.");
+                Setting_RememberPlacementModes_NextBlockColorEnabled = UI::Checkbox("Remember color selections", Setting_RememberPlacementModes_NextBlockColorEnabled);
+            }
             UI::EndDisabled();
             UI::PopID();
         }
@@ -171,6 +224,18 @@ namespace EditorHelpers
                 }
             }
             lastPlaceModeCategory = currentPlaceModeCategory;
+
+            if (Compatibility::BlockColorEnabled())
+            {
+                if (Signal_EnteredEditor() && Setting_RememberPlacementModes_NextBlockColorEnabled)
+                {
+                    Compatibility::SetNextMapElemColor(Editor, Setting_RememberPlacementModes_LastSetNextBlockColor);
+                    Compatibility::SetForceMacroblockColor(Editor, Setting_RememberPlacementModes_LastForceMacroblockColor);
+                }
+
+                Setting_RememberPlacementModes_LastSetNextBlockColor = Compatibility::GetCurrentMapElemColor(Editor);
+                Setting_RememberPlacementModes_LastForceMacroblockColor = Compatibility::GetForceMacroblockColor(Editor);
+            }
         }
     }
 }
