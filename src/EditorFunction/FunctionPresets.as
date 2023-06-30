@@ -118,6 +118,7 @@ namespace EditorHelpers
         private bool m_deleteConfirm = false;
         private bool m_signalSave = false;
         private int m_newPreset = -1;
+        private uint m_lastUpdatedPreset = 0;
 
         string Name() override { return "Presets"; }
         bool Enabled() override { return Setting_FunctionPresets_Enabled; }
@@ -441,9 +442,14 @@ namespace EditorHelpers
             }
             m_signalSave = false;
 
-            for (uint i = 0; i < m_presets.Length; ++i)
+            if (m_lastUpdatedPreset >= m_presets.Length)
             {
-                m_presets[i].UpdateChangesToApply(m_supportedFunctions);
+                m_lastUpdatedPreset = 0;
+            }
+            if (m_lastUpdatedPreset < m_presets.Length)
+            {
+                m_presets[m_lastUpdatedPreset].UpdateChangesToApply(m_supportedFunctions);
+                m_lastUpdatedPreset += 1;
             }
         }
 
