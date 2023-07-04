@@ -95,4 +95,9 @@ namespace EditorHelpers
             UI::PopStyleColor(4);
         }
     }
+
+    void NewMarker()
+    {
+        UI::Text("\\$f00" + Icons::InfoCircle + " New");
+    }
 }

@@ -47,6 +47,8 @@ namespace EditorHelpers
             UI::BeginDisabled(!Setting_Quicksave_Enabled);
             UI::TextWrapped("This function creates a \"Quicksave\" button in the Action subsection. Clicking the "
                 "quicksave button will save the current map and skip all the popup dialogs from the normal save.");
+
+            EditorHelpers::NewMarker();
             UI::TextWrapped("Additionally, you can turn on the following setting to enable the plugin to create a "
                 "backup copy of the map everytime you save. The backup copy will be saved to a folder called "
                 "\"Maps/Quicksaves_EditorHelpers\"");
