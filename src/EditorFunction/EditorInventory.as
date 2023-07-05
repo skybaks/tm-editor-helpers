@@ -285,8 +285,7 @@ namespace EditorHelpers
                     }
 
                     UI::SameLine();
-                    EditorHelpers::NewMarker();
-                    UI::SameLine();
+                    EditorHelpers::NewMarker(sameLine: true);
                     if (settingToolTipsEnabled)
                     {
                         EditorHelpers::HelpMarker("Shift elements up and down within the current active palette");

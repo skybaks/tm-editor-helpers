@@ -5,6 +5,8 @@ bool Setting_WindowVisible = true;
 bool settingToolTipsEnabled = true;
 [Setting category="General" name="Debug Logging Enabled" hidden]
 bool Setting_DebugLoggingEnabled = false;
+[Setting category="General" name="New Marker Displayed" hidden]
+bool Setting_NewMarkerDisplayed = true;
 
 const string g_windowName = Icons::PuzzlePiece + " Editor Helpers";
 
@@ -137,6 +139,8 @@ void RenderSettingsPage()
     UI::PushID("GeneralSettingsPage");
     UI::Markdown("# Editor Helpers");
     settingToolTipsEnabled = UI::Checkbox("Show tooltips in the editor helpers window", settingToolTipsEnabled);
+    EditorHelpers::NewMarker(sameLine: true);
+    Setting_NewMarkerDisplayed = UI::Checkbox("Show tooltips next to new features", Setting_NewMarkerDisplayed);
     Setting_DebugLoggingEnabled = UI::Checkbox("Enable EXTREMELY VERBOSE logging to Openplanet.log", Setting_DebugLoggingEnabled);
     UI::TextWrapped("Listed in these settings are each individual function of the editor helpers plugin. You can"
         " enable or disable each plugin individually. Disabling a function will remove any UI associated with it and"

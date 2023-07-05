@@ -4,6 +4,8 @@
   * Improve backend implementation of presets
   * Preset buttons now show as disabled when there are no changes to apply
   * Add persistence to block color widget and force macroblock color through editor sessions and game restarts. Configure this in the settings for "Remember Placement Modes"
+  * Add markers to highlight new features. Can be disabled in the settings
+  * Add ability to reorder objects in a custom palette
 * Bugfixes
   * Fix mixed usage of path separators
   * Fix issue where previously selected preset was affected by creating a new preset
