@@ -267,6 +267,24 @@ namespace EditorHelpers
                 m_signalSave = true;
             }
 
+            EditorHelpers::NewMarker(sameLine: true);
+            if (settingToolTipsEnabled)
+            {
+                EditorHelpers::HelpMarker("Shift active preset left and right in the tab order");
+                UI::SameLine();
+            }
+            if (UI::Button(Icons::Kenney::ArrowLeft + " Shift Left"))
+            {
+                ShiftPreset(m_selectedPresetIndex, shiftUp: true);
+                m_signalSave = true;
+            }
+            UI::SameLine();
+            if (UI::Button(Icons::Kenney::ArrowRight + " Shift Right"))
+            {
+                ShiftPreset(m_selectedPresetIndex, shiftUp: false);
+                m_signalSave = true;
+            }
+
 
             UI::BeginTabBar("FunctionPresetsTabBarFunctionPresets");
             for (uint presetIndex = 0; presetIndex < m_presets.Length; ++presetIndex)
@@ -491,6 +509,23 @@ namespace EditorHelpers
                     m_presets[i].Key = key;
                     m_signalSave = true;
                     break;
+                }
+            }
+        }
+
+
+        private void ShiftPreset(uint index, bool shiftUp)
+        {
+            if (index >= 0 && index < m_presets.Length)
+            {
+                int newIndex = shiftUp ? int(index) - 1 : int(index) + 1;
+                newIndex = Math::Clamp(newIndex, 0, m_presets.Length - 1);
+                if (newIndex != int(index))
+                {
+                    auto@ preset = m_presets[index];
+                    m_presets.RemoveAt(index);
+                    m_presets.InsertAt(newIndex, preset);
+                    m_forcePresetIndex = newIndex;
                 }
             }
         }
