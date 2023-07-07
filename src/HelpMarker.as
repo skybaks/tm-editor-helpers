@@ -96,8 +96,15 @@ namespace EditorHelpers
         }
     }
 
-    void NewMarker()
+    void NewMarker(bool sameLine = false)
     {
-        UI::Text("\\$f00" + Icons::InfoCircle + " New");
+        if (Setting_NewMarkerDisplayed)
+        {
+            UI::Text("\\$f00" + Icons::InfoCircle + " New");
+            if (sameLine)
+            {
+                UI::SameLine();
+            }
+        }
     }
 }

@@ -105,13 +105,13 @@ namespace EditorHelpers
 
     class EditorInventory : EditorHelpers::EditorFunction
     {
-        private EditorInventoryArticle@[] m_articles;
-        private EditorInventoryArticle@[] m_articlesFiltered;
-        private EditorInventoryArticle@[] m_articlesHistory;
+        private array<EditorInventoryArticle@> m_articles;
+        private array<EditorInventoryArticle@> m_articlesFiltered;
+        private array<EditorInventoryArticle@> m_articlesHistory;
         private string m_filterString;
         private string m_filterStringPrev;
         private CGameCtnArticleNodeArticle@ m_selectedArticlePrev;
-        private EditorInventoryPalette@[] m_palettes;
+        private array<EditorInventoryPalette@> m_palettes;
         private uint m_selectedPaletteIndex;
         private int m_forcePaletteIndex;
         private string m_paletteNewName;
@@ -208,7 +208,7 @@ namespace EditorHelpers
                         EditorHelpers::HelpMarker("Create a new custom palette");
                         UI::SameLine();
                     }
-                    if (UI::Button(" New Palette"))
+                    if (UI::Button(Icons::Kenney::Plus + " New Palette"))
                     {
                         m_palettes.InsertLast(EditorInventoryPalette());
                         m_forcePaletteIndex = m_palettes.Length - 1;
@@ -220,7 +220,7 @@ namespace EditorHelpers
                         EditorHelpers::HelpMarker("Delete the active custom palette");
                         UI::SameLine();
                     }
-                    if (UI::Button(" Delete Selected Palette"))
+                    if (UI::Button(Icons::Kenney::TrashAlt + " Delete Selected Palette"))
                     {
                         m_deleteConfirm = true;
                     }
@@ -270,19 +270,54 @@ namespace EditorHelpers
                         EditorHelpers::HelpMarker("Add or remove elements from the active custom palette");
                         UI::SameLine();
                     }
-                    UI::Text("Current Block/Item/Macroblock: ");
-                    UI::SameLine();
-                    if (UI::Button(" Add") && m_articlesHistory.Length > 0)
+                    if (UI::Button(Icons::Kenney::Plus + " Add") && m_articlesHistory.Length > 0)
                     {
                         AddNewArticleToPalette(m_articlesHistory[0].Article, m_selectedPaletteIndex);
 
                         SavePalettes();
                     }
                     UI::SameLine();
-                    if (UI::Button(" Remove") && m_articlesHistory.Length > 0)
+                    if (UI::Button(Icons::Kenney::Minus + " Remove") && m_articlesHistory.Length > 0)
                     {
                         RemoveArticleFromPalette(m_articlesHistory[0].Article, m_selectedPaletteIndex);
 
+                        SavePalettes();
+                    }
+
+                    UI::SameLine();
+                    EditorHelpers::NewMarker(sameLine: true);
+                    if (settingToolTipsEnabled)
+                    {
+                        EditorHelpers::HelpMarker("Shift selected object up and down within the current active palette");
+                        UI::SameLine();
+                    }
+                    if (UI::Button(Icons::Kenney::ArrowTop + " Shift Up") && m_articlesHistory.Length > 0)
+                    {
+                        ShiftArticleInPalette(m_articlesHistory[0].Article, m_selectedPaletteIndex, shiftUp: true);
+                        SavePalettes();
+                    }
+                    UI::SameLine();
+                    if (UI::Button(Icons::Kenney::ArrowBottom + " Shift Down") && m_articlesHistory.Length > 0)
+                    {
+                        ShiftArticleInPalette(m_articlesHistory[0].Article, m_selectedPaletteIndex, shiftUp: false);
+                        SavePalettes();
+                    }
+
+                    EditorHelpers::NewMarker(sameLine: false);
+                    if (settingToolTipsEnabled)
+                    {
+                        EditorHelpers::HelpMarker("Shift active palette left and right in the tab order");
+                        UI::SameLine();
+                    }
+                    if (UI::Button(Icons::Kenney::ArrowLeft + " Shift Left"))
+                    {
+                        ShiftPalette(m_selectedPaletteIndex, shiftUp: true);
+                        SavePalettes();
+                    }
+                    UI::SameLine();
+                    if (UI::Button(Icons::Kenney::ArrowRight + " Shift Right"))
+                    {
+                        ShiftPalette(m_selectedPaletteIndex, shiftUp: false);
                         SavePalettes();
                     }
 
@@ -732,6 +767,47 @@ namespace EditorHelpers
                         m_palettes[index].Articles.RemoveAt(searchIndex);
                         break;
                     }
+                }
+            }
+        }
+
+        private void ShiftArticleInPalette(const CGameCtnArticleNodeArticle@ newArticle, const uint&in index, bool shiftUp)
+        {
+            if (index >= 0 && index < m_palettes.Length)
+            {
+                for (uint searchIndex = 0; searchIndex < m_palettes[index].Articles.Length; ++searchIndex)
+                {
+                    if (m_palettes[index].Articles[searchIndex].Article is newArticle)
+                    {
+                        auto article = FindArticleByRef(newArticle);
+                        if (article !is null)
+                        {
+                            int newIndex = shiftUp ? int(searchIndex) - 1 : int(searchIndex) + 1;
+                            newIndex = Math::Clamp(newIndex, 0, m_palettes[index].Articles.Length - 1);
+                            if (newIndex != int(searchIndex))
+                            {
+                                m_palettes[index].Articles.RemoveAt(searchIndex);
+                                m_palettes[index].Articles.InsertAt(newIndex, article);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void ShiftPalette(uint index, bool shiftUp)
+        {
+            if (index >= 0 && index < m_palettes.Length)
+            {
+                int newIndex = shiftUp ? int(index) - 1 : int(index) + 1;
+                newIndex = Math::Clamp(newIndex, 0, m_palettes.Length - 1);
+                if (newIndex != int(index))
+                {
+                    auto@ palette = m_palettes[index];
+                    m_palettes.RemoveAt(index);
+                    m_palettes.InsertAt(newIndex, palette);
+                    m_forcePaletteIndex = newIndex;
                 }
             }
         }
