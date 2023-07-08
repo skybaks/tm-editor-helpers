@@ -2,19 +2,19 @@ namespace EditorHelpers
 {
     class CustomItemPlacementPreset : EditorFunctionPresetBase
     {
-        bool EnableGhostMode;
-        bool GhostMode;
-        bool EnableAutorotation;
-        bool Autorotation;
-        bool EnableItemGrid;
-        bool ApplyGrid;
-        float GridHorizontal;
-        float GridVertical;
-        bool EnableItemPivot;
-        bool ApplyPivot;
-        float PivotX;
-        float PivotY;
-        float PivotZ;
+        bool EnableGhostMode = true;
+        bool GhostMode = false;
+        bool EnableAutorotation = true;
+        bool Autorotation = false;
+        bool EnableItemGrid = true;
+        bool ApplyGrid = false;
+        float GridHorizontal = 32.0f;
+        float GridVertical = 8.0f;
+        bool EnableItemPivot = true;
+        bool ApplyPivot = false;
+        float PivotX = 0.0f;
+        float PivotY = 0.0f;
+        float PivotZ = 0.0f;
 
         CustomItemPlacementPreset()
         {

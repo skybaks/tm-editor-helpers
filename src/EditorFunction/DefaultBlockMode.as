@@ -2,15 +2,15 @@ namespace EditorHelpers
 {
     class DefaultBlockModePreset : EditorFunctionPresetBase
     {
-        bool EnableBlockMode;
-        string BlockMode;
-        bool BlockModeEnabled;
-        bool EnableItemMode;
-        string ItemMode;
-        bool ItemModeEnabled;
-        bool EnableMacroblockMode;
-        string MacroblockMode;
-        bool MacroblockModeEnabled;
+        bool EnableBlockMode = true;
+        string BlockMode = "Normal";
+        bool BlockModeEnabled = false;
+        bool EnableItemMode = true;
+        string ItemMode = "Normal";
+        bool ItemModeEnabled = false;
+        bool EnableMacroblockMode = true;
+        string MacroblockMode = "Normal";
+        bool MacroblockModeEnabled = false;
 
         DefaultBlockModePreset()
         {

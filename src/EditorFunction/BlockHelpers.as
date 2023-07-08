@@ -3,8 +3,8 @@ namespace EditorHelpers
 {
     class BlockHelpersPreset : EditorFunctionPresetBase
     {
-        bool EnableHelpersOff;
-        bool HelpersOff;
+        bool EnableHelpersOff = true;
+        bool HelpersOff = false;
 
         BlockHelpersPreset()
         {

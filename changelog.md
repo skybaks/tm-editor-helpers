@@ -8,6 +8,7 @@
   * Add ability to reorder objects in a custom palette
   * Add ability to reorder custom palettes
   * Add ability to reorder presets
+  * Create a standard "Plugin Defaults" preset which contains the default settings of the plugin
 * Bugfixes
   * Fix mixed usage of path separators
   * Fix issue where previously selected preset was affected by creating a new preset

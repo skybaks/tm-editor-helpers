@@ -3,10 +3,10 @@ namespace EditorHelpers
 {
     class PlacementGridPreset : EditorFunctionPresetBase
     {
-        bool EnableGridOn;
-        bool GridOn;
-        bool EnableGridTransparent;
-        bool Transparent;
+        bool EnableGridOn = true;
+        bool GridOn = false;
+        bool EnableGridTransparent = true;
+        bool Transparent = true;
 
         PlacementGridPreset()
         {

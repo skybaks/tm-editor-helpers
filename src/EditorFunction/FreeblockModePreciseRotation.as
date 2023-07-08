@@ -3,11 +3,11 @@ namespace EditorHelpers
 {
     class FreeblockModePreciseRotationPreset : EditorFunctionPresetBase
     {
-        bool EnableStepSize;
-        string StepSize;
-        bool EnablePitchRoll;
-        float Pitch;
-        float Roll;
+        bool EnableStepSize = true;
+        string StepSize = "Default";
+        bool EnablePitchRoll = true;
+        float Pitch = 0.0f;
+        float Roll = 0.0f;
 
         FreeblockModePreciseRotationPreset()
         {
