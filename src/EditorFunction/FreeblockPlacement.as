@@ -4,15 +4,15 @@ namespace EditorHelpers
 {
     class FreeblockPlacementPreset : EditorFunctionPresetBase
     {
-        bool EnableGrid;
-        bool ApplyGrid;
-        float HorizontalGrid;
-        float VerticalGrid;
-        bool EnableTranslate;
-        bool ApplyTranslation;
-        float X_Translation;
-        float Y_Translation;
-        float Z_Translation;
+        bool EnableGrid = true;
+        bool ApplyGrid = false;
+        float HorizontalGrid = 32.0f;
+        float VerticalGrid = 8.0f;
+        bool EnableTranslate = true;
+        bool ApplyTranslation = false;
+        float X_Translation = 0.0f;
+        float Y_Translation = 0.0f;
+        float Z_Translation = 0.0f;
 
         FreeblockPlacementPreset()
         {

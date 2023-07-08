@@ -40,6 +40,7 @@ namespace EditorHelpers
             HotkeyEnabled = false;
             Key = VirtualKey::B;
             ChangesToApply = true;
+            IsDefault = false;
         }
 
         void Init(bool autoUpdate, array<EditorFunctionPresetInterface@>@ functions)
@@ -91,6 +92,7 @@ namespace EditorHelpers
         bool HotkeyEnabled;
         VirtualKey Key;
         bool ChangesToApply;
+        bool IsDefault;
     }
 
     namespace HotkeyInterface
@@ -107,6 +109,9 @@ namespace EditorHelpers
     bool Setting_FunctionPresets_WindowVisible = true;
     [Setting category="Functions" name="Function Presets: Show Activate Buttons" hidden]
     bool Setting_FunctionPresets_ShowActivateButtons = true;
+
+    [Setting category="Functions" name="Function Presets: Default Preset Added" hidden]
+    bool Setting_FunctionPresets_DefaultPresetAdded = false;
 
     class FunctionPresets : EditorHelpers::EditorFunction
     {
@@ -154,6 +159,16 @@ namespace EditorHelpers
 
             Setting_FunctionPresets_WindowVisible = UI::Checkbox("Show Additional Window", Setting_FunctionPresets_WindowVisible);
             Setting_FunctionPresets_ShowActivateButtons = UI::Checkbox("Show Preset Buttons on Action tab", Setting_FunctionPresets_ShowActivateButtons);
+
+            EditorHelpers::NewMarker(sameLine: false);
+            UI::TextWrapped("The \"Plugin Defaults\" is a preset containing the default values of the Editor Helpers"
+                " plugin. If you delete this preset and then later change your mind and want it back then button below"
+                " can be used to recreate it.");
+            if (UI::Button("Recreate \"Plugin Defaults\" preset"))
+            {
+                Setting_FunctionPresets_DefaultPresetAdded = false;
+            }
+
             UI::EndDisabled();
             UI::PopID();
         }
@@ -312,6 +327,7 @@ namespace EditorHelpers
 
                             bool forceValueFlag = false;
                             bool forceValue = true;
+                            UI::BeginDisabled(m_presets[m_selectedPresetIndex].IsDefault);
                             if (UI::Button(" Select All")
                                 || (m_newPreset == int(presetIndex)))
                             {
@@ -325,6 +341,7 @@ namespace EditorHelpers
                                 forceValueFlag = true;
                                 forceValue = false;
                             }
+                            UI::EndDisabled(/* m_presets[m_selectedPresetIndex].IsDefault */);
 
                             if (UI::BeginChild("FunctionPresetsTabBarTableChildCol1"))
                             {
@@ -364,7 +381,7 @@ namespace EditorHelpers
                                 EditorHelpers::HelpMarker("Update this preset's data based on what is currently entered in the Editor Helpers window(s) and save");
                                 UI::SameLine();
                             }
-                            UI::BeginDisabled(!m_presets[m_selectedPresetIndex].ChangesToApply);
+                            UI::BeginDisabled(!m_presets[m_selectedPresetIndex].ChangesToApply || m_presets[m_selectedPresetIndex].IsDefault);
                             if (UI::Button("Update Preset Data"))
                             {
                                 for (uint index = 0; index < m_presets[m_selectedPresetIndex].FunctionDatas.Length; ++index)
@@ -378,7 +395,7 @@ namespace EditorHelpers
 
                                 m_signalSave = true;
                             }
-                            UI::EndDisabled(/*!m_presets[m_selectedPresetIndex].ChangesToApply*/);
+                            UI::EndDisabled(/*!m_presets[m_selectedPresetIndex].ChangesToApply || m_presets[m_selectedPresetIndex].IsDefault*/);
                             UI::SameLine();
                             if (settingToolTipsEnabled)
                             {
@@ -469,6 +486,12 @@ namespace EditorHelpers
                 m_presets[m_lastUpdatedPreset].UpdateChangesToApply(m_supportedFunctions);
                 m_lastUpdatedPreset += 1;
             }
+
+            if (!Setting_FunctionPresets_DefaultPresetAdded)
+            {
+                RecreateDefaultPreset(insertFirst: true, saveToFile: true);
+                Setting_FunctionPresets_DefaultPresetAdded = true;
+            }
         }
 
         array<EditorFunctionPreset@>@ GetPresets() { return m_presets; }
@@ -532,6 +555,7 @@ namespace EditorHelpers
 
         private void RenderPresetEnables(array<EditorFunction@>@ functions, EditorFunctionPreset@ preset, bool forceValue, bool forceValueFlag)
         {
+            UI::BeginDisabled(preset.IsDefault);
             for (uint index = 0; index < functions.Length; ++index)
             {
                 EditorFunctionPresetInterface@ ef = cast<EditorFunctionPresetInterface>(functions[index]);
@@ -547,6 +571,7 @@ namespace EditorHelpers
                     }
                 }
             }
+            UI::EndDisabled(/* preset.IsDefault */);
         }
 
         private void RenderPresetValues(array<EditorFunction@>@ functions, EditorFunctionPreset@ preset)
@@ -565,6 +590,37 @@ namespace EditorHelpers
             }
         }
 
+        private EditorFunctionPreset@ RecreateDefaultPreset(bool insertFirst = false, bool saveToFile = false)
+        {
+            // Only ever want one default preset at most
+            for (uint i = 0; i < m_presets.Length; ++i)
+            {
+                if (m_presets[i].IsDefault)
+                {
+                    m_presets.RemoveAt(i);
+                }
+            }
+
+            EditorFunctionPreset@ defaultPreset = EditorFunctionPreset();
+            defaultPreset.Name = "Plugin Defaults";
+            defaultPreset.IsDefault = true;
+            defaultPreset.Init(autoUpdate: false, functions: m_supportedFunctions);
+            if (insertFirst)
+            {
+                m_presets.InsertAt(0, defaultPreset);
+            }
+            else
+            {
+                m_presets.InsertLast(defaultPreset);
+            }
+
+            if (saveToFile)
+            {
+                m_signalSave = true;
+            }
+            return defaultPreset;
+        }
+
         private void LoadPresets()
         {
             Debug_EnterMethod("LoadPresets");
@@ -580,29 +636,38 @@ namespace EditorHelpers
             auto presets = json.Get("presets", Json::Array());
             for (uint presetIndex = 0; presetIndex < presets.Length; ++presetIndex)
             {
-                auto newPreset = EditorFunctionPreset();
-                newPreset.Name = presets[presetIndex].Get("name", Json::Value("Preset"));
-                newPreset.HotkeyEnabled = presets[presetIndex].Get("hotkey_enabled", Json::Value(false));
-                newPreset.Key = VirtualKey(int(presets[presetIndex].Get("hotkey", Json::Value(66))));
-                newPreset.Init(autoUpdate: false, functions: m_supportedFunctions);
-
-                auto functions = presets[presetIndex].Get("functions", Json::Object());
-                array<string>@ functionKeys = functions.GetKeys();
-                for (uint functionIndex = 0; functionIndex < functionKeys.Length; ++functionIndex)
+                if (bool(presets[presetIndex].Get("is_default", Json::Value(false))))
                 {
-                    string name = functionKeys[functionIndex];
-                    auto@ presetItem = newPreset.GetItem(name);
-                    if (presetItem !is null)
-                    {
-                        presetItem.FromJson(functions.Get(name, Json::Object()));
-                    }
-                    else
-                    {
-                        Debug("Unexpected section in json file. No matching function with name: " + name);
-                    }
+                    EditorFunctionPreset@ newPreset = RecreateDefaultPreset(insertFirst: false, saveToFile: false);
+                    newPreset.HotkeyEnabled = presets[presetIndex].Get("hotkey_enabled", Json::Value(false));
+                    newPreset.Key = VirtualKey(int(presets[presetIndex].Get("hotkey", Json::Value(66))));
                 }
+                else
+                {
+                    auto newPreset = EditorFunctionPreset();
+                    newPreset.Name = presets[presetIndex].Get("name", Json::Value("Preset"));
+                    newPreset.HotkeyEnabled = presets[presetIndex].Get("hotkey_enabled", Json::Value(false));
+                    newPreset.Key = VirtualKey(int(presets[presetIndex].Get("hotkey", Json::Value(66))));
+                    newPreset.Init(autoUpdate: false, functions: m_supportedFunctions);
 
-                m_presets.InsertLast(newPreset);
+                    auto functions = presets[presetIndex].Get("functions", Json::Object());
+                    array<string>@ functionKeys = functions.GetKeys();
+                    for (uint functionIndex = 0; functionIndex < functionKeys.Length; ++functionIndex)
+                    {
+                        string name = functionKeys[functionIndex];
+                        auto@ presetItem = newPreset.GetItem(name);
+                        if (presetItem !is null)
+                        {
+                            presetItem.FromJson(functions.Get(name, Json::Object()));
+                        }
+                        else
+                        {
+                            Debug("Unexpected section in json file. No matching function with name: " + name);
+                        }
+                    }
+
+                    m_presets.InsertLast(newPreset);
+                }
             }
 
             Debug_LeaveMethod();
@@ -626,6 +691,7 @@ namespace EditorHelpers
                 preset["functions"] = Json::Object();
                 preset["hotkey_enabled"] = m_presets[presetIndex].HotkeyEnabled;
                 preset["hotkey"] = int(m_presets[presetIndex].Key);
+                preset["is_default"] = m_presets[presetIndex].IsDefault;
 
                 for (uint presetItemIndex = 0; presetItemIndex < m_presets[presetIndex].FunctionDatas.Length; ++presetItemIndex)
                 {

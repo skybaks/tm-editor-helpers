@@ -2,8 +2,8 @@ namespace EditorHelpers
 {
     class CameraModesPreset : EditorFunctionPresetBase
     {
-        bool EnableCamera;
-        string Camera;
+        bool EnableCamera = true;
+        string Camera = "Orbital";
 
         CameraModesPreset()
         {

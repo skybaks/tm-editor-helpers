@@ -2,8 +2,8 @@ namespace EditorHelpers
 {
     class MoodChangerFunctionPreset : EditorFunctionPresetBase
     {
-        bool EnableTime;
-        string Time;
+        bool EnableTime = false;
+        string Time = "12:06:00";
 
         MoodChangerFunctionPreset()
         {

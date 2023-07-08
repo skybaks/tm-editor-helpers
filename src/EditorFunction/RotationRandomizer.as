@@ -3,23 +3,23 @@ namespace EditorHelpers
 {
     class RotationRandomizerPreset : EditorFunctionPresetBase
     {
-        bool EnableRandomizerMode;
-        string RandomizerMode;
-        bool EnableAxes;
-        bool AxisX;
-        bool AxisY;
-        bool AxisZ;
-        bool EnableAxisLimits;
-        float Y_LimitMin;
-        float Y_LimitMax;
-        float X_LimitMin;
-        float X_LimitMax;
-        float Z_LimitMin;
-        float Z_LimitMax;
-        bool EnableAxisSteps;
-        float StepY;
-        float StepX;
-        float StepZ;
+        bool EnableRandomizerMode = true;
+        string RandomizerMode = "OFF";
+        bool EnableAxes = true;
+        bool AxisX = false;
+        bool AxisY = false;
+        bool AxisZ = false;
+        bool EnableAxisLimits = true;
+        float Y_LimitMin = -180.0f;
+        float Y_LimitMax = 180.0f;
+        float X_LimitMin = -180.0f;
+        float X_LimitMax = 180.0f;
+        float Z_LimitMin = -180.0f;
+        float Z_LimitMax = 180.0f;
+        bool EnableAxisSteps = true;
+        float StepY = 15.0f;
+        float StepX = 10.0f;
+        float StepZ = 10.0f;
 
         RotationRandomizerPreset()
         {
