@@ -21,9 +21,12 @@ namespace EditorHelpers
 
     [Setting category="Functions" name="Quicksave: Enabled" hidden]
     bool Setting_Quicksave_Enabled = true;
-
     [Setting category="Functions" name="Quicksave: Create Copy" hidden]
     bool Setting_Quicksave_CreateCopy = false;
+    [Setting category="Functions" name="Quicksave: Display Copy Notification"]
+    bool Setting_Quicksave_DisplayCopyNotification = false;
+    [Setting category="Functions" name="Quicksave: Copy Notification Length"]
+    float Setting_Quicksave_CopyNotificationLength = 8.0f;
 
     class Quicksave : EditorHelpers::EditorFunction
     {
@@ -53,6 +56,14 @@ namespace EditorHelpers
                 "backup copy of the map everytime you save. The backup copy will be saved to a folder called "
                 "\"Maps/Quicksaves_EditorHelpers\"");
             Setting_Quicksave_CreateCopy = UI::Checkbox("Create a backup copy of the map upon saving", Setting_Quicksave_CreateCopy);
+
+            Setting_Quicksave_DisplayCopyNotification = UI::Checkbox("Display a notification when the backup is created", Setting_Quicksave_DisplayCopyNotification);
+
+            UI::Text("Length to display notification (seconds)");
+            UI::SameLine();
+            float notificationLength = UI::InputFloat("##Setting_Quicksave_CopyNotificationLength", Setting_Quicksave_CopyNotificationLength);
+            Setting_Quicksave_CopyNotificationLength = Math::Min(25.0, Math::Max(1.0, notificationLength));
+
             UI::EndDisabled();
             UI::EndGroup();
             if (UI::IsItemHovered())
@@ -184,6 +195,16 @@ namespace EditorHelpers
             IO::File of(CombinePath(autosaveFolderPath, targetFileName), IO::FileMode::Write);
             of.Write(data);
             of.Close();
+
+            if (Setting_Quicksave_DisplayCopyNotification)
+            {
+                int displayTime = int(Setting_Quicksave_CopyNotificationLength * 1000.0f);
+                UI::ShowNotification(
+                    "Editor Helpers: " + Name(),
+                    "Saved copy to \"" + targetFileName + "\"",
+                    displayTime
+                );
+            }
         }
 
         // C:\folder\path\file.txt -> file.txt
