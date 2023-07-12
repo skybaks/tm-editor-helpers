@@ -23,9 +23,9 @@ namespace EditorHelpers
     bool Setting_Quicksave_Enabled = true;
     [Setting category="Functions" name="Quicksave: Create Copy" hidden]
     bool Setting_Quicksave_CreateCopy = false;
-    [Setting category="Functions" name="Quicksave: Display Copy Notification"]
+    [Setting category="Functions" name="Quicksave: Display Copy Notification" hidden]
     bool Setting_Quicksave_DisplayCopyNotification = false;
-    [Setting category="Functions" name="Quicksave: Copy Notification Length"]
+    [Setting category="Functions" name="Quicksave: Copy Notification Length" hidden]
     float Setting_Quicksave_CopyNotificationLength = 8.0f;
 
     class Quicksave : EditorHelpers::EditorFunction
