@@ -160,7 +160,6 @@ namespace EditorHelpers
             Setting_FunctionPresets_WindowVisible = UI::Checkbox("Show Additional Window", Setting_FunctionPresets_WindowVisible);
             Setting_FunctionPresets_ShowActivateButtons = UI::Checkbox("Show Preset Buttons on Action tab", Setting_FunctionPresets_ShowActivateButtons);
 
-            EditorHelpers::NewMarker(sameLine: false);
             UI::TextWrapped("The \"Plugin Defaults\" is a preset containing the default values of the Editor Helpers"
                 " plugin. If you delete this preset and then later change your mind and want it back then button below"
                 " can be used to recreate it.");
@@ -282,7 +281,6 @@ namespace EditorHelpers
                 m_signalSave = true;
             }
 
-            EditorHelpers::NewMarker(sameLine: true);
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Shift active preset left and right in the tab order");
