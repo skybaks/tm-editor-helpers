@@ -121,7 +121,6 @@ namespace EditorHelpers
             Setting_RememberPlacementModes_MaintainSelectionMode = UI::Checkbox("Remember selection add/remove mode after using camera", Setting_RememberPlacementModes_MaintainSelectionMode);
             if (Compatibility::BlockColorEnabled())
             {
-                EditorHelpers::NewMarker(sameLine: false);
                 UI::TextWrapped("The following setting controls whether your selections on the \"Next block color\" and"
                     " the \"Force macroblock colors\" widgets will be persisted through editor sessions and game"
                     " restarts.");

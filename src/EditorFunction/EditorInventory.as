@@ -285,7 +285,6 @@ namespace EditorHelpers
                     }
 
                     UI::SameLine();
-                    EditorHelpers::NewMarker(sameLine: true);
                     if (settingToolTipsEnabled)
                     {
                         EditorHelpers::HelpMarker("Shift selected object up and down within the current active palette");
@@ -303,7 +302,6 @@ namespace EditorHelpers
                         SavePalettes();
                     }
 
-                    EditorHelpers::NewMarker(sameLine: false);
                     if (settingToolTipsEnabled)
                     {
                         EditorHelpers::HelpMarker("Shift active palette left and right in the tab order");

@@ -139,7 +139,6 @@ void RenderSettingsPage()
     UI::PushID("GeneralSettingsPage");
     UI::Markdown("# Editor Helpers");
     settingToolTipsEnabled = UI::Checkbox("Show tooltips in the editor helpers window", settingToolTipsEnabled);
-    EditorHelpers::NewMarker(sameLine: true);
     Setting_NewMarkerDisplayed = UI::Checkbox("Show tooltips next to new features", Setting_NewMarkerDisplayed);
     Setting_DebugLoggingEnabled = UI::Checkbox("Enable EXTREMELY VERBOSE logging to Openplanet.log", Setting_DebugLoggingEnabled);
     UI::TextWrapped("Listed in these settings are each individual function of the editor helpers plugin. You can"
