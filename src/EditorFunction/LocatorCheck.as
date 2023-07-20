@@ -133,12 +133,12 @@ namespace EditorHelpers
 
             if (m_deps.Length > 0)
             {
-                m_headerText = "Locators - Valid \\$0f0" + Icons::Kenney::Check;
+                m_headerText = "Locators - Valid \\$0f0" + Icons::Check;
                 for (uint i = 0; i < m_deps.Length; ++i)
                 {
                     if (!m_deps[i].ValidLocator())
                     {
-                        m_headerText = "Locators - Error(s) \\$f00" + Icons::Kenney::Times;
+                        m_headerText = "Locators - Error(s) \\$f00" + Icons::Times;
                         break;
                     }
                 }
@@ -152,6 +152,8 @@ namespace EditorHelpers
         void RenderInterface_MainWindow() override
         {
             if (!Enabled()) return;
+
+            EditorHelpers::NewMarker(sameLine: false);
 
             EditorHelpers::BeginHighlight("LocatorCheck::Display");
             if (settingToolTipsEnabled)
@@ -176,11 +178,11 @@ namespace EditorHelpers
                         UI::TableNextColumn();
                         if (m_deps[i].ValidLocator())
                         {
-                            UI::Text("\\$0f0" + Icons::Kenney::Check);
+                            UI::Text("\\$0f0" + Icons::Check);
                         }
                         else
                         {
-                            UI::Text("\\$f00" + Icons::Kenney::Times);
+                            UI::Text("\\$f00" + Icons::Times);
                             if (UI::IsItemHovered())
                             {
                                 UI::BeginTooltip();
