@@ -1,3 +1,8 @@
+## 6.3.0
+* Features
+  * Locator check now also tests that media URLs return a valid response
+
+
 ## 6.2.0
 * Features
   * Add new option to Quicksave function to create a backup copy of the map each time it is saved

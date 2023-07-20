@@ -16,9 +16,47 @@ namespace EditorHelpers
 
         bool ValidLocator()
         {
-            return Url != "" || IsGameResource;
+            return IsGameResource || (!IsGameResource && Url != "" && ValidUrl());
+        }
+
+        bool ValidUrl()
+        {
+            bool valid = false;
+            if (g_checkedUrls.Exists(Url))
+            {
+                valid = bool(g_checkedUrls[Url]);
+            }
+            return valid;
+        }
+
+        string LocatorTooltipErrorText()
+        {
+            string text = "";
+            if (!IsGameResource && Url == "")
+            {
+                text = "Locator is missing an external URL";
+            }
+            else if (!IsGameResource && Url != "" && !ValidUrl())
+            {
+                text = "Locator URL is incorrect or not working";
+            }
+            return text;
+        }
+
+        string UrlTooltipErrorText()
+        {
+            string text = "";
+            if (!ValidUrl())
+            {
+                text = "Locator URL does not return a valid response";
+            }
+            return text;
         }
     }
+
+    // Maintain a global collection of checked Urls. This should reduce the
+    // number of external requests we send.
+    dictionary g_checkedUrls = {};
 
     [Setting category="Functions" name="LocatorCheck: Enabled" hidden]
     bool Setting_LocatorCheck_Enabled = true;
@@ -28,6 +66,7 @@ namespace EditorHelpers
         private bool m_initGameResources = true;
         private string[] m_gameResources = {};
         private XmlHeaderDependency[] m_deps = {};
+        private string m_headerText = "Locators";
 
         string Name() override { return "Locator Check"; }
         bool Enabled() override { return Setting_LocatorCheck_Enabled; }
@@ -89,6 +128,24 @@ namespace EditorHelpers
                 {
                     m_deps[i].IsGameResource = m_gameResources.Find(m_deps[i].File) >= 0;
                 }
+                startnew(CoroutineFunc(Async_TestLocatorUrls));
+            }
+
+            if (m_deps.Length > 0)
+            {
+                m_headerText = "Locators - Valid \\$0f0" + Icons::Check;
+                for (uint i = 0; i < m_deps.Length; ++i)
+                {
+                    if (!m_deps[i].ValidLocator())
+                    {
+                        m_headerText = "Locators - Error(s) \\$f00" + Icons::Times;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                m_headerText = "Locators";
             }
         }
 
@@ -96,20 +153,23 @@ namespace EditorHelpers
         {
             if (!Enabled()) return;
 
+            EditorHelpers::NewMarker(sameLine: false);
+
             EditorHelpers::BeginHighlight("LocatorCheck::Display");
             if (settingToolTipsEnabled)
             {
                 EditorHelpers::HelpMarker("Check locators embedded in the map");
                 UI::SameLine();
             }
-            if (UI::TreeNode("Locators"))
+            if (UI::TreeNode(m_headerText + "###Locators"))
             {
-                if (m_deps.Length > 0 && UI::BeginTable("LocatorInfoTable", 4))
+                if (m_deps.Length > 0 && UI::BeginTable("LocatorInfoTable", 5))
                 {
-                    UI::TableSetupColumn("", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 15.0f);
+                    UI::TableSetupColumn("##LocValid", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 15.0f);
+                    UI::TableSetupColumn("##UrlValid", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 15.0f);
                     UI::TableSetupColumn("File");
                     UI::TableSetupColumn("Url");
-                    UI::TableSetupColumn("", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 30.0f);
+                    UI::TableSetupColumn("##UrlButton", UI::TableColumnFlags(UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoResize), 30.0f);
                     UI::TableHeadersRow();
 
                     for (uint i = 0; i < m_deps.Length; i++)
@@ -118,11 +178,36 @@ namespace EditorHelpers
                         UI::TableNextColumn();
                         if (m_deps[i].ValidLocator())
                         {
-                            UI::Text("\\$0f0");
+                            UI::Text("\\$0f0" + Icons::Check);
                         }
                         else
                         {
-                            UI::Text("\\$f00");
+                            UI::Text("\\$f00" + Icons::Times);
+                            if (UI::IsItemHovered())
+                            {
+                                UI::BeginTooltip();
+                                UI::Text(m_deps[i].LocatorTooltipErrorText());
+                                UI::EndTooltip();
+                            }
+                        }
+
+                        UI::TableNextColumn();
+                        if (m_deps[i].Url != "")
+                        {
+                            if (m_deps[i].ValidUrl())
+                            {
+                                UI::Text("\\$0f0" + Icons::Link);
+                            }
+                            else
+                            {
+                                UI::Text("\\$f00" + Icons::ChainBroken);
+                                if (UI::IsItemHovered())
+                                {
+                                    UI::BeginTooltip();
+                                    UI::Text(m_deps[i].UrlTooltipErrorText());
+                                    UI::EndTooltip();
+                                }
+                            }
                         }
 
                         UI::TableNextColumn();
@@ -284,6 +369,29 @@ namespace EditorHelpers
             catch
             {
                 error("Error while parsing GBX XML Header");
+            }
+        }
+
+        private bool Async_HttpHeadSuccess(const string&in url)
+        {
+            bool success = false;
+            Net::HttpRequest@ request = Net::HttpHead(url);
+            while (!request.Finished())
+            {
+                yield();
+            }
+            success = request.ResponseCode() < 400 && request.ResponseCode() >= 200 && request.Error().Length == 0;
+            return success;
+        }
+
+        private void Async_TestLocatorUrls()
+        {
+            for (uint i = 0; i < m_deps.Length; ++i)
+            {
+                if (m_deps[i].Url != "" && !g_checkedUrls.Exists(m_deps[i].Url))
+                {
+                    g_checkedUrls[m_deps[i].Url] = Async_HttpHeadSuccess(m_deps[i].Url);
+                }
             }
         }
     }
