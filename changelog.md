@@ -1,6 +1,6 @@
 ## 6.3.0
 * Features
-  * Locator check now also tests that media URLs return a valid response
+  * Locator check now also tests that media URLs return a valid HTTP response. Can configure in settings
 
 
 ## 6.2.0
