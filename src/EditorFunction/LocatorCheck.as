@@ -21,12 +21,15 @@ namespace EditorHelpers
 
         bool ValidUrl()
         {
-            bool valid = false;
-            if (g_checkedUrls.Exists(Url))
+            if (!Setting_LocatorCheck_UrlTestEnabled)
             {
-                valid = bool(g_checkedUrls[Url]);
+                return Url != "";
             }
-            return valid;
+            else if (g_checkedUrls.Exists(Url))
+            {
+                return bool(g_checkedUrls[Url]);
+            }
+            return false;
         }
 
         string LocatorTooltipErrorText()
@@ -60,6 +63,8 @@ namespace EditorHelpers
 
     [Setting category="Functions" name="LocatorCheck: Enabled" hidden]
     bool Setting_LocatorCheck_Enabled = true;
+    [Setting category="Functions" name="LocatorCheck: Url Test Enabled" hidden]
+    bool Setting_LocatorCheck_UrlTestEnabled = true;
 
     class LocatorCheck : EditorHelpers::EditorFunction
     {
@@ -83,6 +88,12 @@ namespace EditorHelpers
             UI::TextWrapped("This function will read the file header information from your map file each time you save"
                 " to check the linked media dependencies and the results will be displayed. This should let you know"
                 " if your media locators are working or not.");
+            EditorHelpers::NewMarker(sameLine: false);
+            UI::TextWrapped("If checked, the following setting will allow the plugin to perform a single HTTP HEAD"
+                " request to the locator URL to test the response. This should provide an indication that the media"
+                " hosting is still valid and accessible. If the setting is enabled while on a map simply resave or"
+                " reload the map to trigger an update.");
+            Setting_LocatorCheck_UrlTestEnabled = UI::Checkbox("Test locator URLs for a valid HTTP response", Setting_LocatorCheck_UrlTestEnabled);
             UI::EndDisabled();
             UI::EndGroup();
             if (UI::IsItemHovered())
@@ -128,7 +139,11 @@ namespace EditorHelpers
                 {
                     m_deps[i].IsGameResource = m_gameResources.Find(m_deps[i].File) >= 0;
                 }
-                startnew(CoroutineFunc(Async_TestLocatorUrls));
+
+                if (Setting_LocatorCheck_UrlTestEnabled)
+                {
+                    startnew(CoroutineFunc(Async_TestLocatorUrls));
+                }
             }
 
             if (m_deps.Length > 0)
@@ -194,19 +209,26 @@ namespace EditorHelpers
                         UI::TableNextColumn();
                         if (m_deps[i].Url != "")
                         {
-                            if (m_deps[i].ValidUrl())
+                            if (Setting_LocatorCheck_UrlTestEnabled)
                             {
-                                UI::Text("\\$0f0" + Icons::Link);
+                                if (m_deps[i].ValidUrl())
+                                {
+                                    UI::Text("\\$0f0" + Icons::Link);
+                                }
+                                else
+                                {
+                                    UI::Text("\\$f00" + Icons::ChainBroken);
+                                    if (UI::IsItemHovered())
+                                    {
+                                        UI::BeginTooltip();
+                                        UI::Text(m_deps[i].UrlTooltipErrorText());
+                                        UI::EndTooltip();
+                                    }
+                                }
                             }
                             else
                             {
-                                UI::Text("\\$f00" + Icons::ChainBroken);
-                                if (UI::IsItemHovered())
-                                {
-                                    UI::BeginTooltip();
-                                    UI::Text(m_deps[i].UrlTooltipErrorText());
-                                    UI::EndTooltip();
-                                }
+                                UI::Text("");
                             }
                         }
 
@@ -374,6 +396,8 @@ namespace EditorHelpers
 
         private bool Async_HttpHeadSuccess(const string&in url)
         {
+            Debug_EnterMethod("Async_HttpHeadSuccess");
+
             bool success = false;
             Net::HttpRequest@ request = Net::HttpHead(url);
             while (!request.Finished())
@@ -381,11 +405,16 @@ namespace EditorHelpers
                 yield();
             }
             success = request.ResponseCode() < 400 && request.ResponseCode() >= 200 && request.Error().Length == 0;
+
+            Debug(tostring(request.ResponseCode()) + " returned from " + tostring(url));
+            Debug_LeaveMethod();
             return success;
         }
 
         private void Async_TestLocatorUrls()
         {
+            Debug_EnterMethod("Async_TestLocatorUrls");
+
             for (uint i = 0; i < m_deps.Length; ++i)
             {
                 if (m_deps[i].Url != "" && !g_checkedUrls.Exists(m_deps[i].Url))
@@ -393,6 +422,8 @@ namespace EditorHelpers
                     g_checkedUrls[m_deps[i].Url] = Async_HttpHeadSuccess(m_deps[i].Url);
                 }
             }
+
+            Debug_LeaveMethod();
         }
     }
 }
