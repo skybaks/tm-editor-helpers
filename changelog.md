@@ -1,6 +1,6 @@
 ## 6.3.0
 * Features
-  * Locator check now also tests that media URLs return a valid HTTP response. Can configure in settings
+  * Locator check can now test that media URLs return a valid HTTP response. See plugin settings to enable
 
 
 ## 6.2.0

@@ -64,7 +64,7 @@ namespace EditorHelpers
     [Setting category="Functions" name="LocatorCheck: Enabled" hidden]
     bool Setting_LocatorCheck_Enabled = true;
     [Setting category="Functions" name="LocatorCheck: Url Test Enabled" hidden]
-    bool Setting_LocatorCheck_UrlTestEnabled = true;
+    bool Setting_LocatorCheck_UrlTestEnabled = false;
 
     class LocatorCheck : EditorHelpers::EditorFunction
     {
@@ -167,8 +167,6 @@ namespace EditorHelpers
         void RenderInterface_MainWindow() override
         {
             if (!Enabled()) return;
-
-            EditorHelpers::NewMarker(sameLine: false);
 
             EditorHelpers::BeginHighlight("LocatorCheck::Display");
             if (settingToolTipsEnabled)
