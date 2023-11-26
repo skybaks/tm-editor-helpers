@@ -88,7 +88,6 @@ namespace EditorHelpers
             UI::TextWrapped("This function will read the file header information from your map file each time you save"
                 " to check the linked media dependencies and the results will be displayed. This should let you know"
                 " if your media locators are working or not.");
-            EditorHelpers::NewMarker(sameLine: false);
             UI::TextWrapped("If checked, the following setting will allow the plugin to perform a single HTTP HEAD"
                 " request to the locator URL to test the response. This should provide an indication that the media"
                 " hosting is still valid and accessible. If the setting is enabled while on a map simply resave or"

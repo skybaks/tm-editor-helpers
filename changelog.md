@@ -1,3 +1,8 @@
+## 6.3.1
+* Bugfixes
+  * Fix inventory validation not passing due to recent block restructure
+
+
 ## 6.3.0
 * Features
   * Locator check can now test that media URLs return a valid HTTP response. See plugin settings to enable

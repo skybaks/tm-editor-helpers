@@ -578,13 +578,13 @@ namespace EditorHelpers
                 m_palettes.RemoveRange(0, m_palettes.Length);
             }
 
-            if (!VerifyInventoryItem(Editor.PluginMapType.Inventory.RootNodes[0], "RoadTech"))
+            if (!VerifyInventoryItem(Editor.PluginMapType.Inventory.RootNodes[0], "Roads"))
             {
                 Debug("Error verifying blocks integrity. aborting index");
                 Debug_LeaveMethod();
                 return;
             }
-            if (!VerifyInventoryItem(Editor.PluginMapType.Inventory.RootNodes[1], "RoadTech"))
+            if (!VerifyInventoryItem(Editor.PluginMapType.Inventory.RootNodes[1], "Roads"))
             {
                 Debug("Error verifying blocks integrity. aborting index");
                 Debug_LeaveMethod();
