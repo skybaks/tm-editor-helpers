@@ -206,6 +206,7 @@ namespace EditorHelpers
         float PivotX = 0.0f;
         float PivotY = 0.0f;
         float PivotZ = 0.0f;
+        bool ManualPivot = false;
 
         bool GhostMode = false;
         bool AutoRotation = false;
@@ -422,6 +423,7 @@ namespace EditorHelpers
                             currentItemPlacementDef.PivotY = Compatibility::GetPivotPositionsY(Editor.CurrentItemModel.DefaultPlacementParam_Head, pivotsLength - 1);
                             currentItemPlacementDef.PivotZ = Compatibility::GetPivotPositionsZ(Editor.CurrentItemModel.DefaultPlacementParam_Head, pivotsLength - 1);
                         }
+                        currentItemPlacementDef.ManualPivot = Editor.CurrentItemModel.DefaultPlacementParam_Head.SwitchPivotManually;
 
                         currentItemPlacementDef.GhostMode = Editor.CurrentItemModel.DefaultPlacementParam_Head.GhostMode;
                         currentItemPlacementDef.AutoRotation = Editor.CurrentItemModel.DefaultPlacementParam_Head.AutoRotation;
@@ -503,6 +505,7 @@ namespace EditorHelpers
                     Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, Setting_CustomItemPlacement_ItemPivot.x);
                     Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, Setting_CustomItemPlacement_ItemPivot.y);
                     Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, Setting_CustomItemPlacement_ItemPivot.z);
+                    currentItemModel.DefaultPlacementParam_Head.SwitchPivotManually = true;
                 }
                 else if (!Setting_CustomItemPlacement_ApplyPivot && lastApplyPivot)
                 {
@@ -579,6 +582,7 @@ namespace EditorHelpers
                         Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, pivotsLength - 1, itemPlacementDef.PivotY);
                         Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, pivotsLength - 1, itemPlacementDef.PivotZ);
                     }
+                    currentItemModel.DefaultPlacementParam_Head.SwitchPivotManually = itemPlacementDef.ManualPivot;
 
                     if (!Setting_CustomItemPlacement_ApplyPivot)
                     {
