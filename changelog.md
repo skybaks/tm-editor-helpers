@@ -1,3 +1,8 @@
+## 6.4.0
+* Features
+  * Force "manually switch pivot" flag when overriding item pivot. Use "Q" to cycle through item pivots.
+
+
 ## 6.3.1
 * Bugfixes
   * Fix inventory validation not passing due to recent block restructure
