@@ -504,6 +504,18 @@ namespace EditorHelpers
                 m_parallelLoadYieldTime = Time::Now;
             }
 
+            // Since yield will skip us to the next frame we must be aware that
+            // the user could choose to exit the editor in the middle of this
+            // process! If that does happen we should break out and exit
+            if (Editor is null
+                || Editor.PluginMapType is null
+                || Editor.PluginMapType.Inventory is null)
+            {
+                Debug("Null reference! aborting index");
+                Debug_LeaveMethod();
+                return;
+            }
+
             CGameCtnArticleNodeDirectory@ currentDir = cast<CGameCtnArticleNodeDirectory>(current);
             CGameCtnArticleNodeDirectory@ sisterDir = cast<CGameCtnArticleNodeDirectory>(sister);
             if (currentDir !is null)
@@ -576,6 +588,15 @@ namespace EditorHelpers
             {
                 Debug("Clearing palettes");
                 m_palettes.RemoveRange(0, m_palettes.Length);
+            }
+
+            if (Editor is null
+                || Editor.PluginMapType is null
+                || Editor.PluginMapType.Inventory is null)
+            {
+                Debug("Null reference! aborting index");
+                Debug_LeaveMethod();
+                return;
             }
 
             if (!VerifyInventoryItem(Editor.PluginMapType.Inventory.RootNodes[0], "Roads"))
