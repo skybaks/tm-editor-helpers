@@ -1,3 +1,8 @@
+## 6.4.1
+* Bugfixes
+  * Fix an issue where leaving the editor too quickly would result in a script crash or even a game crash in some cases.
+
+
 ## 6.4.0
 * Features
   * Force "manually switch pivot" flag when overriding item pivot. Use "Q" to cycle through item pivots.
