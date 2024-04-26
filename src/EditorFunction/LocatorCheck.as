@@ -414,9 +414,10 @@ namespace EditorHelpers
 
             for (uint i = 0; i < m_deps.Length; ++i)
             {
-                if (m_deps[i].Url != "" && !g_checkedUrls.Exists(m_deps[i].Url))
+                string checkUrl = m_deps[i].Url;
+                if (checkUrl != "" && !g_checkedUrls.Exists(checkUrl))
                 {
-                    g_checkedUrls[m_deps[i].Url] = Async_HttpHeadSuccess(m_deps[i].Url);
+                    g_checkedUrls[checkUrl] = Async_HttpHeadSuccess(checkUrl);
                 }
             }
 
