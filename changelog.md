@@ -1,3 +1,9 @@
+## 6.4.2
+* Bugfixes
+  * Fix a script exception in the locator check when leaving the editor quickly after entering
+  * Fix a game crash in inventory indexing when leaving the editor quickly after entering
+
+
 ## 6.4.1
 * Bugfixes
   * Fix an issue where leaving the editor too quickly would result in a script crash or even a game crash in some cases.
