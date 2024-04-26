@@ -511,9 +511,8 @@ namespace EditorHelpers
                 || Editor.PluginMapType is null
                 || Editor.PluginMapType.Inventory is null)
             {
-                Debug("Null reference! aborting index");
-                Debug_LeaveMethod();
-                return;
+                Debug("Null reference! aborting index after yield");
+                Debug_LeaveMethod(); return;
             }
 
             CGameCtnArticleNodeDirectory@ currentDir = cast<CGameCtnArticleNodeDirectory>(current);
@@ -538,6 +537,19 @@ namespace EditorHelpers
                     if (newDir.IsDirectory)
                     {
                         RecursiveAddInventoryArticle(newDir, name + "/" + newDir.NodeName, placeMode, newSisterDir);
+                        Debug("Returned from RecursiveAddInventoryArticle");
+
+                        // If we are aborting due to the leaving the editor
+                        // then we need to get out of this loop ASAP because
+                        // all the references to inventory objects are
+                        // potential crashes
+                        if (Editor is null
+                            || Editor.PluginMapType is null
+                            || Editor.PluginMapType.Inventory is null)
+                        {
+                            Debug("Null reference! aborting index after returned from RecursiveAddInventoryArticle");
+                            Debug_LeaveMethod(); return;
+                        }
                     }
                     else
                     {
@@ -629,10 +641,36 @@ namespace EditorHelpers
             // for ghost block mode and free block mode. They are the same
             // blocks but the articles have different pointers.
             m_parallelLoadYieldTime = Time::Now;
+            if (Editor is null
+                || Editor.PluginMapType is null
+                || Editor.PluginMapType.Inventory is null
+                || Editor.PluginMapType.Inventory.RootNodes.Length < 2)
+            {
+                Debug("Editor is null. Exiting index");
+                Debug_LeaveMethod(); return;
+            }
             RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[0], "Block", CGameEditorPluginMap::EPlaceMode::Block, Editor.PluginMapType.Inventory.RootNodes[1]);
+
             Debug("Loading inventory items");
+            if (Editor is null
+                || Editor.PluginMapType is null
+                || Editor.PluginMapType.Inventory is null
+                || Editor.PluginMapType.Inventory.RootNodes.Length < 4)
+            {
+                Debug("Editor is null. Exiting index");
+                Debug_LeaveMethod(); return;
+            }
             RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[3], "Item", CGameEditorPluginMap::EPlaceMode::Item, null);
+
             Debug("Loading inventory macroblocks");
+            if (Editor is null
+                || Editor.PluginMapType is null
+                || Editor.PluginMapType.Inventory is null
+                || Editor.PluginMapType.Inventory.RootNodes.Length < 5)
+            {
+                Debug("Editor is null. Exiting index");
+                Debug_LeaveMethod(); return;
+            }
             RecursiveAddInventoryArticle(Editor.PluginMapType.Inventory.RootNodes[4], "Macroblock", CGameEditorPluginMap::EPlaceMode::Macroblock, null);
 
             Debug("Inventory total length: " + tostring(m_articles.Length));
