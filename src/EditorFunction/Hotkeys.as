@@ -430,6 +430,27 @@ namespace EditorHelpers
             Debug_LeaveMethod();
         }
 
+        void RenderInterface_Debug() override
+        {
+            UI::Text("Hotkeys {");
+
+            string keys = "";
+            for (uint i = 0; i < m_keysDown.Length; ++i)
+            {
+                keys += tostring(m_keysDown[i]);
+                if (i + 1 < m_keysDown.Length)
+                {
+                    keys += ", ";
+                }
+            }
+            UI::Text("  m_keysDown = {" + keys + "}");
+            UI::Text("  m_mapElemColorPrev = " + tostring(m_mapElemColorPrev));
+            UI::Text("  m_mapElemColorPrevPrev = " + tostring(m_mapElemColorPrevPrev));
+            UI::Text("  m_rebindKeyName = " + tostring(m_rebindKeyName));
+
+            UI::Text("}");
+        }
+
         private void OnKeyPress_AirBlockModeHotkey(const VirtualKey&in key)
         {
             Debug_EnterMethod("OnKeyPress_AirBlockModeHotkey");

@@ -107,6 +107,17 @@ void RenderInterface()
         RenderMainWindowSubsection("Build", g_functionsBuild);
         RenderMainWindowSubsection("Info", g_functionsInfo);
 
+        if (UI::CollapsingHeader("Debug"))
+        {
+            for (uint index = 0; index < g_functions.Length; index++)
+            {
+                if (g_functions[index].Enabled())
+                {
+                    g_functions[index].RenderInterface_Debug();
+                }
+            }
+        }
+
         UI::End();
     }
 
