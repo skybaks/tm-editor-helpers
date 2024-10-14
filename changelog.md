@@ -1,3 +1,10 @@
+## 6.5.0
+* Features
+  * Add debug window for looking at some plugin internals (only useful for debugging issues)
+* Bugfixes
+  * Fix problem with plugin hotkeys after pressing keys that switch window focus
+
+
 ## 6.4.2
 * Bugfixes
   * Fix a script exception in the locator check when leaving the editor quickly after entering

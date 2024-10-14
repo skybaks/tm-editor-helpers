@@ -312,6 +312,12 @@ namespace EditorHelpers
                 Debug("NEW COLOR! Prev color is: " + tostring(m_mapElemColorPrev) + " PrevPrev color is: " + tostring(m_mapElemColorPrevPrev));
             }
 
+            // Remove tracked keys if we lose window focus
+            if (!GetApp().InputPort.IsFocused && m_keysDown.Length > 0)
+            {
+                m_keysDown.RemoveRange(0, m_keysDown.Length);
+            }
+
             Debug_LeaveMethod();
         }
 
