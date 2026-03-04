@@ -203,9 +203,7 @@ namespace EditorHelpers
     {
         bool Initialized = false;
         bool HasPivotPosition = false;
-        float PivotX = 0.0f;
-        float PivotY = 0.0f;
-        float PivotZ = 0.0f;
+        array<vec3> Pivots = {};
         bool ManualPivot = false;
 
         bool GhostMode = false;
@@ -417,11 +415,13 @@ namespace EditorHelpers
                         currentItemPlacementDef.Initialized = true;
                         uint pivotsLength = Compatibility::GetPivotPositionsLength(Editor.CurrentItemModel.DefaultPlacementParam_Head);
                         currentItemPlacementDef.HasPivotPosition = pivotsLength > 0;
-                        if (pivotsLength > 0)
+                        for (uint i = 0; i < pivotsLength; ++i)
                         {
-                            currentItemPlacementDef.PivotX = Compatibility::GetPivotPositionsX(Editor.CurrentItemModel.DefaultPlacementParam_Head, pivotsLength - 1);
-                            currentItemPlacementDef.PivotY = Compatibility::GetPivotPositionsY(Editor.CurrentItemModel.DefaultPlacementParam_Head, pivotsLength - 1);
-                            currentItemPlacementDef.PivotZ = Compatibility::GetPivotPositionsZ(Editor.CurrentItemModel.DefaultPlacementParam_Head, pivotsLength - 1);
+                            float x = Compatibility::GetPivotPositionsX(Editor.CurrentItemModel.DefaultPlacementParam_Head, i);
+                            float y = Compatibility::GetPivotPositionsY(Editor.CurrentItemModel.DefaultPlacementParam_Head, i);
+                            float z = Compatibility::GetPivotPositionsZ(Editor.CurrentItemModel.DefaultPlacementParam_Head, i);
+                            Debug("Pivot[" + tostring(i) + "] = vec3(" + tostring(x) + "," + tostring(y) + "," + tostring(z) + ")");
+                            currentItemPlacementDef.Pivots.InsertLast(vec3(x, y, z));
                         }
                         currentItemPlacementDef.ManualPivot = Editor.CurrentItemModel.DefaultPlacementParam_Head.SwitchPivotManually;
 
@@ -443,10 +443,21 @@ namespace EditorHelpers
 
                     if (!Setting_CustomItemPlacement_ApplyPivot)
                     {
-                        Debug("Putting pivot back to item defaults due to setting not enabled");
-                        Setting_CustomItemPlacement_ItemPivot.x = currentItemPlacementDef.PivotX;
-                        Setting_CustomItemPlacement_ItemPivot.y = currentItemPlacementDef.PivotY;
-                        Setting_CustomItemPlacement_ItemPivot.z = currentItemPlacementDef.PivotZ;
+                        Debug("Putting pivot back to item default due to setting not enabled");
+                        float x = 0.0f;
+                        float y = 0.0f;
+                        float z = 0.0f;
+                        if (currentItemPlacementDef.Pivots.Length > 0)
+                        {
+                            Debug("Using the first element in the pivot positions array");
+                            x = currentItemPlacementDef.Pivots[0].x;
+                            y = currentItemPlacementDef.Pivots[0].y;
+                            z = currentItemPlacementDef.Pivots[0].z;
+                        }
+
+                        Setting_CustomItemPlacement_ItemPivot.x = x;
+                        Setting_CustomItemPlacement_ItemPivot.y = y;
+                        Setting_CustomItemPlacement_ItemPivot.z = z;
                     }
                 }
 
@@ -501,10 +512,13 @@ namespace EditorHelpers
 
                 if (Setting_CustomItemPlacement_ApplyPivot)
                 {
-                    uint lastPivotIndex = Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head)-1;
-                    Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, Setting_CustomItemPlacement_ItemPivot.x);
-                    Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, Setting_CustomItemPlacement_ItemPivot.y);
-                    Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, lastPivotIndex, Setting_CustomItemPlacement_ItemPivot.z);
+                    uint pivotsLength = Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head);
+                    for (uint i = 0; i < pivotsLength; ++i)
+                    {
+                        Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, i, Setting_CustomItemPlacement_ItemPivot.x);
+                        Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, i, Setting_CustomItemPlacement_ItemPivot.y);
+                        Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, i, Setting_CustomItemPlacement_ItemPivot.z);
+                    }
                     currentItemModel.DefaultPlacementParam_Head.SwitchPivotManually = true;
                 }
                 else if (!Setting_CustomItemPlacement_ApplyPivot && lastApplyPivot)
@@ -576,21 +590,32 @@ namespace EditorHelpers
 
                     uint pivotsLength = Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head);
                     Debug("pivotsLength = " + tostring(pivotsLength));
-                    if (pivotsLength > 0)
+                    for (uint i = 0; (i < itemPlacementDef.Pivots.Length) && (i < pivotsLength); ++i)
                     {
-                        Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, pivotsLength - 1, itemPlacementDef.PivotX);
-                        Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, pivotsLength - 1, itemPlacementDef.PivotY);
-                        Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, pivotsLength - 1, itemPlacementDef.PivotZ);
+                        Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, i, itemPlacementDef.Pivots[i].x);
+                        Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, i, itemPlacementDef.Pivots[i].y);
+                        Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, i, itemPlacementDef.Pivots[i].z);
+                        Debug("Resetting Pivots[" + tostring(i) + "] -> " + tostring(itemPlacementDef.Pivots[i]));
                     }
                     currentItemModel.DefaultPlacementParam_Head.SwitchPivotManually = itemPlacementDef.ManualPivot;
 
                     if (!Setting_CustomItemPlacement_ApplyPivot)
                     {
                         Debug("Putting pivot back to item default due to setting not enabled");
+                        float x = 0.0f;
+                        float y = 0.0f;
+                        float z = 0.0f;
+                        if (itemPlacementDef.Pivots.Length > 0)
+                        {
+                            Debug("Using the first element in the pivot positions array");
+                            x = itemPlacementDef.Pivots[0].x;
+                            y = itemPlacementDef.Pivots[0].y;
+                            z = itemPlacementDef.Pivots[0].z;
+                        }
 
-                        Setting_CustomItemPlacement_ItemPivot.x = itemPlacementDef.PivotX;
-                        Setting_CustomItemPlacement_ItemPivot.y = itemPlacementDef.PivotY;
-                        Setting_CustomItemPlacement_ItemPivot.z = itemPlacementDef.PivotZ;
+                        Setting_CustomItemPlacement_ItemPivot.x = x;
+                        Setting_CustomItemPlacement_ItemPivot.y = y;
+                        Setting_CustomItemPlacement_ItemPivot.z = z;
                     }
                 }
             }
