@@ -918,6 +918,12 @@ namespace EditorHelpers
                 IO::Move(IO::FromStorageFolder("EditorFunction_CustomPalette.json"), IO::FromStorageFolder("EditorFunction_EditorInventory.json"));
             }
 
+            if (!IO::FileExists(IO::FromStorageFolder("EditorFunction_EditorInventory.json")))
+            {
+                Debug("File EditorFunction_EditorInventory.json doesn't exist. No palettes to be loaded.");
+                Debug_LeaveMethod(); return;
+            }
+
             auto json = Json::FromFile(IO::FromStorageFolder("EditorFunction_EditorInventory.json"));
 
             auto palettes = json.Get("palettes", Json::Array());

@@ -1,3 +1,8 @@
+## 6.5.0
+* Bugfixes
+  * Update for Openplanet 1.29.12+
+  * Remove warning message when EditorFunction_EditorInventory.json doesn't exist
+
 ## 6.4.2
 * Bugfixes
   * Fix a script exception in the locator check when leaving the editor quickly after entering
