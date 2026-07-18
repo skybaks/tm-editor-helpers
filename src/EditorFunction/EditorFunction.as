@@ -38,7 +38,7 @@ namespace EditorHelpers
         {
             if (Setting_DebugLoggingEnabled)
             {
-                trace(Name() + " :" + string::Join(m_debugMethodStack, ":") + ": " + message);
+                trace(Name() + " :" + Text::Join(m_debugMethodStack, ":") + ": " + message);
             }
         }
     }

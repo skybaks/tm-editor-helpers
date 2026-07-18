@@ -226,7 +226,7 @@ namespace EditorHelpers
             {
                 pathParts.RemoveAt(pathParts.Length - 1);
             }
-            return string::Join(pathParts, "/");
+            return Text::Join(pathParts, "/");
         }
 
         // file.txt -> file
@@ -242,7 +242,7 @@ namespace EditorHelpers
             {
                 nameParts.RemoveAt(nameParts.Length - 1);
             }
-            return string::Join(nameParts, ".");
+            return Text::Join(nameParts, ".");
         }
 
         private string CombinePath(const string&in path1, const string&in path2)
