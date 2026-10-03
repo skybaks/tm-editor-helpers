@@ -51,6 +51,21 @@ namespace EditorHelpers
 #endif
             return elemColor;
         }
+
+        bool EditorIsNull()
+        {
+            return cast<CGameCtnEditorFree>(GetApp().Editor) is null;
+        }
+
+        bool IsMapTesting()
+        {
+#if TMNEXT
+        return GetApp().CurrentPlayground !is null;
+#else
+        CGameCtnEditorFree@ editor = cast<CGameCtnEditorFree>(GetApp().Editor);
+        return editor !is null && editor.PluginMapType !is null && editor.PluginMapType.IsSwitchedToPlayground;
+#endif
+        }
     }
 
     [Setting category="Functions" name="Hotkeys: Hotkeys Function Enabled" hidden]
