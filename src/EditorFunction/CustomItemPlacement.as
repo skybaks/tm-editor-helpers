@@ -605,7 +605,7 @@ namespace EditorHelpers
                         Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, i, revertVals.x);
                         Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, i, revertVals.y);
                         Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, i, revertVals.z);
-                        Debug("Resetting Pivots[" + tostring(i) + "] -> " + tostring(itemPlacementDef.Pivots[i]));
+                        Debug("Resetting Pivots[" + tostring(i) + "] -> " + tostring(revertVals));
                     }
                     currentItemModel.DefaultPlacementParam_Head.SwitchPivotManually = itemPlacementDef.ManualPivot;
 
