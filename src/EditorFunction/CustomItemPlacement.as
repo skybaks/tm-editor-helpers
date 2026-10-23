@@ -590,11 +590,21 @@ namespace EditorHelpers
 
                     uint pivotsLength = Compatibility::GetPivotPositionsLength(currentItemModel.DefaultPlacementParam_Head);
                     Debug("pivotsLength = " + tostring(pivotsLength));
-                    for (uint i = 0; (i < itemPlacementDef.Pivots.Length) && (i < pivotsLength); ++i)
+                    Debug("itemPlacementDef.Pivots.Length = " + tostring(itemPlacementDef.Pivots.Length));
+                    for (uint i = 0; i < pivotsLength; ++i)
                     {
-                        Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, i, itemPlacementDef.Pivots[i].x);
-                        Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, i, itemPlacementDef.Pivots[i].y);
-                        Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, i, itemPlacementDef.Pivots[i].z);
+                        vec3 revertVals = vec3(0, 0, 0);
+                        // If we had to add a pivot for the override then there wont be a default value saved. In that
+                        // case it should be set back to <0, 0, 0>
+                        if (i < itemPlacementDef.Pivots.Length)
+                        {
+                            revertVals.x = itemPlacementDef.Pivots[i].x;
+                            revertVals.y = itemPlacementDef.Pivots[i].y;
+                            revertVals.z = itemPlacementDef.Pivots[i].z;
+                        }
+                        Compatibility::SetPivotPositionsX(currentItemModel.DefaultPlacementParam_Head, i, revertVals.x);
+                        Compatibility::SetPivotPositionsY(currentItemModel.DefaultPlacementParam_Head, i, revertVals.y);
+                        Compatibility::SetPivotPositionsZ(currentItemModel.DefaultPlacementParam_Head, i, revertVals.z);
                         Debug("Resetting Pivots[" + tostring(i) + "] -> " + tostring(itemPlacementDef.Pivots[i]));
                     }
                     currentItemModel.DefaultPlacementParam_Head.SwitchPivotManually = itemPlacementDef.ManualPivot;
