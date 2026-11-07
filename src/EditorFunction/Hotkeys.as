@@ -51,21 +51,6 @@ namespace EditorHelpers
 #endif
             return elemColor;
         }
-
-        bool EditorIsNull()
-        {
-            return cast<CGameCtnEditorFree>(GetApp().Editor) is null;
-        }
-
-        bool IsMapTesting()
-        {
-#if TMNEXT
-        return GetApp().CurrentPlayground !is null;
-#else
-        CGameCtnEditorFree@ editor = cast<CGameCtnEditorFree>(GetApp().Editor);
-        return editor !is null && editor.PluginMapType !is null && editor.PluginMapType.IsSwitchedToPlayground;
-#endif
-        }
     }
 
     [Setting category="Functions" name="Hotkeys: Hotkeys Function Enabled" hidden]
@@ -416,9 +401,9 @@ namespace EditorHelpers
                 return;
             }
 
-            if (!Enabled() || Compatibility::EditorIsNull() || Compatibility::IsMapTesting())
+            if (!Enabled() || ::Compatibility::EditorIsNull() || ::Compatibility::IsMapTesting())
             {
-                Debug("!Enabled():" + tostring(!Enabled()) + " Compatibility::EditorIsNull():" + tostring(Compatibility::EditorIsNull()) + " Compatibility::IsMapTesting():" + tostring(Compatibility::IsMapTesting()));
+                Debug("!Enabled():" + tostring(!Enabled()) + " Compatibility::EditorIsNull():" + tostring(::Compatibility::EditorIsNull()) + " Compatibility::IsMapTesting():" + tostring(::Compatibility::IsMapTesting()));
                 Debug_LeaveMethod();
                 return;
             }
