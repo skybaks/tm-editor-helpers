@@ -416,9 +416,9 @@ namespace EditorHelpers
                 return;
             }
 
-            if (!Enabled() || Compatibility::EditorIsNull() || Compatibility::IsMapTesting())
+            if (!Enabled() || EditorHelpers::Compatibility::EditorIsNull() || EditorHelpers::Compatibility::IsMapTesting())
             {
-                Debug("!Enabled():" + tostring(!Enabled()) + " Compatibility::EditorIsNull():" + tostring(Compatibility::EditorIsNull()) + " Compatibility::IsMapTesting():" + tostring(Compatibility::IsMapTesting()));
+                Debug("!Enabled():" + tostring(!Enabled()) + " Compatibility::EditorIsNull():" + tostring(EditorHelpers::Compatibility::EditorIsNull()) + " Compatibility::IsMapTesting():" + tostring(EditorHelpers::Compatibility::IsMapTesting()));
                 Debug_LeaveMethod();
                 return;
             }
