@@ -1,9 +1,11 @@
 ## 6.5.0
 * Features
   * Apply Custom Pivot for items now applies to all the pivot positions in the item. Previously, it only overrode a single pivot position
+  * Remove warning message when EditorFunction_EditorInventory.json doesn't exist (@Glocom)
 * Bugfixes
-  * Update for Openplanet 1.29.12+
-  * Remove warning message when EditorFunction_EditorInventory.json doesn't exist
+  * Fix compilation error with Openplanet 1.29.15 (@Fort)
+  * Refactor for deprecated functions in Openplanet 1.29.12+ (@Glocom)
+
 
 ## 6.4.2
 * Bugfixes
